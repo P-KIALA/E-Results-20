@@ -210,7 +210,7 @@ export const sendResults: RequestHandler = async (req, res) => {
 
 export const getSendLogs: RequestHandler = async (req, res) => {
   try {
-    const { doctor_id, status, site_id, limit = 50, offset = 0 } = req.query;
+    const { doctor_id, status, site_id, startDate, endDate, limit = 50, offset = 0 } = req.query;
     const userId = (req as any).userId;
 
     let query = supabase
@@ -239,6 +239,18 @@ export const getSendLogs: RequestHandler = async (req, res) => {
       if (site) {
         query = query.eq("patient_site", site.name);
       }
+    }
+
+    // Filter by date range
+    if (startDate) {
+      query = query.gte("created_at", startDate as string);
+    }
+
+    if (endDate) {
+      // Add one day to endDate to include the entire end date
+      const endDateObj = new Date(endDate as string);
+      endDateObj.setDate(endDateObj.getDate() + 1);
+      query = query.lt("created_at", endDateObj.toISOString());
     }
 
     const { data, error, count } = await query;
