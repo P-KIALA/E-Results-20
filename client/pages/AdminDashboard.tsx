@@ -17,7 +17,9 @@ interface UserItem {
   email: string;
   role: "admin" | "user";
   permissions: string[];
+  site?: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 const AVAILABLE_PERMISSIONS = [
@@ -146,7 +148,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleEditUser = (u: UserItem & { site?: string | null }) => {
+  const handleEditUser = (u: UserItem) => {
     setEditingId(u.id);
     setFormData({
       email: u.email,
@@ -368,8 +370,8 @@ export default function AdminDashboard() {
                         Rôle:{" "}
                         {u.role === "admin" ? "Administrateur" : "Utilisateur"}
                       </p>
-                      { (u as any).site && (
-                        <p className="text-sm text-muted-foreground">Site: {(u as any).site}</p>
+                      {u.site && (
+                        <p className="text-sm text-muted-foreground">Site: {u.site}</p>
                       )}
                       {u.permissions && u.permissions.length > 0 && (
                         <div className="mt-2">
