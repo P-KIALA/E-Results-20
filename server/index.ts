@@ -47,6 +47,11 @@ export function createServer() {
   app.put("/api/users/:id", requireAuth, updateUser);
   app.delete("/api/users/:id", requireAuth, deleteUser);
 
+  // Sites management
+  app.get("/api/sites", requireAuth, getSites);
+  app.post("/api/sites", requireAuth, createSite);
+  app.get("/api/users/:id/accessible-sites", requireAuth, getUserAccessibleSites);
+
   // Example API routes
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "ping";
