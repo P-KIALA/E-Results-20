@@ -10,14 +10,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { User, Trash2, Plus, Users } from "lucide-react";
+import { User, Trash2, Plus, Users, Edit2, X } from "lucide-react";
 
 interface UserItem {
   id: string;
   email: string;
   role: "admin" | "user";
+  permissions: string[];
   created_at: string;
 }
+
+const AVAILABLE_PERMISSIONS = [
+  { id: "manage_doctors", label: "Ajouter des médecins" },
+  { id: "view_reports", label: "Afficher les rapports" },
+  { id: "manage_users", label: "Gérer les utilisateurs" },
+];
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -25,10 +32,12 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     role: "user" as const,
+    permissions: [] as string[],
   });
   const [message, setMessage] = useState<{
     type: "success" | "error";
@@ -71,38 +80,76 @@ export default function AdminDashboard() {
     e.preventDefault();
     setMessage(null);
 
-    if (!formData.email || !formData.password) {
+    if (!formData.email || (!editingId && !formData.password)) {
       setMessage({ type: "error", text: "Email et mot de passe requis" });
       return;
     }
 
     try {
       const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        }),
-      });
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
+      if (editingId) {
+        // Update user
+        const res = await fetch(`/api/users/${editingId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            role: formData.role,
+            permissions: formData.permissions,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error);
+        }
+
+        setMessage({ type: "success", text: "Utilisateur modifié" });
+      } else {
+        // Create new user
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            role: formData.role,
+            permissions: formData.permissions,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error);
+        }
+
+        setMessage({ type: "success", text: "Utilisateur créé" });
       }
 
-      setMessage({ type: "success", text: "Utilisateur créé" });
-      setFormData({ email: "", password: "", role: "user" });
+      setFormData({ email: "", password: "", role: "user", permissions: [] });
+      setEditingId(null);
       setShowForm(false);
       await fetchUsers();
     } catch (error) {
       setMessage({ type: "error", text: String(error) });
     }
+  };
+
+  const handleEditUser = (u: UserItem) => {
+    setEditingId(u.id);
+    setFormData({
+      email: u.email,
+      password: "",
+      role: u.role,
+      permissions: u.permissions || [],
+    });
+    setShowForm(true);
   };
 
   const handleDeleteUser = async (id: string) => {
@@ -124,6 +171,25 @@ export default function AdminDashboard() {
     } catch (error) {
       setMessage({ type: "error", text: "Erreur" });
     }
+  };
+
+  const togglePermission = (permission: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      permissions: prev.permissions.includes(permission)
+        ? prev.permissions.filter((p) => p !== permission)
+        : [...prev.permissions, permission],
+    }));
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingId(null);
+    setFormData({ email: "", password: "", role: "user", permissions: [] });
+  };
+
+  const getPermissionLabel = (permissionId: string) => {
+    return AVAILABLE_PERMISSIONS.find((p) => p.id === permissionId)?.label || permissionId;
   };
 
   return (
@@ -159,8 +225,15 @@ export default function AdminDashboard() {
 
       {showForm && (
         <Card>
-          <CardHeader>
-            <CardTitle>Créer un nouvel utilisateur</CardTitle>
+          <CardHeader className="flex flex-row justify-between items-start">
+            <div>
+              <CardTitle>
+                {editingId ? "Modifier l'utilisateur" : "Créer un nouvel utilisateur"}
+              </CardTitle>
+            </div>
+            <button onClick={closeForm} className="text-muted-foreground hover:text-foreground">
+              <X size={20} />
+            </button>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCreateUser} className="space-y-4">
@@ -173,25 +246,28 @@ export default function AdminDashboard() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
+                  disabled={!!editingId}
                   required
                 />
               </div>
 
-              <div>
-                <label className="text-sm font-medium">Mot de passe</label>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  required
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Min 6 caractères
-                </p>
-              </div>
+              {!editingId && (
+                <div>
+                  <label className="text-sm font-medium">Mot de passe</label>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Min 6 caractères
+                  </p>
+                </div>
+              )}
 
               <div>
                 <label className="text-sm font-medium">Rôle</label>
@@ -207,12 +283,36 @@ export default function AdminDashboard() {
                 </select>
               </div>
 
+              <div>
+                <label className="text-sm font-medium block mb-3">
+                  Permissions supplémentaires
+                </label>
+                <div className="space-y-2">
+                  {AVAILABLE_PERMISSIONS.map((perm) => (
+                    <div key={perm.id} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id={perm.id}
+                        checked={formData.permissions.includes(perm.id)}
+                        onChange={() => togglePermission(perm.id)}
+                        className="rounded border-gray-300"
+                      />
+                      <label htmlFor={perm.id} className="text-sm cursor-pointer">
+                        {perm.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex gap-2">
-                <Button type="submit">Créer</Button>
+                <Button type="submit">
+                  {editingId ? "Modifier" : "Créer"}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setShowForm(false)}
+                  onClick={closeForm}
                 >
                   Annuler
                 </Button>
@@ -240,27 +340,54 @@ export default function AdminDashboard() {
                     <div className="mt-1 p-2 bg-primary/10 rounded-lg text-primary">
                       <User size={18} />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="font-semibold">{u.email}</p>
                       <p className="text-sm text-muted-foreground">
                         Rôle:{" "}
                         {u.role === "admin" ? "Administrateur" : "Utilisateur"}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      {u.permissions && u.permissions.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-xs font-medium text-muted-foreground">
+                            Permissions:
+                          </p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {u.permissions.map((perm) => (
+                              <span
+                                key={perm}
+                                className="inline-block px-2 py-1 text-xs bg-primary/10 text-primary rounded"
+                              >
+                                {getPermissionLabel(perm)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-2">
                         Créé:{" "}
                         {new Date(u.created_at).toLocaleDateString("fr-FR")}
                       </p>
                     </div>
                   </div>
                   {u.id !== user?.id && (
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDeleteUser(u.id)}
-                      className="gap-2"
-                    >
-                      <Trash2 size={14} />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditUser(u)}
+                        className="gap-2"
+                      >
+                        <Edit2 size={14} />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteUser(u.id)}
+                        className="gap-2"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
                   )}
                 </div>
               </CardContent>
