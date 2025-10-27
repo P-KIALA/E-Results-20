@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, Users, MapPin, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -13,68 +12,81 @@ export default function Sidebar() {
     return null;
   }
 
+  const navItemClass = (active: boolean) =>
+    cn(
+      "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+      "no-underline text-decoration-none",
+      active
+        ? "bg-primary text-primary-foreground font-semibold"
+        : "text-foreground hover:bg-muted/60 hover:text-primary"
+    );
+
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 bg-muted/30 border-r flex flex-col gap-2 p-2 overflow-y-auto">
+    <aside className="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 hover:w-56 bg-background border-r border-border flex flex-col gap-1 p-3 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out group">
       {user?.role === "admin" ? (
         <>
-          <Link to="/console" title="Console">
-            <Button
-              variant={isActive("/console") ? "default" : "ghost"}
-              size="icon"
-              className="w-full h-16 flex flex-col items-center justify-center gap-1 rounded-md"
-            >
-              <LayoutDashboard size={20} />
-              <span className="text-xs text-center">Console</span>
-            </Button>
+          <Link
+            to="/console"
+            className={navItemClass(isActive("/console"))}
+            title="Console"
+          >
+            <LayoutDashboard size={22} className="flex-shrink-0" />
+            <span className="hidden group-hover:inline whitespace-nowrap font-medium">
+              Console
+            </span>
           </Link>
 
-          <Link to="/admin" title="Utilisateurs">
-            <Button
-              variant={isActive("/admin") ? "default" : "ghost"}
-              size="icon"
-              className="w-full h-16 flex flex-col items-center justify-center gap-1 rounded-md"
-            >
-              <Users size={20} />
-              <span className="text-xs text-center">Users</span>
-            </Button>
+          <Link
+            to="/admin"
+            className={navItemClass(isActive("/admin"))}
+            title="Utilisateurs"
+          >
+            <Users size={22} className="flex-shrink-0" />
+            <span className="hidden group-hover:inline whitespace-nowrap font-medium">
+              Utilisateurs
+            </span>
           </Link>
 
-          <Link to="/sites" title="Sites">
-            <Button
-              variant={isActive("/sites") ? "default" : "ghost"}
-              size="icon"
-              className="w-full h-16 flex flex-col items-center justify-center gap-1 rounded-md"
-            >
-              <MapPin size={20} />
-              <span className="text-xs text-center">Sites</span>
-            </Button>
+          <Link
+            to="/sites"
+            className={navItemClass(isActive("/sites"))}
+            title="Sites"
+          >
+            <MapPin size={22} className="flex-shrink-0" />
+            <span className="hidden group-hover:inline whitespace-nowrap font-medium">
+              Sites
+            </span>
           </Link>
         </>
       ) : (
-        <Link to="/dashboard" title="Envois">
-          <Button
-            variant={isActive("/dashboard") ? "default" : "ghost"}
-            size="icon"
-            className="w-full h-16 flex flex-col items-center justify-center gap-1 rounded-md"
-          >
-            <LayoutDashboard size={20} />
-            <span className="text-xs text-center">Envois</span>
-          </Button>
+        <Link
+          to="/dashboard"
+          className={navItemClass(isActive("/dashboard"))}
+          title="Envois"
+        >
+          <LayoutDashboard size={22} className="flex-shrink-0" />
+          <span className="hidden group-hover:inline whitespace-nowrap font-medium">
+            Envois
+          </span>
         </Link>
       )}
 
       <div className="flex-1" />
 
-      <Button
-        variant="ghost"
-        size="icon"
+      <button
         onClick={logout}
-        className="w-full h-16 flex flex-col items-center justify-center gap-1 rounded-md text-destructive hover:text-destructive hover:bg-destructive/10"
+        className={cn(
+          "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+          "w-full text-left no-underline text-destructive",
+          "hover:bg-destructive/10 hover:text-destructive font-semibold"
+        )}
         title="Déconnexion"
       >
-        <LogOut size={20} />
-        <span className="text-xs text-center">Déco</span>
-      </Button>
+        <LogOut size={22} className="flex-shrink-0" />
+        <span className="hidden group-hover:inline whitespace-nowrap">
+          Déconnexion
+        </span>
+      </button>
     </aside>
   );
 }
