@@ -200,6 +200,16 @@ export default function UserDashboard() {
       return;
     }
 
+    if (!patientName.trim()) {
+      setMessage({ type: "error", text: "Le nom du malade est requis" });
+      return;
+    }
+
+    if (!patientSite.trim()) {
+      setMessage({ type: "error", text: "Le site du centre est requis" });
+      return;
+    }
+
     setSending(true);
     try {
       const token = localStorage.getItem("auth_token");
@@ -213,6 +223,8 @@ export default function UserDashboard() {
           doctor_ids: selectedDoctors,
           custom_message: customMessage,
           file_ids: uploadedFileIds,
+          patient_name: patientName || undefined,
+          patient_site: patientSite || undefined,
         }),
       });
 
@@ -228,6 +240,7 @@ export default function UserDashboard() {
         text: `${successCount}/${selectedDoctors.length} envoyé(s)`,
       });
       setSelectedDoctors([]);
+      setPatientName("");
       setCustomMessage(
         "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
       );
