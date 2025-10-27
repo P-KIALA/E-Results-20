@@ -112,6 +112,11 @@ export default function DoctorsTab() {
 
     try {
       const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        return;
+      }
+
       const res = await fetch(`/api/doctors/${id}`, {
         method: "DELETE",
         headers: {
@@ -122,16 +127,29 @@ export default function DoctorsTab() {
         setMessage({ type: "success", text: "Médecin supprimé" });
         await fetchDoctors();
       } else {
-        setMessage({ type: "error", text: "Erreur de suppression" });
+        const err = await res.json().catch(() => ({}));
+        setMessage({
+          type: "error",
+          text: err.error || "Erreur de suppression",
+        });
       }
     } catch (error) {
-      setMessage({ type: "error", text: "Erreur de suppression" });
+      console.error("Error deleting doctor:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur de suppression",
+      });
     }
   };
 
   const handleVerify = async (id: string) => {
     try {
       const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        return;
+      }
+
       const res = await fetch(`/api/doctors/${id}/verify`, {
         method: "POST",
         headers: {
@@ -141,9 +159,19 @@ export default function DoctorsTab() {
       if (res.ok) {
         setMessage({ type: "success", text: "Vérification en cours..." });
         await fetchDoctors();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setMessage({
+          type: "error",
+          text: err.error || "Erreur de vérification",
+        });
       }
     } catch (error) {
-      setMessage({ type: "error", text: "Erreur de vérification" });
+      console.error("Error verifying doctor:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur de vérification",
+      });
     }
   };
 
