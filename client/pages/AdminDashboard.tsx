@@ -367,6 +367,9 @@ export default function AdminDashboard() {
                         Rôle:{" "}
                         {u.role === "admin" ? "Administrateur" : "Utilisateur"}
                       </p>
+                      { (u as any).site && (
+                        <p className="text-sm text-muted-foreground">Site: {(u as any).site}</p>
+                      )}
                       {u.permissions && u.permissions.length > 0 && (
                         <div className="mt-2">
                           <p className="text-xs font-medium text-muted-foreground">
