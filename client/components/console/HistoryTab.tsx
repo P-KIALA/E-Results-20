@@ -24,6 +24,22 @@ export default function HistoryTab() {
 
   const getToken = () => localStorage.getItem("auth_token");
 
+  const fetchSites = useCallback(async () => {
+    try {
+      const token = getToken();
+      const res = await fetch("/api/sites", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch sites");
+      const data = await res.json();
+      setSites(data.sites || []);
+    } catch (error) {
+      console.error("Error fetching sites:", error);
+    }
+  }, []);
+
   const fetchDoctors = useCallback(async () => {
     try {
       const token = getToken();
@@ -46,6 +62,7 @@ export default function HistoryTab() {
       const params = new URLSearchParams();
       if (filterStatus) params.append("status", filterStatus);
       if (filterDoctor) params.append("doctor_id", filterDoctor);
+      if (filterSite) params.append("site_id", filterSite);
 
       const token = getToken();
       const res = await fetch(`/api/send-logs?${params}`, {
@@ -61,7 +78,7 @@ export default function HistoryTab() {
     } finally {
       setLoading(false);
     }
-  }, [filterStatus, filterDoctor]);
+  }, [filterStatus, filterDoctor, filterSite]);
 
   // Load only when user requests (no automatic polling)
   useEffect(() => {
