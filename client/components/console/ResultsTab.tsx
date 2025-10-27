@@ -98,12 +98,12 @@ export default function ResultsTab() {
         body: JSON.stringify({ files: fileDataList }),
       });
 
+      const result = await res.json();
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
+        throw new Error(result.error || "Upload failed");
       }
 
-      const result = await res.json();
       setUploadedFileIds(result.files.map((f: any) => f.id));
       setMessage({
         type: "success",
