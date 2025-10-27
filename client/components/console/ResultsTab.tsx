@@ -268,9 +268,10 @@ export default function ResultsTab() {
             </div>
           )}
 
-          {/* Patient name - always visible and required */}
+          {/* Patient name and site - always visible and required */}
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
+              <label className="text-sm font-medium">Nom du malade</label>
               <Input
                 placeholder="Nom du malade"
                 value={patientName}
@@ -283,6 +284,9 @@ export default function ResultsTab() {
             </div>
 
             <div>
+              <label className="text-sm font-medium">
+                Site du centre {user?.site && "(auto-complété)"}
+              </label>
               <Input
                 placeholder="Site du centre"
                 value={patientSite}
