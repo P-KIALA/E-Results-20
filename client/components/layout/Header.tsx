@@ -19,7 +19,7 @@ export default function Header() {
               <path d="M12 3v6l4 2" stroke="currentColor" className="text-primary" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <span className="font-extrabold text-lg tracking-tight">WhatsDeliver</span>
+          <span className="font-extrabold text-lg tracking-tight">E-Resultat CD EYANO</span>
         </Link>
 
         {isAuthenticated && (
