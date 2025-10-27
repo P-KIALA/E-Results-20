@@ -71,6 +71,10 @@ export default function StatsTab() {
     setLoading(true);
     try {
       const token = localStorage.getItem("auth_token");
+      if (!token) {
+        console.error("No auth token found");
+        return;
+      }
 
       // Fetch all send logs to calculate stats
       const res = await fetch("/api/send-logs?limit=10000", {
@@ -79,7 +83,10 @@ export default function StatsTab() {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch logs");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to fetch logs");
+      }
 
       const data = await res.json();
       const logs = data.logs || [];
