@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Doctor } from "@shared/api";
 import { Upload, Send, CheckCircle } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export default function ResultsTab() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
