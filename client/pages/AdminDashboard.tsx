@@ -10,6 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { User, Trash2, Plus, Users, Edit2, X } from "lucide-react";
 
 interface UserItem {
@@ -286,7 +293,7 @@ export default function AdminDashboard() {
                     <label className="text-sm font-medium">Mot de passe</label>
                     <Input
                       type="password"
-                      placeholder="••••••••"
+                      placeholder="•••���••••"
                       value={formData.password}
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
