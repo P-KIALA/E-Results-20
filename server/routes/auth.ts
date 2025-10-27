@@ -257,6 +257,7 @@ export const updateUser: RequestHandler = async (req, res) => {
     const updateData: any = {};
     if (role !== undefined) updateData.role = role;
     if (permissions !== undefined) updateData.permissions = permissions;
+    if (site !== undefined) updateData.site = site;
 
     const { data: user, error } = await supabase
       .from("users")
