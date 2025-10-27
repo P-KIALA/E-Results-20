@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/lib/auth-context";
 import {
   Card,
   CardContent,
@@ -8,15 +9,18 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SendLogEntry, Doctor } from "@shared/api";
-import { Clock, CheckCircle, AlertCircle, Loader } from "lucide-react";
+import { SendLogEntry, Doctor, Site } from "@shared/api";
+import { Clock, CheckCircle, AlertCircle, Loader, MapPin } from "lucide-react";
 
 export default function HistoryTab() {
+  const { user } = useAuth();
   const [logs, setLogs] = useState<(SendLogEntry & { doctors?: any })[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDoctor, setFilterDoctor] = useState("");
+  const [filterSite, setFilterSite] = useState("");
 
   const getToken = () => localStorage.getItem("auth_token");
 
