@@ -409,7 +409,7 @@ export default function AdminDashboard() {
                             <input
                               type="checkbox"
                               id={`site-${site.id}`}
-                              checked={formData.accessible_site_ids.includes(
+                              checked={(formData.accessible_site_ids || []).includes(
                                 site.id
                               )}
                               onChange={() => toggleAccessibleSite(site.id)}
