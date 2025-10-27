@@ -33,6 +33,11 @@ function expressPlugin(): Plugin {
     configureServer(server) {
       const app = createServer();
 
+      // Initialize storage buckets
+      initializeBuckets().catch((error) => {
+        console.error("Failed to initialize storage:", error);
+      });
+
       // Add Express app as middleware to Vite dev server
       server.middlewares.use(app);
     },
