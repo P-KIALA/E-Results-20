@@ -341,6 +341,36 @@ export default function UserDashboard() {
         </Card>
       )}
 
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="text-sm font-medium">Nom du malade</label>
+          <Input
+            placeholder="Nom du malade"
+            value={patientName}
+            onChange={(e) => setPatientName(e.target.value)}
+            aria-required={true}
+          />
+          {!patientName.trim() && (
+            <p className="text-xs text-red-600 mt-1">Le nom du malade est requis.</p>
+          )}
+        </div>
+
+        <div>
+          <label className="text-sm font-medium">
+            Site du centre {user?.site && "(auto-complété)"}
+          </label>
+          <Input
+            placeholder="Site du centre"
+            value={patientSite}
+            onChange={(e) => setPatientSite(e.target.value)}
+            aria-required={true}
+          />
+          {!patientSite.trim() && (
+            <p className="text-xs text-red-600 mt-1">Le site du centre est requis.</p>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
