@@ -251,6 +251,78 @@ export default function UserDashboard() {
         </div>
       )}
 
+      {user?.permissions?.includes("manage_doctors") && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="flex flex-row justify-between items-start">
+            <div>
+              <CardTitle>Ajouter un médecin</CardTitle>
+              <CardDescription>
+                Créez un nouveau profil médecin
+              </CardDescription>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => setShowAddDoctor(!showAddDoctor)}
+              className="gap-2"
+            >
+              <Plus size={16} /> {showAddDoctor ? "Annuler" : "Ajouter"}
+            </Button>
+          </CardHeader>
+
+          {showAddDoctor && (
+            <CardContent>
+              <form onSubmit={handleAddDoctor} className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Nom</label>
+                  <Input
+                    placeholder="Dr. Dupont"
+                    value={newDoctor.name}
+                    onChange={(e) =>
+                      setNewDoctor({ ...newDoctor, name: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Téléphone</label>
+                  <Input
+                    placeholder="+243821234567"
+                    value={newDoctor.phone}
+                    onChange={(e) =>
+                      setNewDoctor({ ...newDoctor, phone: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Spécialisation</label>
+                  <Input
+                    placeholder="Cardiologie"
+                    value={newDoctor.specialization}
+                    onChange={(e) =>
+                      setNewDoctor({
+                        ...newDoctor,
+                        specialization: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={addingDoctor}
+                  className="w-full"
+                >
+                  {addingDoctor ? "Ajout en cours..." : "Créer le médecin"}
+                </Button>
+              </form>
+            </CardContent>
+          )}
+        </Card>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
