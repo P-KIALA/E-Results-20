@@ -44,59 +44,6 @@ export default function Header() {
           </span>
         </Link>
 
-        {isAuthenticated && (
-          <nav className="hidden gap-6 md:flex">
-            {user?.role === "admin" ? (
-              <>
-                <Link
-                  to="/console"
-                  className={cn(
-                    "text-sm transition-colors hover:text-foreground/80",
-                    isActive("/console")
-                      ? "text-foreground"
-                      : "text-foreground/60",
-                  )}
-                >
-                  Console
-                </Link>
-                <Link
-                  to="/admin"
-                  className={cn(
-                    "text-sm transition-colors hover:text-foreground/80",
-                    isActive("/admin")
-                      ? "text-foreground"
-                      : "text-foreground/60",
-                  )}
-                >
-                  Utilisateurs
-                </Link>
-                <Link
-                  to="/sites"
-                  className={cn(
-                    "text-sm transition-colors hover:text-foreground/80",
-                    isActive("/sites")
-                      ? "text-foreground"
-                      : "text-foreground/60",
-                  )}
-                >
-                  Sites
-                </Link>
-              </>
-            ) : (
-              <Link
-                to="/dashboard"
-                className={cn(
-                  "text-sm transition-colors hover:text-foreground/80",
-                  isActive("/dashboard")
-                    ? "text-foreground"
-                    : "text-foreground/60",
-                )}
-              >
-                Envois
-              </Link>
-            )}
-          </nav>
-        )}
 
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
