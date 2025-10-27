@@ -77,9 +77,10 @@ export default function UserDashboard() {
         }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
+        throw new Error(data.error || "Erreur lors de la création");
       }
 
       setMessage({ type: "success", text: "Médecin ajouté" });
