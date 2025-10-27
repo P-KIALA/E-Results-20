@@ -223,3 +223,54 @@ export const deleteUser: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Failed to delete user" });
   }
 };
+
+// Admin-only: update user
+export const updateUser: RequestHandler = async (req, res) => {
+  try {
+    const adminId = (req as any).userId;
+    const { id: targetUserId } = req.params;
+    const { role, permissions } = req.body;
+
+    if (!adminId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Check if admin
+    const { data: admin, error: adminError } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", adminId)
+      .single();
+
+    if (adminError || admin?.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const updateData: any = {};
+    if (role !== undefined) updateData.role = role;
+    if (permissions !== undefined) updateData.permissions = permissions;
+
+    const { data: user, error } = await supabase
+      .from("users")
+      .update(updateData)
+      .eq("id", targetUserId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions || [],
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Failed to update user" });
+  }
+};
