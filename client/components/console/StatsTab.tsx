@@ -62,6 +62,8 @@ export default function StatsTab() {
   const [statusSummary, setStatusSummary] = useState<StatusSummary[]>([]);
   const [totalMessages, setTotalMessages] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
     fetchStats();
