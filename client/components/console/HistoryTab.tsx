@@ -146,6 +146,22 @@ export default function HistoryTab() {
           >
             {loading ? "Chargement..." : "Charger l'historique"}
           </Button>
+
+          <Button
+            variant="outline"
+            onClick={async () => {
+              setLoading(true);
+              try {
+                await fetchLogs();
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className="px-3 py-2"
+          >
+            Actualiser
+          </Button>
         </div>
       </div>
 
