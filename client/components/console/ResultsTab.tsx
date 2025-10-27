@@ -24,7 +24,13 @@ export default function ResultsTab() {
 
   const fetchDoctors = async () => {
     try {
-      const res = await fetch("/api/doctors");
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/doctors", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setDoctors(data.doctors?.filter((d: Doctor) => d.whatsapp_verified) || []);
     } catch (error) {
@@ -71,9 +77,13 @@ export default function ResultsTab() {
         })
       );
 
+      const token = localStorage.getItem("auth_token");
       const res = await fetch("/api/upload-files", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ files: fileDataList }),
       });
 
@@ -106,9 +116,13 @@ export default function ResultsTab() {
 
     setSending(true);
     try {
+      const token = localStorage.getItem("auth_token");
       const res = await fetch("/api/send-results", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           doctor_ids: selectedDoctors,
           custom_message: customMessage,
