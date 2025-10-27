@@ -61,13 +61,22 @@ export interface VerifyPhoneResponse {
 
 export type UserRole = "admin" | "user";
 
-export type Permission = "manage_doctors" | "view_reports" | "manage_users";
+export type Permission = "manage_doctors" | "view_reports" | "manage_users" | "access_all_sites";
+
+export interface Site {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface User {
   id: string;
   email: string;
   role: UserRole;
   permissions: Permission[];
+  primary_site_id?: string | null;
+  primary_site?: Site | null;
   site?: string | null;
   created_at: string;
   updated_at: string;
