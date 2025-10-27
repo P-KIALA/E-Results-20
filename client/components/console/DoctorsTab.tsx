@@ -122,7 +122,7 @@ export default function DoctorsTab() {
   };
 
   const handleDeleteDoctor = async (id: string) => {
-    if (!confirm("��tes-vous sûr ?")) return;
+    if (!confirm("Êtes-vous sûr ?")) return;
 
     try {
       const token = localStorage.getItem("auth_token");
@@ -191,6 +191,56 @@ export default function DoctorsTab() {
       setMessage({
         type: "error",
         text: error instanceof Error ? error.message : "Erreur de vérification",
+      });
+    }
+  };
+
+  const handleEditDoctor = async (id: string) => {
+    if (!editName.trim()) {
+      setMessage({
+        type: "error",
+        text: "Le nom ne peut pas être vide",
+      });
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
+        return;
+      }
+
+      const res = await fetch(`/api/doctors/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: editName }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        setMessage({
+          type: "error",
+          text: err.error || "Erreur lors de la modification",
+        });
+        return;
+      }
+
+      setMessage({ type: "success", text: "Médecin modifié avec succès" });
+      setEditingDoctorId(null);
+      setEditName("");
+      await fetchDoctors();
+    } catch (error) {
+      console.error("Error editing doctor:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur lors de la modification",
       });
     }
   };
