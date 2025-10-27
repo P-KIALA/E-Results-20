@@ -114,3 +114,52 @@ export const getUserAccessibleSites: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch accessible sites" });
   }
 };
+
+export const deleteSite: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+    const { id: siteId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Check if user is admin
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", userId)
+      .single();
+
+    if (userError || user?.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Check if site exists
+    const { data: site, error: siteError } = await supabase
+      .from("sites")
+      .select("id, name")
+      .eq("id", siteId)
+      .single();
+
+    if (siteError || !site) {
+      return res.status(404).json({ error: "Site not found" });
+    }
+
+    // Delete the site (CASCADE will handle related records)
+    const { error: deleteError } = await supabase
+      .from("sites")
+      .delete()
+      .eq("id", siteId);
+
+    if (deleteError) throw deleteError;
+
+    res.json({
+      success: true,
+      message: `Site "${site.name}" deleted successfully`,
+    });
+  } catch (error) {
+    console.error("Error deleting site:", error);
+    res.status(500).json({ error: "Failed to delete site" });
+  }
+};
