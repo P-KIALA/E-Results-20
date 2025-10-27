@@ -496,7 +496,7 @@ export default function UserDashboard() {
           />
           <Button
             onClick={handleSend}
-            disabled={sending || selectedDoctors.length === 0}
+            disabled={sending || selectedDoctors.length === 0 || !patientName.trim() || !patientSite.trim()}
             className="w-full gap-2"
           >
             <Send size={16} />
