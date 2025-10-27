@@ -187,12 +187,24 @@ export const getAllUsers: RequestHandler = async (req, res) => {
 
     const { data: users, error } = await supabase
       .from("users")
-      .select("id, email, role, site, created_at, updated_at")
+      .select("id, email, role, primary_site_id, permissions, created_at, updated_at")
       .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    res.json({ users: users || [] });
+    // Fetch all sites for site names
+    const { data: allSites = [] } = await supabase
+      .from("sites")
+      .select("id, name");
+
+    const sitesMap = new Map(allSites.map((s: any) => [s.id, s]));
+
+    const enrichedUsers = (users || []).map((u: any) => ({
+      ...u,
+      primary_site: u.primary_site_id ? sitesMap.get(u.primary_site_id) || null : null,
+    }));
+
+    res.json({ users: enrichedUsers });
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ error: "Failed to fetch users" });
