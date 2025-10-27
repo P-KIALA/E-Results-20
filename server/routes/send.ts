@@ -1,31 +1,38 @@
 import { RequestHandler } from "express";
+import twilio from "twilio";
 import { supabase } from "../lib/supabase";
 import { SendResultsRequest } from "@shared/api";
 
-// Mock Twilio sending (will be replaced with real Twilio integration)
+// Initialize Twilio client
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN,
+);
+
 async function sendViaWhatsApp(
   to: string,
   message: string,
   mediaUrls: string[],
 ): Promise<string> {
-  // TODO: Replace with real Twilio WhatsApp API
-  // const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-  // const result = await twilioClient.messages.create({
-  //   from: 'whatsapp:' + TWILIO_FROM_NUMBER,
-  //   to: 'whatsapp:' + to,
-  //   body: message,
-  //   mediaUrl: mediaUrls,
-  // });
-  // return result.sid;
+  try {
+    const messageParams: any = {
+      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+      to: `whatsapp:${to}`,
+      body: message,
+    };
 
-  console.log(`[MOCK] Sending to ${to}: "${message}"`);
-  if (mediaUrls.length > 0) {
-    console.log(`[MOCK] With attachments:`, mediaUrls);
+    if (mediaUrls.length > 0) {
+      messageParams.mediaUrl = mediaUrls;
+    }
+
+    const result = await twilioClient.messages.create(messageParams);
+
+    console.log(`Message sent successfully to ${to}: ${result.sid}`);
+    return result.sid;
+  } catch (error) {
+    console.error(`Error sending WhatsApp message to ${to}:`, error);
+    throw error;
   }
-
-  // Mock SID generation
-  const mockSid = `SM${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
-  return mockSid;
 }
 
 export const sendResults: RequestHandler = async (req, res) => {
