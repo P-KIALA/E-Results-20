@@ -1,9 +1,15 @@
 import path from "path";
 import { createServer } from "./index";
+import { initializeBuckets } from "./lib/storage";
 import * as express from "express";
 
 const app = createServer();
 const port = process.env.PORT || 3000;
+
+// Initialize storage buckets
+initializeBuckets().catch((error) => {
+  console.error("Failed to initialize storage:", error);
+});
 
 // In production, serve the built SPA files
 const __dirname = import.meta.dirname;
