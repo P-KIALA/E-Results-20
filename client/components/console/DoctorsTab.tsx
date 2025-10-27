@@ -71,15 +71,24 @@ export default function DoctorsTab() {
     setSubmitting(true);
 
     try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        return;
+      }
+
       const res = await fetch("/api/doctors", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(formData),
       });
 
       if (!res.ok) {
         const err = await res.json();
-        setMessage({ type: "error", text: err.error || "Erreur" });
+        setMessage({ type: "error", text: err.error || "Erreur lors de l'ajout" });
         return;
       }
 
@@ -88,7 +97,11 @@ export default function DoctorsTab() {
       setShowForm(false);
       await fetchDoctors();
     } catch (error) {
-      setMessage({ type: "error", text: "Erreur lors de l'ajout" });
+      console.error("Error adding doctor:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur lors de l'ajout",
+      });
     } finally {
       setSubmitting(false);
     }
