@@ -395,9 +395,9 @@ export default function UserDashboard() {
               </p>
             ) : (
               doctors.map((doctor) => (
-                <label
+                <div
                   key={doctor.id}
-                  className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer"
+                  className="flex items-center gap-2 p-2 rounded hover:bg-muted group"
                 >
                   <input
                     type="checkbox"
@@ -418,7 +418,17 @@ export default function UserDashboard() {
                       {doctor.phone}
                     </p>
                   </div>
-                </label>
+                  {user?.permissions?.includes("manage_doctors") && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteDoctor(doctor.id)}
+                      className="opacity-0 group-hover:opacity-100 transition"
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  )}
+                </div>
               ))
             )}
           </CardContent>
