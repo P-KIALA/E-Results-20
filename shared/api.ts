@@ -68,6 +68,7 @@ export interface User {
   email: string;
   role: UserRole;
   permissions: Permission[];
+  site?: string | null;
   created_at: string;
   updated_at: string;
 }
