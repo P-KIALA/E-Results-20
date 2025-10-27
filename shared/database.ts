@@ -79,6 +79,8 @@ export type Database = {
           error_message: string | null;
           id: string;
           patient_name: string | null;
+          patient_site: string | null;
+          sender_id: string | null;
           read_at: string | null;
           sent_at: string | null;
           status: string | null;
@@ -93,6 +95,8 @@ export type Database = {
           error_message?: string | null;
           id?: string;
           patient_name?: string | null;
+          patient_site?: string | null;
+          sender_id?: string | null;
           read_at?: string | null;
           sent_at?: string | null;
           status?: string | null;
@@ -107,6 +111,8 @@ export type Database = {
           error_message?: string | null;
           id?: string;
           patient_name?: string | null;
+          patient_site?: string | null;
+          sender_id?: string | null;
           read_at?: string | null;
           sent_at?: string | null;
           status?: string | null;
