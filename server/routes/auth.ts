@@ -255,7 +255,7 @@ export const updateUser: RequestHandler = async (req, res) => {
   try {
     const adminId = (req as any).userId;
     const { id: targetUserId } = req.params;
-    const { role, permissions, site } = req.body;
+    const { role, permissions, primary_site_id, accessible_site_ids } = req.body;
 
     if (!adminId) {
       return res.status(401).json({ error: "Unauthorized" });
@@ -275,7 +275,7 @@ export const updateUser: RequestHandler = async (req, res) => {
     const updateData: any = {};
     if (role !== undefined) updateData.role = role;
     if (permissions !== undefined) updateData.permissions = permissions;
-    if (site !== undefined) updateData.site = site;
+    if (primary_site_id !== undefined) updateData.primary_site_id = primary_site_id;
 
     const { data: user, error } = await supabase
       .from("users")
@@ -286,12 +286,42 @@ export const updateUser: RequestHandler = async (req, res) => {
 
     if (error) throw error;
 
+    // Update accessible sites if provided
+    if (accessible_site_ids !== undefined && Array.isArray(accessible_site_ids)) {
+      // Delete existing access records
+      await supabase
+        .from("user_site_access")
+        .delete()
+        .eq("user_id", targetUserId);
+
+      // Insert new access records
+      if (accessible_site_ids.length > 0) {
+        const accessRecords = accessible_site_ids.map((site_id: string) => ({
+          user_id: targetUserId,
+          site_id,
+        }));
+
+        await supabase
+          .from("user_site_access")
+          .insert(accessRecords);
+      }
+    }
+
+    // Fetch all sites for site names
+    const { data: allSites = [] } = await supabase
+      .from("sites")
+      .select("id, name");
+
+    const sitesMap = new Map(allSites.map((s: any) => [s.id, s]));
+
     res.json({
       user: {
         id: user.id,
         email: user.email,
         role: user.role,
         permissions: user.permissions || [],
+        primary_site_id: user.primary_site_id || null,
+        primary_site: user.primary_site_id ? sitesMap.get(user.primary_site_id) || null : null,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
