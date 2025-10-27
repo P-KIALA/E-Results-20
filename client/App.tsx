@@ -95,6 +95,16 @@ const App = () => (
               }
             />
             <Route
+              path="/sites"
+              element={
+                <Layout>
+                  <ProtectedRoute requiredRole="admin">
+                    <SitesManagement />
+                  </ProtectedRoute>
+                </Layout>
+              }
+            />
+            <Route
               path="/dashboard"
               element={
                 <Layout>
