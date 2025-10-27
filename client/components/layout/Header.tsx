@@ -1,9 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
+import { LogOut, User, Settings } from "lucide-react";
 
 export default function Header() {
   const location = useLocation();
+  const { user, logout, isAuthenticated } = useAuth();
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -18,14 +21,38 @@ export default function Header() {
           </div>
           <span className="font-extrabold text-lg tracking-tight">WhatsDeliver</span>
         </Link>
-        <nav className="hidden gap-6 md:flex">
-          <Link to="/" className={cn("text-sm transition-colors hover:text-foreground/80", isActive("/") ? "text-foreground" : "text-foreground/60")}>Accueil</Link>
-          <Link to="/console" className={cn("text-sm transition-colors hover:text-foreground/80", isActive("/console") ? "text-foreground" : "text-foreground/60")}>Console</Link>
-        </nav>
+
+        {isAuthenticated && (
+          <nav className="hidden gap-6 md:flex">
+            <Link to="/" className={cn("text-sm transition-colors hover:text-foreground/80", isActive("/") ? "text-foreground" : "text-foreground/60")}>Accueil</Link>
+            {user?.role === 'admin' ? (
+              <>
+                <Link to="/console" className={cn("text-sm transition-colors hover:text-foreground/80", isActive("/console") ? "text-foreground" : "text-foreground/60")}>Console</Link>
+                <Link to="/admin" className={cn("text-sm transition-colors hover:text-foreground/80", isActive("/admin") ? "text-foreground" : "text-foreground/60")}>Utilisateurs</Link>
+              </>
+            ) : (
+              <Link to="/dashboard" className={cn("text-sm transition-colors hover:text-foreground/80", isActive("/dashboard") ? "text-foreground" : "text-foreground/60")}>Envois</Link>
+            )}
+          </nav>
+        )}
+
         <div className="flex items-center gap-3">
-          <Link to="/console">
-            <Button size="sm" className="shadow-sm">Ouvrir la console</Button>
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <div className="hidden sm:flex items-center gap-2 text-sm">
+                <User size={16} className="text-primary" />
+                <span>{user?.email}</span>
+                <span className="text-muted-foreground">({user?.role === 'admin' ? 'Admin' : 'Utilisateur'})</span>
+              </div>
+              <Button size="sm" variant="outline" onClick={logout} className="gap-2">
+                <LogOut size={16} /> Déconnexion
+              </Button>
+            </>
+          ) : (
+            <Link to="/login">
+              <Button size="sm">Connexion</Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>
