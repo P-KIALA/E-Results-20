@@ -60,7 +60,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      navigate("/");
+      navigate("/console");
     } catch (err) {
       setError(String(err) || "Connexion échouée");
     }
