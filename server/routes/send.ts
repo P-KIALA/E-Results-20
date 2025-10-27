@@ -117,6 +117,17 @@ export const sendResults: RequestHandler = async (req, res) => {
       }
 
       try {
+        // Get sender user info for site context
+        let senderSiteId = null;
+        if ((req as any).userId) {
+          const { data: senderUser } = await supabase
+            .from("users")
+            .select("primary_site_id")
+            .eq("id", (req as any).userId)
+            .single();
+          senderSiteId = senderUser?.primary_site_id || null;
+        }
+
         // Create send log entry
         const { data: sendLog, error: logError } = await supabase
           .from("send_logs")
