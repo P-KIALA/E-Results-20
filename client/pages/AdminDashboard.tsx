@@ -232,7 +232,11 @@ export default function AdminDashboard() {
 
       {message && (
         <div
-          className={`p-4 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+          className={`p-4 rounded-lg ${
+            message.type === "success"
+              ? "bg-green-50 text-green-800"
+              : "bg-red-50 text-red-800"
+          }`}
         >
           {message.text}
         </div>
@@ -248,116 +252,122 @@ export default function AdminDashboard() {
             </span>
           </div>
           <Button
-            onClick={() => setShowUserForm(!showUserForm)}
+            onClick={() => {
+              setEditingId(null);
+              setFormData({
+                email: "",
+                password: "",
+                role: "user",
+                permissions: [],
+              });
+              setShowUserForm(true);
+            }}
             className="gap-2"
           >
             <Plus size={16} /> Créer utilisateur
           </Button>
         </div>
 
-        {showUserForm && (
-          <Card>
-            <CardHeader className="flex flex-row justify-between items-start">
+        {/* User Form Dialog */}
+        <Dialog open={showUserForm} onOpenChange={setShowUserForm}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {editingId
+                  ? "Modifier l'utilisateur"
+                  : "Créer un nouvel utilisateur"}
+              </DialogTitle>
+              <DialogDescription>
+                {editingId
+                  ? "Modifiez les informations de l'utilisateur"
+                  : "Remplissez les informations du nouvel utilisateur"}
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateUser} className="space-y-4">
               <div>
-                <CardTitle>
-                  {editingId
-                    ? "Modifier l'utilisateur"
-                    : "Créer un nouvel utilisateur"}
-                </CardTitle>
+                <label className="text-sm font-medium">Email</label>
+                <Input
+                  type="email"
+                  placeholder="email@example.com"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  disabled={!!editingId}
+                  required
+                />
               </div>
-              <button
-                onClick={closeForm}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X size={20} />
-              </button>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleCreateUser} className="space-y-4">
+
+              {!editingId && (
                 <div>
-                  <label className="text-sm font-medium">Email</label>
+                  <label className="text-sm font-medium">Mot de passe</label>
                   <Input
-                    type="email"
-                    placeholder="email@example.com"
-                    value={formData.email}
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.password}
                     onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
+                      setFormData({ ...formData, password: e.target.value })
                     }
-                    disabled={!!editingId}
                     required
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Min 6 caractères
+                  </p>
                 </div>
+              )}
 
-                {!editingId && (
-                  <div>
-                    <label className="text-sm font-medium">Mot de passe</label>
-                    <Input
-                      type="password"
-                      placeholder="•••���••••"
-                      value={formData.password}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Min 6 caractères
-                    </p>
-                  </div>
-                )}
+              <div>
+                <label className="text-sm font-medium">Rôle</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value as any })
+                  }
+                  className="w-full px-3 py-2 rounded-md border bg-background text-sm"
+                >
+                  <option value="user">Utilisateur</option>
+                  <option value="admin">Administrateur</option>
+                </select>
+              </div>
 
-                <div>
-                  <label className="text-sm font-medium">Rôle</label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) =>
-                      setFormData({ ...formData, role: e.target.value as any })
-                    }
-                    className="w-full px-3 py-2 rounded-md border bg-background text-sm"
-                  >
-                    <option value="user">Utilisateur</option>
-                    <option value="admin">Administrateur</option>
-                  </select>
+              <div>
+                <label className="text-sm font-medium block mb-3">
+                  Permissions supplémentaires
+                </label>
+                <div className="space-y-2">
+                  {AVAILABLE_PERMISSIONS.map((perm) => (
+                    <div key={perm.id} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id={perm.id}
+                        checked={formData.permissions.includes(perm.id)}
+                        onChange={() => togglePermission(perm.id)}
+                        className="rounded border-gray-300"
+                      />
+                      <label
+                        htmlFor={perm.id}
+                        className="text-sm cursor-pointer"
+                      >
+                        {perm.label}
+                      </label>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
-                <div>
-                  <label className="text-sm font-medium block mb-3">
-                    Permissions supplémentaires
-                  </label>
-                  <div className="space-y-2">
-                    {AVAILABLE_PERMISSIONS.map((perm) => (
-                      <div key={perm.id} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id={perm.id}
-                          checked={formData.permissions.includes(perm.id)}
-                          onChange={() => togglePermission(perm.id)}
-                          className="rounded border-gray-300"
-                        />
-                        <label
-                          htmlFor={perm.id}
-                          className="text-sm cursor-pointer"
-                        >
-                          {perm.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="flex gap-2">
+                <Button type="submit">
+                  {editingId ? "Modifier" : "Créer"}
+                </Button>
+                <Button type="button" variant="outline" onClick={closeForm}>
+                  Annuler
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
 
-                <div className="flex gap-2">
-                  <Button type="submit">
-                    {editingId ? "Modifier" : "Créer"}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={closeForm}>
-                    Annuler
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
-
+        {/* Users List */}
         <div className="grid gap-4">
           {loading ? (
             <p className="text-center text-muted-foreground">Chargement...</p>
