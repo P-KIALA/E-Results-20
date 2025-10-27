@@ -119,4 +119,12 @@ const App = () => (
   </QueryClientProvider>
 );
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootEl = document.getElementById("root");
+if (!rootEl) throw new Error("Root element not found");
+
+// Reuse existing root across HMR to avoid calling createRoot multiple times
+const anyWindow = window as any;
+if (!anyWindow.__app_root) {
+  anyWindow.__app_root = createRoot(rootEl);
+}
+anyWindow.__app_root.render(<App />);
