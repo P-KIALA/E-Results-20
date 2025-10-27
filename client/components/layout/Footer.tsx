@@ -16,10 +16,7 @@ export default function Footer() {
           </div>
           <p className="text-sm text-muted-foreground max-w-sm">Logiciel d'envoi des résultats en ligne via WhatsApp, fiable et simple.</p>
         </div>
-        <div className="text-sm text-muted-foreground flex flex-col gap-2">
-          <Link to="/" className="hover:text-foreground">Accueil</Link>
-          <Link to="/console" className="hover:text-foreground">Console</Link>
-        </div>
+        <div className="text-sm text-muted-foreground flex flex-col gap-2"></div>
         <div className="text-sm text-muted-foreground md:text-right">
           <p>
             © {new Date().getFullYear()} Le PARACLET. Tous droits réservés.
