@@ -12,7 +12,7 @@ export default function Footer() {
                 <path d="M12 3v6l4 2" stroke="currentColor" className="text-primary" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <span className="font-bold">WhatsDeliver</span>
+            <span className="font-bold">E-Resultat CD EYANO</span>
           </div>
           <p className="text-sm text-muted-foreground max-w-sm">Logiciel d'envoi des résultats en ligne via WhatsApp, fiable et simple.</p>
         </div>

@@ -39,7 +39,7 @@ export default function LoginPage() {
                 </svg>
               </div>
             </div>
-            <CardTitle className="text-2xl">WhatsDeliver</CardTitle>
+            <CardTitle className="text-2xl">E-Resultat CD EYANO</CardTitle>
             <CardDescription>Connectez-vous à votre compte</CardDescription>
           </CardHeader>
           <CardContent>
