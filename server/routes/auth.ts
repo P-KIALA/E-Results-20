@@ -56,8 +56,8 @@ export const register: RequestHandler = async (req, res) => {
       password,
       role = "user",
       permissions = [],
-      site = null,
-    } = req.body as RegisterRequest & { site?: string | null };
+      primary_site_id = null,
+    } = req.body as RegisterRequest & { primary_site_id?: string | null };
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
@@ -67,6 +67,11 @@ export const register: RequestHandler = async (req, res) => {
       return res
         .status(400)
         .json({ error: "Password must be at least 6 characters" });
+    }
+
+    // For non-admin users, primary_site_id is required
+    if (role !== "admin" && !primary_site_id) {
+      return res.status(400).json({ error: "Site principal requis pour les utilisateurs" });
     }
 
     // Check if user already exists
@@ -91,7 +96,7 @@ export const register: RequestHandler = async (req, res) => {
         password_hash: passwordHash,
         role,
         permissions,
-        site,
+        primary_site_id,
       })
       .select()
       .single();
@@ -108,6 +113,7 @@ export const register: RequestHandler = async (req, res) => {
         email: user.email,
         role: user.role,
         permissions: user.permissions || [],
+        primary_site_id: user.primary_site_id || null,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
