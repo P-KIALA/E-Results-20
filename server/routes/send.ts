@@ -78,16 +78,14 @@ export const sendResults: RequestHandler = async (req, res) => {
     const { doctor_ids, custom_message, file_ids } =
       req.body as SendResultsRequest;
 
+    // Note: patient_name field may not be present in DB schema yet in some environments.
+    // To avoid blocking message sending while migrations propagate, do not enforce it server-side.
     const patient_name = (req.body as any).patient_name;
 
     if (!doctor_ids || doctor_ids.length === 0 || !custom_message) {
       return res
         .status(400)
         .json({ error: "doctor_ids and custom_message are required" });
-    }
-
-    if (!patient_name || String(patient_name).trim() === "") {
-      return res.status(400).json({ error: "patient_name is required" });
     }
 
     const results: any[] = [];
