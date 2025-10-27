@@ -1,30 +1,30 @@
-import { RequestHandler } from 'express';
-import { supabase } from '../lib/supabase';
-import { hashPassword, verifyPassword, generateToken } from '../lib/auth';
-import { LoginRequest, RegisterRequest } from '@shared/api';
+import { RequestHandler } from "express";
+import { supabase } from "../lib/supabase";
+import { hashPassword, verifyPassword, generateToken } from "../lib/auth";
+import { LoginRequest, RegisterRequest } from "@shared/api";
 
 export const login: RequestHandler = async (req, res) => {
   try {
     const { email, password } = req.body as LoginRequest;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
     // Get user from database
     const { data: user, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email.toLowerCase())
+      .from("users")
+      .select("*")
+      .eq("email", email.toLowerCase())
       .single();
 
     if (error || !user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     // Verify password
     if (!verifyPassword(password, user.password_hash)) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     // Generate token
@@ -43,32 +43,34 @@ export const login: RequestHandler = async (req, res) => {
       expiresIn,
     });
   } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ error: 'Login failed' });
+    console.error("Error during login:", error);
+    res.status(500).json({ error: "Login failed" });
   }
 };
 
 export const register: RequestHandler = async (req, res) => {
   try {
-    const { email, password, role = 'user' } = req.body as RegisterRequest;
+    const { email, password, role = "user" } = req.body as RegisterRequest;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({ error: "Email and password are required" });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters" });
     }
 
     // Check if user already exists
     const { data: existing } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email.toLowerCase())
+      .from("users")
+      .select("id")
+      .eq("email", email.toLowerCase())
       .single();
 
     if (existing) {
-      return res.status(409).json({ error: 'Email already exists' });
+      return res.status(409).json({ error: "Email already exists" });
     }
 
     // Hash password
@@ -76,7 +78,7 @@ export const register: RequestHandler = async (req, res) => {
 
     // Create user
     const { data: user, error } = await supabase
-      .from('users')
+      .from("users")
       .insert({
         email: email.toLowerCase(),
         password_hash: passwordHash,
@@ -103,8 +105,8 @@ export const register: RequestHandler = async (req, res) => {
       expiresIn,
     });
   } catch (error) {
-    console.error('Error during registration:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    console.error("Error during registration:", error);
+    res.status(500).json({ error: "Registration failed" });
   }
 };
 
@@ -119,17 +121,17 @@ export const getMe: RequestHandler = async (req, res) => {
     const userId = (req as any).userId;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     const { data: user, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
+      .from("users")
+      .select("*")
+      .eq("id", userId)
       .single();
 
     if (error || !user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
 
     res.json({
@@ -140,8 +142,8 @@ export const getMe: RequestHandler = async (req, res) => {
       updated_at: user.updated_at,
     });
   } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Failed to fetch user' });
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Failed to fetch user" });
   }
 };
 
@@ -151,31 +153,31 @@ export const getAllUsers: RequestHandler = async (req, res) => {
     const userId = (req as any).userId;
 
     if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     // Check if user is admin
     const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', userId)
+      .from("users")
+      .select("role")
+      .eq("id", userId)
       .single();
 
-    if (userError || user?.role !== 'admin') {
-      return res.status(403).json({ error: 'Forbidden' });
+    if (userError || user?.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     const { data: users, error } = await supabase
-      .from('users')
-      .select('id, email, role, created_at, updated_at')
-      .order('created_at', { ascending: false });
+      .from("users")
+      .select("id, email, role, created_at, updated_at")
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
 
     res.json({ users: users || [] });
   } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Failed to fetch users' });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Failed to fetch users" });
   }
 };
 
@@ -186,34 +188,34 @@ export const deleteUser: RequestHandler = async (req, res) => {
     const { id: targetUserId } = req.params;
 
     if (!adminId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     // Check if admin
     const { data: admin, error: adminError } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', adminId)
+      .from("users")
+      .select("role")
+      .eq("id", adminId)
       .single();
 
-    if (adminError || admin?.role !== 'admin') {
-      return res.status(403).json({ error: 'Forbidden' });
+    if (adminError || admin?.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     if (adminId === targetUserId) {
-      return res.status(400).json({ error: 'Cannot delete your own account' });
+      return res.status(400).json({ error: "Cannot delete your own account" });
     }
 
     const { error } = await supabase
-      .from('users')
+      .from("users")
       .delete()
-      .eq('id', targetUserId);
+      .eq("id", targetUserId);
 
     if (error) throw error;
 
     res.json({ success: true });
   } catch (error) {
-    console.error('Error deleting user:', error);
-    res.status(500).json({ error: 'Failed to delete user' });
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Failed to delete user" });
   }
 };

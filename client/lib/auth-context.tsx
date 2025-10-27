@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { User, AuthSession } from '@shared/api';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { User, AuthSession } from "@shared/api";
 
 interface AuthContextType {
   user: User | null;
@@ -12,7 +18,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const SESSION_KEY = 'auth_session';
+const SESSION_KEY = "auth_session";
 const TIMEOUT_DURATION = 60 * 60 * 1000; // 1 hour
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -35,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.removeItem(SESSION_KEY);
         }
       } catch (error) {
-        console.error('Error parsing saved session:', error);
+        console.error("Error parsing saved session:", error);
         localStorage.removeItem(SESSION_KEY);
       }
     }
@@ -50,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Set new timeout for 1 hour of inactivity
     const newTimeoutId = setTimeout(() => {
-      console.log('Session expired due to inactivity');
+      console.log("Session expired due to inactivity");
       logout();
     }, TIMEOUT_DURATION);
 
@@ -66,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Listen for user activity
-    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    const events = ["mousedown", "keydown", "scroll", "touchstart", "click"];
     events.forEach((event) => {
       window.addEventListener(event, resetTimeout);
     });
@@ -81,15 +87,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Login failed');
+        throw new Error(error.error || "Login failed");
       }
 
       const data = await response.json();
@@ -101,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(data.user);
       localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem("auth_token", data.token);
       setupTimeout();
     } finally {
       setIsLoading(false);
@@ -111,15 +117,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Registration failed');
+        throw new Error(error.error || "Registration failed");
       }
 
       const data = await response.json();
@@ -131,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(data.user);
       localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem("auth_token", data.token);
       setupTimeout();
     } finally {
       setIsLoading(false);
@@ -141,7 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem("auth_token");
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -166,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 }

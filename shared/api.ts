@@ -22,7 +22,7 @@ export interface AddDoctorRequest {
 export interface SendLogEntry {
   id: string;
   doctor_id: string;
-  status: 'pending' | 'sent' | 'delivered' | 'read' | 'failed';
+  status: "pending" | "sent" | "delivered" | "read" | "failed";
   custom_message?: string;
   sent_at?: string;
   delivered_at?: string;
@@ -57,7 +57,7 @@ export interface VerifyPhoneResponse {
   formatted_phone: string;
 }
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = "admin" | "user";
 
 export interface User {
   id: string;

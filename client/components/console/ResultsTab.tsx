@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,12 +16,15 @@ export default function ResultsTab() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedDoctors, setSelectedDoctors] = useState<string[]>([]);
   const [customMessage, setCustomMessage] = useState(
-    "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement"
+    "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
   );
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error", text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -32,7 +41,9 @@ export default function ResultsTab() {
       });
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
-      setDoctors(data.doctors?.filter((d: Doctor) => d.whatsapp_verified) || []);
+      setDoctors(
+        data.doctors?.filter((d: Doctor) => d.whatsapp_verified) || [],
+      );
     } catch (error) {
       setMessage({ type: "error", text: "Erreur lors du chargement" });
     }
@@ -74,7 +85,7 @@ export default function ResultsTab() {
             data,
             type: file.type,
           };
-        })
+        }),
       );
 
       const token = localStorage.getItem("auth_token");
@@ -94,7 +105,10 @@ export default function ResultsTab() {
 
       const result = await res.json();
       setUploadedFileIds(result.files.map((f: any) => f.id));
-      setMessage({ type: "success", text: `${result.files.length} fichier(s) uploadé(s)` });
+      setMessage({
+        type: "success",
+        text: `${result.files.length} fichier(s) uploadé(s)`,
+      });
       setFiles([]);
     } catch (error) {
       setMessage({ type: "error", text: `Erreur: ${String(error)}` });
@@ -137,10 +151,13 @@ export default function ResultsTab() {
 
       const result = await res.json();
       const successCount = result.results.filter((r: any) => r.success).length;
-      setMessage({ type: "success", text: `${successCount}/${selectedDoctors.length} envoyé(s)` });
+      setMessage({
+        type: "success",
+        text: `${successCount}/${selectedDoctors.length} envoyé(s)`,
+      });
       setSelectedDoctors([]);
       setCustomMessage(
-        "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement"
+        "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
       );
       setUploadedFileIds([]);
     } catch (error) {
@@ -154,11 +171,15 @@ export default function ResultsTab() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Envoyer des résultats</h3>
-        <p className="text-sm text-muted-foreground">Uploadez les fichiers et envoyez-les aux médecins</p>
+        <p className="text-sm text-muted-foreground">
+          Uploadez les fichiers et envoyez-les aux médecins
+        </p>
       </div>
 
       {message && (
-        <div className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}>
+        <div
+          className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+        >
           {message.text}
         </div>
       )}
@@ -182,19 +203,26 @@ export default function ResultsTab() {
             />
             <label htmlFor="file-input" className="cursor-pointer">
               <p className="font-medium">Cliquez pour sélectionner</p>
-              <p className="text-sm text-muted-foreground">ou glissez des fichiers ici</p>
+              <p className="text-sm text-muted-foreground">
+                ou glissez des fichiers ici
+              </p>
             </label>
           </div>
 
           {files.length > 0 && (
             <div className="space-y-2">
               {files.map((f, i) => (
-                <div key={i} className="flex justify-between items-center p-2 bg-muted rounded">
+                <div
+                  key={i}
+                  className="flex justify-between items-center p-2 bg-muted rounded"
+                >
                   <span className="text-sm">{f.name}</span>
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => setFiles(files.filter((_, idx) => idx !== i))}
+                    onClick={() =>
+                      setFiles(files.filter((_, idx) => idx !== i))
+                    }
                   >
                     ✕
                   </Button>
@@ -203,8 +231,14 @@ export default function ResultsTab() {
             </div>
           )}
 
-          <Button onClick={handleUploadFiles} disabled={uploading || files.length === 0} className="w-full">
-            {uploading ? "Upload en cours..." : `Upload ${files.length} fichier(s)`}
+          <Button
+            onClick={handleUploadFiles}
+            disabled={uploading || files.length === 0}
+            className="w-full"
+          >
+            {uploading
+              ? "Upload en cours..."
+              : `Upload ${files.length} fichier(s)`}
           </Button>
 
           {uploadedFileIds.length > 0 && (
@@ -219,14 +253,21 @@ export default function ResultsTab() {
       <Card>
         <CardHeader>
           <CardTitle>Sélectionner les médecins destinataires</CardTitle>
-          <CardDescription>Seuls les médecins avec WhatsApp vérifié sont listés</CardDescription>
+          <CardDescription>
+            Seuls les médecins avec WhatsApp vérifié sont listés
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
           {doctors.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucun médecin disponible</p>
+            <p className="text-sm text-muted-foreground">
+              Aucun médecin disponible
+            </p>
           ) : (
             doctors.map((doctor) => (
-              <label key={doctor.id} className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer">
+              <label
+                key={doctor.id}
+                className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer"
+              >
                 <input
                   type="checkbox"
                   checked={selectedDoctors.includes(doctor.id)}
@@ -234,13 +275,17 @@ export default function ResultsTab() {
                     if (e.target.checked) {
                       setSelectedDoctors([...selectedDoctors, doctor.id]);
                     } else {
-                      setSelectedDoctors(selectedDoctors.filter((id) => id !== doctor.id));
+                      setSelectedDoctors(
+                        selectedDoctors.filter((id) => id !== doctor.id),
+                      );
                     }
                   }}
                 />
                 <div className="flex-1">
                   <p className="font-medium text-sm">{doctor.name}</p>
-                  <p className="text-xs text-muted-foreground">{doctor.phone}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {doctor.phone}
+                  </p>
                 </div>
               </label>
             ))
@@ -259,7 +304,11 @@ export default function ResultsTab() {
             rows={6}
             placeholder="Écrivez votre message..."
           />
-          <Button onClick={handleSend} disabled={sending || selectedDoctors.length === 0} className="w-full gap-2">
+          <Button
+            onClick={handleSend}
+            disabled={sending || selectedDoctors.length === 0}
+            className="w-full gap-2"
+          >
             <Send size={16} />
             {sending ? "Envoi en cours..." : "Envoyer"}
           </Button>

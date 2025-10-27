@@ -1,17 +1,36 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Doctor } from "@shared/api";
-import { CheckCircle, AlertCircle, Plus, Trash2, RefreshCw } from "lucide-react";
+import {
+  CheckCircle,
+  AlertCircle,
+  Plus,
+  Trash2,
+  RefreshCw,
+} from "lucide-react";
 
 export default function DoctorsTab() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ phone: "", name: "", specialization: "" });
+  const [formData, setFormData] = useState({
+    phone: "",
+    name: "",
+    specialization: "",
+  });
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error", text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchDoctors();
@@ -39,7 +58,7 @@ export default function DoctorsTab() {
   const handleAddDoctor = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    
+
     try {
       const res = await fetch("/api/doctors", {
         method: "POST",
@@ -109,7 +128,9 @@ export default function DoctorsTab() {
       <div className="flex justify-between items-center">
         <div>
           <h3 className="text-lg font-semibold">Gestion des médecins</h3>
-          <p className="text-sm text-muted-foreground">Ajoutez et gérez les médecins destinataires</p>
+          <p className="text-sm text-muted-foreground">
+            Ajoutez et gérez les médecins destinataires
+          </p>
         </div>
         <Button onClick={() => setShowForm(!showForm)} className="gap-2">
           <Plus size={16} /> Ajouter médecin
@@ -117,7 +138,9 @@ export default function DoctorsTab() {
       </div>
 
       {message && (
-        <div className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}>
+        <div
+          className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+        >
           {message.text}
         </div>
       )}
@@ -135,17 +158,23 @@ export default function DoctorsTab() {
                   type="tel"
                   placeholder="+33 6 12 34 56 78"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
                   required
                 />
-                <p className="text-xs text-muted-foreground mt-1">Format international (ex: +33612345678)</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Format international (ex: +33612345678)
+                </p>
               </div>
               <div>
                 <label className="text-sm font-medium">Nom *</label>
                 <Input
                   placeholder="Dr. Martin Dupont"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -154,14 +183,20 @@ export default function DoctorsTab() {
                 <Input
                   placeholder="Cardiologue"
                   value={formData.specialization}
-                  onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, specialization: e.target.value })
+                  }
                 />
               </div>
               <div className="flex gap-2">
                 <Button type="submit" disabled={submitting}>
                   {submitting ? "Ajout..." : "Ajouter"}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowForm(false)}
+                >
                   Annuler
                 </Button>
               </div>
@@ -188,14 +223,26 @@ export default function DoctorsTab() {
                     <div className="flex items-center gap-2 mb-2">
                       <h4 className="font-semibold">{doctor.name}</h4>
                       {doctor.whatsapp_verified ? (
-                        <CheckCircle size={16} className="text-green-600" title="Vérifié WhatsApp" />
+                        <CheckCircle
+                          size={16}
+                          className="text-green-600"
+                          title="Vérifié WhatsApp"
+                        />
                       ) : (
-                        <AlertCircle size={16} className="text-amber-600" title="Non vérifié WhatsApp" />
+                        <AlertCircle
+                          size={16}
+                          className="text-amber-600"
+                          title="Non vérifié WhatsApp"
+                        />
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{doctor.phone}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {doctor.phone}
+                    </p>
                     {doctor.specialization && (
-                      <p className="text-sm text-muted-foreground">{doctor.specialization}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {doctor.specialization}
+                      </p>
                     )}
                   </div>
                   <div className="flex gap-2">

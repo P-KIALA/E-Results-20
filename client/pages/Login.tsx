@@ -1,38 +1,44 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/auth-context';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogIn, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { LogIn, ChevronLeft, ChevronRight } from "lucide-react";
 
 const images = [
   {
-    url: 'https://images.pexels.com/photos/6285370/pexels-photo-6285370.jpeg?v=1',
-    alt: 'Centre de diagnostic médical',
+    url: "https://images.pexels.com/photos/6285370/pexels-photo-6285370.jpeg?v=1",
+    alt: "Centre de diagnostic médical",
   },
   {
-    url: 'https://images.pexels.com/photos/7734576/pexels-photo-7734576.jpeg?v=1',
-    alt: 'Envoi et partage sécurisé des résultats',
+    url: "https://images.pexels.com/photos/7734576/pexels-photo-7734576.jpeg?v=1",
+    alt: "Envoi et partage sécurisé des résultats",
   },
   {
-    url: 'https://images.pexels.com/photos/6011598/pexels-photo-6011598.jpeg?v=1',
-    alt: 'Technologie médicale et gestion numérique',
+    url: "https://images.pexels.com/photos/6011598/pexels-photo-6011598.jpeg?v=1",
+    alt: "Technologie médicale et gestion numérique",
   },
 ];
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading, isAuthenticated } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate("/");
     }
   }, [isAuthenticated, navigate]);
 
@@ -50,13 +56,13 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       await login(email, password);
-      navigate('/');
+      navigate("/");
     } catch (err) {
-      setError(String(err) || 'Connexion échouée');
+      setError(String(err) || "Connexion échouée");
     }
   };
 
@@ -68,7 +74,7 @@ export default function LoginPage() {
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
+              index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
           >
             <img
@@ -94,7 +100,7 @@ export default function LoginPage() {
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-              Bienvenu au service{' '}
+              Bienvenu au service{" "}
               <span className="block text-emerald-400">E-Resultat</span>
               <span className="text-2xl md:text-3xl font-bold">
                 du Centre de Diagnostic EYANO
@@ -104,8 +110,9 @@ export default function LoginPage() {
 
           <div className="space-y-4">
             <p className="text-lg text-white/90 leading-relaxed max-w-xl">
-              Plateforme sécurisée et moderne pour la transmission instantanée des résultats médicaux via WhatsApp. 
-              Simplifiez vos processus, améliorez l'expérience patient et garantissez la confidentialité.
+              Plateforme sécurisée et moderne pour la transmission instantanée
+              des résultats médicaux via WhatsApp. Simplifiez vos processus,
+              améliorez l'expérience patient et garantissez la confidentialité.
             </p>
 
             <div className="flex gap-4">
@@ -131,9 +138,29 @@ export default function LoginPage() {
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <div className="h-12 w-12 rounded-lg bg-primary/10 grid place-items-center">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3a9 9 0 1 0 9 9" stroke="currentColor" className="text-primary" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 3v6l4 2" stroke="currentColor" className="text-primary" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 3a9 9 0 1 0 9 9"
+                      stroke="currentColor"
+                      className="text-primary"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M12 3v6l4 2"
+                      stroke="currentColor"
+                      className="text-primary"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
               </div>
@@ -172,9 +199,13 @@ export default function LoginPage() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full gap-2" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  className="w-full gap-2"
+                  disabled={isLoading}
+                >
                   <LogIn size={18} />
-                  {isLoading ? 'Connexion...' : 'Se connecter'}
+                  {isLoading ? "Connexion..." : "Se connecter"}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">

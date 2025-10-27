@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SendLogEntry, Doctor } from "@shared/api";
@@ -95,7 +101,9 @@ export default function HistoryTab() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Historique des envois</h3>
-        <p className="text-sm text-muted-foreground">Suivi en temps réel de tous les envois</p>
+        <p className="text-sm text-muted-foreground">
+          Suivi en temps réel de tous les envois
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -143,26 +151,46 @@ export default function HistoryTab() {
                   <div className="flex items-start gap-3 flex-1">
                     <div className="mt-1">{getStatusIcon(log.status)}</div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium">{getDoctorName(log.doctor_id)}</p>
+                      <p className="font-medium">
+                        {getDoctorName(log.doctor_id)}
+                      </p>
                       {log.custom_message && (
                         <p className="text-sm text-muted-foreground line-clamp-2">
                           "{log.custom_message}"
                         </p>
                       )}
                       <div className="flex flex-wrap gap-2 mt-2 text-xs text-muted-foreground">
-                        {log.sent_at && <span>Envoyé: {new Date(log.sent_at).toLocaleString("fr-FR")}</span>}
-                        {log.delivered_at && <span>Livré: {new Date(log.delivered_at).toLocaleString("fr-FR")}</span>}
-                        {log.read_at && <span>Lu: {new Date(log.read_at).toLocaleString("fr-FR")}</span>}
+                        {log.sent_at && (
+                          <span>
+                            Envoyé:{" "}
+                            {new Date(log.sent_at).toLocaleString("fr-FR")}
+                          </span>
+                        )}
+                        {log.delivered_at && (
+                          <span>
+                            Livré:{" "}
+                            {new Date(log.delivered_at).toLocaleString("fr-FR")}
+                          </span>
+                        )}
+                        {log.read_at && (
+                          <span>
+                            Lu: {new Date(log.read_at).toLocaleString("fr-FR")}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium">{getStatusLabel(log.status)}</p>
+                    <p className="text-sm font-medium">
+                      {getStatusLabel(log.status)}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(log.created_at).toLocaleString("fr-FR")}
                     </p>
                     {log.error_message && (
-                      <p className="text-xs text-red-600 mt-1">{log.error_message}</p>
+                      <p className="text-xs text-red-600 mt-1">
+                        {log.error_message}
+                      </p>
                     )}
                   </div>
                 </div>

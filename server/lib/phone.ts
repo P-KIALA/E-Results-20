@@ -10,17 +10,17 @@ export interface PhoneValidationResult {
 
 export function validateAndFormatPhone(phone: string): PhoneValidationResult {
   // Remove spaces, dashes, parentheses
-  const cleaned = phone.replace(/[\s\-()]/g, '');
+  const cleaned = phone.replace(/[\s\-()]/g, "");
 
   // Check if it starts with + or convert 0 to country code
   let formatted = cleaned;
-  if (!formatted.startsWith('+')) {
+  if (!formatted.startsWith("+")) {
     // If it starts with 0, assume it's a French number (country code 33)
-    if (formatted.startsWith('0')) {
-      formatted = '+33' + formatted.slice(1);
-    } else if (!formatted.startsWith('+')) {
+    if (formatted.startsWith("0")) {
+      formatted = "+33" + formatted.slice(1);
+    } else if (!formatted.startsWith("+")) {
       // Try to assume country code 33 (France) if no prefix
-      formatted = '+33' + formatted;
+      formatted = "+33" + formatted;
     }
   }
 
@@ -36,11 +36,13 @@ export function validateAndFormatPhone(phone: string): PhoneValidationResult {
 }
 
 // Simulate WhatsApp verification (in real scenario, call Twilio Lookup API)
-export async function checkWhatsAppAvailability(phone: string): Promise<boolean> {
+export async function checkWhatsAppAvailability(
+  phone: string,
+): Promise<boolean> {
   // TODO: Replace with real Twilio Lookup API when credentials are available
   // For now, simulate by checking if phone is valid E.164
   const validation = validateAndFormatPhone(phone);
-  
+
   // Simulate: return true for demonstration
   // In production: await twilioClient.lookups.v2.phoneNumbers(phone).fetch({ fields: 'line_type_intelligence' })
   if (!validation.is_valid) {
@@ -49,6 +51,6 @@ export async function checkWhatsAppAvailability(phone: string): Promise<boolean>
 
   // Mock: assume 80% of valid numbers are on WhatsApp
   const mockWhatsAppRate = 0.8;
-  const hash = phone.split('').reduce((h, c) => h + c.charCodeAt(0), 0);
+  const hash = phone.split("").reduce((h, c) => h + c.charCodeAt(0), 0);
   return (hash % 100) / 100 < mockWhatsAppRate;
 }

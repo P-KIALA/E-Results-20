@@ -10,13 +10,20 @@ export default function ConsolePage() {
   return (
     <div className="container py-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold tracking-tight">Console d'administration</h1>
+        <h1 className="text-4xl font-bold tracking-tight">
+          Console d'administration
+        </h1>
         <p className="text-lg text-muted-foreground mt-2">
-          Gérez les médecins, envoyez les résultats et suivez l'historique en temps réel
+          Gérez les médecins, envoyez les résultats et suivez l'historique en
+          temps réel
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full max-w-md grid-cols-3">
           <TabsTrigger value="doctors">Médecins</TabsTrigger>
           <TabsTrigger value="results">Résultats</TabsTrigger>

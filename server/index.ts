@@ -2,10 +2,23 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { getDoctors, addDoctor, updateDoctor, deleteDoctor, verifyDoctor } from "./routes/doctors";
+import {
+  getDoctors,
+  addDoctor,
+  updateDoctor,
+  deleteDoctor,
+  verifyDoctor,
+} from "./routes/doctors";
 import { sendResults, getSendLogs, webhookTwilio } from "./routes/send";
 import { uploadFiles, getFileUrl } from "./routes/upload";
-import { login, register, logout, getMe, getAllUsers, deleteUser } from "./routes/auth";
+import {
+  login,
+  register,
+  logout,
+  getMe,
+  getAllUsers,
+  deleteUser,
+} from "./routes/auth";
 import { createInitialAdmin } from "./routes/seed";
 import { authMiddleware, requireAuth } from "./lib/middleware";
 

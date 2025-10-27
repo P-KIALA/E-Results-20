@@ -1,15 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/auth-context';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Trash2, Plus, Users } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { User, Trash2, Plus, Users } from "lucide-react";
 
 interface UserItem {
   id: string;
   email: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   created_at: string;
 }
 
@@ -19,13 +25,20 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ email: '', password: '', role: 'user' as const });
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    role: "user" as const,
+  });
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Check if user is admin
   useEffect(() => {
-    if (user && user.role !== 'admin') {
-      navigate('/');
+    if (user && user.role !== "admin") {
+      navigate("/");
     }
   }, [user, navigate]);
 
@@ -36,19 +49,19 @@ export default function AdminDashboard() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('auth_token');
-      const res = await fetch('/api/users', {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!res.ok) throw new Error('Failed to fetch users');
+      if (!res.ok) throw new Error("Failed to fetch users");
 
       const data = await res.json();
       setUsers(data.users || []);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erreur lors du chargement' });
+      setMessage({ type: "error", text: "Erreur lors du chargement" });
     } finally {
       setLoading(false);
     }
@@ -59,16 +72,16 @@ export default function AdminDashboard() {
     setMessage(null);
 
     if (!formData.email || !formData.password) {
-      setMessage({ type: 'error', text: 'Email et mot de passe requis' });
+      setMessage({ type: "error", text: "Email et mot de passe requis" });
       return;
     }
 
     try {
-      const token = localStorage.getItem('auth_token');
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -83,47 +96,51 @@ export default function AdminDashboard() {
         throw new Error(err.error);
       }
 
-      setMessage({ type: 'success', text: 'Utilisateur créé' });
-      setFormData({ email: '', password: '', role: 'user' });
+      setMessage({ type: "success", text: "Utilisateur créé" });
+      setFormData({ email: "", password: "", role: "user" });
       setShowForm(false);
       await fetchUsers();
     } catch (error) {
-      setMessage({ type: 'error', text: String(error) });
+      setMessage({ type: "error", text: String(error) });
     }
   };
 
   const handleDeleteUser = async (id: string) => {
-    if (!confirm('Êtes-vous sûr ?')) return;
+    if (!confirm("Êtes-vous sûr ?")) return;
 
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem("auth_token");
       const res = await fetch(`/api/users/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!res.ok) throw new Error('Erreur de suppression');
+      if (!res.ok) throw new Error("Erreur de suppression");
 
-      setMessage({ type: 'success', text: 'Utilisateur supprimé' });
+      setMessage({ type: "success", text: "Utilisateur supprimé" });
       await fetchUsers();
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erreur' });
+      setMessage({ type: "error", text: "Erreur" });
     }
   };
 
   return (
     <div className="container py-8 space-y-8">
       <div>
-        <h1 className="text-4xl font-bold tracking-tight">Gestion des utilisateurs</h1>
+        <h1 className="text-4xl font-bold tracking-tight">
+          Gestion des utilisateurs
+        </h1>
         <p className="text-lg text-muted-foreground mt-2">
           Créez et gérez les comptes administrateur et utilisateur
         </p>
       </div>
 
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+        <div
+          className={`p-4 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+        >
           {message.text}
         </div>
       )}
@@ -131,7 +148,9 @@ export default function AdminDashboard() {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Users size={24} className="text-primary" />
-          <span className="text-xl font-semibold">{users.length} utilisateur(s)</span>
+          <span className="text-xl font-semibold">
+            {users.length} utilisateur(s)
+          </span>
         </div>
         <Button onClick={() => setShowForm(!showForm)} className="gap-2">
           <Plus size={16} /> Créer utilisateur
@@ -151,7 +170,9 @@ export default function AdminDashboard() {
                   type="email"
                   placeholder="email@example.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -162,17 +183,23 @@ export default function AdminDashboard() {
                   type="password"
                   placeholder="••••••••"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   required
                 />
-                <p className="text-xs text-muted-foreground mt-1">Min 6 caractères</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Min 6 caractères
+                </p>
               </div>
 
               <div>
                 <label className="text-sm font-medium">Rôle</label>
                 <select
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value as any })
+                  }
                   className="w-full px-3 py-2 rounded-md border bg-background text-sm"
                 >
                   <option value="user">Utilisateur</option>
@@ -182,7 +209,11 @@ export default function AdminDashboard() {
 
               <div className="flex gap-2">
                 <Button type="submit">Créer</Button>
-                <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowForm(false)}
+                >
                   Annuler
                 </Button>
               </div>
@@ -212,10 +243,12 @@ export default function AdminDashboard() {
                     <div>
                       <p className="font-semibold">{u.email}</p>
                       <p className="text-sm text-muted-foreground">
-                        Rôle: {u.role === 'admin' ? 'Administrateur' : 'Utilisateur'}
+                        Rôle:{" "}
+                        {u.role === "admin" ? "Administrateur" : "Utilisateur"}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Créé: {new Date(u.created_at).toLocaleDateString('fr-FR')}
+                        Créé:{" "}
+                        {new Date(u.created_at).toLocaleDateString("fr-FR")}
                       </p>
                     </div>
                   </div>

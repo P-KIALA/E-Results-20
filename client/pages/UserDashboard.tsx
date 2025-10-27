@@ -1,20 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Upload, Send } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Upload, Send } from "lucide-react";
 
 export default function UserDashboard() {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [selectedDoctors, setSelectedDoctors] = useState<string[]>([]);
   const [customMessage, setCustomMessage] = useState(
-    'Bonjour,\n\nVous trouverez ci-joint les résultats d\'analyse demandés.\n\nCordialement'
+    "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
   );
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -23,8 +32,8 @@ export default function UserDashboard() {
 
   const fetchDoctors = async () => {
     try {
-      const token = localStorage.getItem('auth_token');
-      const res = await fetch('/api/doctors', {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/doctors", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -32,7 +41,7 @@ export default function UserDashboard() {
       const data = await res.json();
       setDoctors(data.doctors?.filter((d: any) => d.whatsapp_verified) || []);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erreur lors du chargement' });
+      setMessage({ type: "error", text: "Erreur lors du chargement" });
     }
   };
 
@@ -40,7 +49,7 @@ export default function UserDashboard() {
     const selected = Array.from(e.target.files || []);
     const validFiles = selected.filter((f) => {
       if (f.size > 16 * 1024 * 1024) {
-        setMessage({ type: 'error', text: `${f.name} dépasse 16 MB` });
+        setMessage({ type: "error", text: `${f.name} dépasse 16 MB` });
         return false;
       }
       return true;
@@ -50,7 +59,7 @@ export default function UserDashboard() {
 
   const handleUploadFiles = async () => {
     if (files.length === 0) {
-      setMessage({ type: 'error', text: 'Sélectionnez au moins un fichier' });
+      setMessage({ type: "error", text: "Sélectionnez au moins un fichier" });
       return;
     }
 
@@ -61,7 +70,7 @@ export default function UserDashboard() {
           const data = await new Promise<string>((resolve) => {
             const reader = new FileReader();
             reader.onload = () => {
-              const base64 = (reader.result as string).split(',')[1];
+              const base64 = (reader.result as string).split(",")[1];
               resolve(base64);
             };
             reader.readAsDataURL(file);
@@ -72,14 +81,14 @@ export default function UserDashboard() {
             data,
             type: file.type,
           };
-        })
+        }),
       );
 
-      const token = localStorage.getItem('auth_token');
-      const res = await fetch('/api/upload-files', {
-        method: 'POST',
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/upload-files", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ files: fileDataList }),
@@ -92,10 +101,13 @@ export default function UserDashboard() {
 
       const result = await res.json();
       setUploadedFileIds(result.files.map((f: any) => f.id));
-      setMessage({ type: 'success', text: `${result.files.length} fichier(s) uploadé(s)` });
+      setMessage({
+        type: "success",
+        text: `${result.files.length} fichier(s) uploadé(s)`,
+      });
       setFiles([]);
     } catch (error) {
-      setMessage({ type: 'error', text: `Erreur: ${String(error)}` });
+      setMessage({ type: "error", text: `Erreur: ${String(error)}` });
     } finally {
       setUploading(false);
     }
@@ -103,22 +115,22 @@ export default function UserDashboard() {
 
   const handleSend = async () => {
     if (selectedDoctors.length === 0) {
-      setMessage({ type: 'error', text: 'Sélectionnez au moins un médecin' });
+      setMessage({ type: "error", text: "Sélectionnez au moins un médecin" });
       return;
     }
 
     if (!customMessage.trim()) {
-      setMessage({ type: 'error', text: 'Écrivez un message' });
+      setMessage({ type: "error", text: "Écrivez un message" });
       return;
     }
 
     setSending(true);
     try {
-      const token = localStorage.getItem('auth_token');
-      const res = await fetch('/api/send-results', {
-        method: 'POST',
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/send-results", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -135,14 +147,17 @@ export default function UserDashboard() {
 
       const result = await res.json();
       const successCount = result.results.filter((r: any) => r.success).length;
-      setMessage({ type: 'success', text: `${successCount}/${selectedDoctors.length} envoyé(s)` });
+      setMessage({
+        type: "success",
+        text: `${successCount}/${selectedDoctors.length} envoyé(s)`,
+      });
       setSelectedDoctors([]);
       setCustomMessage(
-        'Bonjour,\n\nVous trouverez ci-joint les résultats d\'analyse demandés.\n\nCordialement'
+        "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
       );
       setUploadedFileIds([]);
     } catch (error) {
-      setMessage({ type: 'error', text: `Erreur: ${String(error)}` });
+      setMessage({ type: "error", text: `Erreur: ${String(error)}` });
     } finally {
       setSending(false);
     }
@@ -151,14 +166,18 @@ export default function UserDashboard() {
   return (
     <div className="container py-8 space-y-8">
       <div>
-        <h1 className="text-4xl font-bold tracking-tight">Envoyer des résultats</h1>
+        <h1 className="text-4xl font-bold tracking-tight">
+          Envoyer des résultats
+        </h1>
         <p className="text-lg text-muted-foreground mt-2">
           Uploadez les fichiers et envoyez-les aux médecins
         </p>
       </div>
 
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+        <div
+          className={`p-4 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+        >
           {message.text}
         </div>
       )}
@@ -183,19 +202,26 @@ export default function UserDashboard() {
               />
               <label htmlFor="file-input" className="cursor-pointer">
                 <p className="font-medium">Cliquez pour sélectionner</p>
-                <p className="text-sm text-muted-foreground">ou glissez des fichiers ici</p>
+                <p className="text-sm text-muted-foreground">
+                  ou glissez des fichiers ici
+                </p>
               </label>
             </div>
 
             {files.length > 0 && (
               <div className="space-y-2">
                 {files.map((f, i) => (
-                  <div key={i} className="flex justify-between items-center p-2 bg-muted rounded">
+                  <div
+                    key={i}
+                    className="flex justify-between items-center p-2 bg-muted rounded"
+                  >
                     <span className="text-sm">{f.name}</span>
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => setFiles(files.filter((_, idx) => idx !== i))}
+                      onClick={() =>
+                        setFiles(files.filter((_, idx) => idx !== i))
+                      }
                     >
                       ✕
                     </Button>
@@ -204,8 +230,14 @@ export default function UserDashboard() {
               </div>
             )}
 
-            <Button onClick={handleUploadFiles} disabled={uploading || files.length === 0} className="w-full">
-              {uploading ? 'Upload en cours...' : `Upload ${files.length} fichier(s)`}
+            <Button
+              onClick={handleUploadFiles}
+              disabled={uploading || files.length === 0}
+              className="w-full"
+            >
+              {uploading
+                ? "Upload en cours..."
+                : `Upload ${files.length} fichier(s)`}
             </Button>
           </CardContent>
         </Card>
@@ -217,10 +249,15 @@ export default function UserDashboard() {
           </CardHeader>
           <CardContent className="space-y-2 max-h-96 overflow-y-auto">
             {doctors.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucun médecin disponible</p>
+              <p className="text-sm text-muted-foreground">
+                Aucun médecin disponible
+              </p>
             ) : (
               doctors.map((doctor) => (
-                <label key={doctor.id} className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer">
+                <label
+                  key={doctor.id}
+                  className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer"
+                >
                   <input
                     type="checkbox"
                     checked={selectedDoctors.includes(doctor.id)}
@@ -228,13 +265,17 @@ export default function UserDashboard() {
                       if (e.target.checked) {
                         setSelectedDoctors([...selectedDoctors, doctor.id]);
                       } else {
-                        setSelectedDoctors(selectedDoctors.filter((id) => id !== doctor.id));
+                        setSelectedDoctors(
+                          selectedDoctors.filter((id) => id !== doctor.id),
+                        );
                       }
                     }}
                   />
                   <div className="flex-1">
                     <p className="font-medium text-sm">{doctor.name}</p>
-                    <p className="text-xs text-muted-foreground">{doctor.phone}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {doctor.phone}
+                    </p>
                   </div>
                 </label>
               ))
@@ -254,9 +295,13 @@ export default function UserDashboard() {
             rows={6}
             placeholder="Écrivez votre message..."
           />
-          <Button onClick={handleSend} disabled={sending || selectedDoctors.length === 0} className="w-full gap-2">
+          <Button
+            onClick={handleSend}
+            disabled={sending || selectedDoctors.length === 0}
+            className="w-full gap-2"
+          >
             <Send size={16} />
-            {sending ? 'Envoi en cours...' : 'Envoyer'}
+            {sending ? "Envoi en cours..." : "Envoyer"}
           </Button>
         </CardContent>
       </Card>

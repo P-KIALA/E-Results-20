@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/lib/auth-context';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 
 const images = [
   {
-    url: 'https://images.pexels.com/photos/6285370/pexels-photo-6285370.jpeg?v=1',
-    alt: 'Centre de diagnostic médical',
+    url: "https://images.pexels.com/photos/6285370/pexels-photo-6285370.jpeg?v=1",
+    alt: "Centre de diagnostic médical",
   },
   {
-    url: 'https://images.pexels.com/photos/7734576/pexels-photo-7734576.jpeg?v=1',
-    alt: 'Envoi et partage sécurisé des résultats',
+    url: "https://images.pexels.com/photos/7734576/pexels-photo-7734576.jpeg?v=1",
+    alt: "Envoi et partage sécurisé des résultats",
   },
   {
-    url: 'https://images.pexels.com/photos/6011598/pexels-photo-6011598.jpeg?v=1',
-    alt: 'Technologie médicale et gestion numérique',
+    url: "https://images.pexels.com/photos/6011598/pexels-photo-6011598.jpeg?v=1",
+    alt: "Technologie médicale et gestion numérique",
   },
 ];
 
@@ -56,7 +56,7 @@ export default function Index() {
                 </div>
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-                  Bienvenu au service{' '}
+                  Bienvenu au service{" "}
                   <span className="block text-primary">E-Resultat</span>
                   <span className="text-2xl md:text-3xl font-bold text-foreground">
                     du Centre de Diagnostic EYANO
@@ -66,14 +66,18 @@ export default function Index() {
 
               <div className="space-y-6">
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-                  Plateforme sécurisée et moderne pour la transmission instantanée des résultats médicaux via WhatsApp. 
-                  Simplifiez vos processus, améliorez l'expérience patient et garantissez la confidentialité.
+                  Plateforme sécurisée et moderne pour la transmission
+                  instantanée des résultats médicaux via WhatsApp. Simplifiez
+                  vos processus, améliorez l'expérience patient et garantissez
+                  la confidentialité.
                 </p>
 
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                    <span className="text-sm font-medium">Sécurisé & Conforme</span>
+                    <span className="text-sm font-medium">
+                      Sécurisé & Conforme
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-green-500"></div>
@@ -87,10 +91,7 @@ export default function Index() {
 
                 {!isAuthenticated && (
                   <div className="pt-4">
-                    <Button 
-                      size="lg" 
-                      onClick={() => navigate('/login')}
-                    >
+                    <Button size="lg" onClick={() => navigate("/login")}>
                       Se connecter
                     </Button>
                   </div>
@@ -106,7 +107,7 @@ export default function Index() {
                   <div
                     key={index}
                     className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                      index === currentIndex ? 'opacity-100' : 'opacity-0'
+                      index === currentIndex ? "opacity-100" : "opacity-0"
                     }`}
                   >
                     <img
@@ -143,8 +144,8 @@ export default function Index() {
                       onClick={() => setCurrentIndex(index)}
                       className={`h-2 rounded-full transition-all ${
                         index === currentIndex
-                          ? 'bg-white w-8'
-                          : 'bg-white/50 w-2 hover:bg-white/75'
+                          ? "bg-white w-8"
+                          : "bg-white/50 w-2 hover:bg-white/75"
                       }`}
                       aria-label={`Aller à l'image ${index + 1}`}
                     />
