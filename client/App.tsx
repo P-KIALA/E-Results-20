@@ -5,8 +5,8 @@ import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/lib/auth-context";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -29,22 +29,6 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function HomeRedirect() {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  if (isAuthenticated) {
-    navigate("/console", { replace: true });
-    return null;
-  }
-
-  return (
-    <Layout>
-      <Index />
-    </Layout>
-  );
-}
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -56,7 +40,9 @@ const App = () => (
             <Route
               path="/"
               element={
-                <HomeRedirect />
+                <Layout>
+                  <Index />
+                </Layout>
               }
             />
             <Route
