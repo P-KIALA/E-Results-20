@@ -123,11 +123,15 @@ export const sendResults: RequestHandler = async (req, res) => {
           .insert({
             doctor_id,
             custom_message,
-            patient_name: (req.body as any).patient_name || null,
             status: "pending",
           })
           .select()
           .single();
+
+        if (logError) {
+          // If patient_name column exists, update later (best-effort)
+          console.warn("send_logs insert encountered error:", logError);
+        }
 
         if (logError) throw logError;
 
