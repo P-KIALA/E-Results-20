@@ -54,11 +54,7 @@ const App = () => (
           <Routes>
             <Route
               path="/"
-              element={
-                <Layout>
-                  <Index />
-                </Layout>
-              }
+              element={<RootRedirector />}
             />
             <Route
               path="/login"
