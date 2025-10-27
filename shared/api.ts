@@ -56,3 +56,40 @@ export interface VerifyPhoneResponse {
   is_whatsapp: boolean;
   formatted_phone: string;
 }
+
+export type UserRole = 'admin' | 'user';
+
+export interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  token: string;
+  expiresIn: number;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  role?: UserRole;
+}
+
+export interface AuthSession {
+  user: User;
+  token: string;
+  expiresAt: number;
+}
+
+export interface LogoutResponse {
+  success: boolean;
+}
