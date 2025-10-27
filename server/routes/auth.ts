@@ -163,12 +163,24 @@ export const getMe: RequestHandler = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Fetch primary site if exists
+    let primarySite = null;
+    if (user.primary_site_id) {
+      const { data: site } = await supabase
+        .from("sites")
+        .select("*")
+        .eq("id", user.primary_site_id)
+        .single();
+      primarySite = site;
+    }
+
     res.json({
       id: user.id,
       email: user.email,
       role: user.role,
       permissions: user.permissions || [],
-      site: user.site || null,
+      primary_site_id: user.primary_site_id || null,
+      primary_site: primarySite,
       created_at: user.created_at,
       updated_at: user.updated_at,
     });
