@@ -65,6 +65,8 @@ export default function HistoryTab() {
       if (filterStatus) params.append("status", filterStatus);
       if (filterDoctor) params.append("doctor_id", filterDoctor);
       if (filterSite) params.append("site_id", filterSite);
+      if (startDate) params.append("startDate", startDate);
+      if (endDate) params.append("endDate", endDate);
 
       const token = getToken();
       const res = await fetch(`/api/send-logs?${params}`, {
@@ -80,7 +82,7 @@ export default function HistoryTab() {
     } finally {
       setLoading(false);
     }
-  }, [filterStatus, filterDoctor, filterSite]);
+  }, [filterStatus, filterDoctor, filterSite, startDate, endDate]);
 
   // Load only when user requests (no automatic polling)
   useEffect(() => {
