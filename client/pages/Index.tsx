@@ -57,11 +57,11 @@ export default function Index() {
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
                   Bienvenu au service{" "}
-                  <span className="block text-primary">E-Resultat</span>
-                  <span className="text-2xl md:text-3xl font-bold text-foreground">
-                    du Centre de Diagnostic EYANO
-                  </span>
+                  <span className="block text-primary">E-Result</span>
                 </h1>
+                <h2 className="text-3xl md:text-4xl font-black uppercase tracking-wider text-foreground">
+                  Centre de Diagnostic EYANO
+                </h2>
               </div>
 
               <div className="space-y-6">
