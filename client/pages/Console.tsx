@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DoctorsTab from "@/components/console/DoctorsTab";
 import ResultsTab from "@/components/console/ResultsTab";
 import HistoryTab from "@/components/console/HistoryTab";
+import StatsTab from "@/components/console/StatsTab";
 
 export default function ConsolePage() {
   const [activeTab, setActiveTab] = useState("doctors");
