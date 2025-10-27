@@ -18,6 +18,7 @@ import {
   getMe,
   getAllUsers,
   deleteUser,
+  updateUser,
 } from "./routes/auth";
 import { createInitialAdmin } from "./routes/seed";
 import { authMiddleware, requireAuth } from "./lib/middleware";
