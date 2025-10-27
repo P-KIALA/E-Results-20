@@ -135,6 +135,11 @@ export default function ResultsTab() {
       return;
     }
 
+    if (!patientSite.trim()) {
+      setMessage({ type: "error", text: "Le site du centre est requis" });
+      return;
+    }
+
     setSending(true);
     try {
       const token = localStorage.getItem("auth_token");
@@ -149,6 +154,7 @@ export default function ResultsTab() {
           custom_message: customMessage,
           file_ids: uploadedFileIds,
           patient_name: patientName || undefined,
+          patient_site: patientSite || undefined,
         }),
       });
 
@@ -257,16 +263,30 @@ export default function ResultsTab() {
           )}
 
           {/* Patient name - always visible and required */}
-          <div className="mt-4">
-            <Input
-              placeholder="Nom du malade"
-              value={patientName}
-              onChange={(e) => setPatientName(e.target.value)}
-              aria-required={true}
-            />
-            {!patientName.trim() && (
-              <p className="text-xs text-red-600 mt-1">Le nom du malade est requis.</p>
-            )}
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <Input
+                placeholder="Nom du malade"
+                value={patientName}
+                onChange={(e) => setPatientName(e.target.value)}
+                aria-required={true}
+              />
+              {!patientName.trim() && (
+                <p className="text-xs text-red-600 mt-1">Le nom du malade est requis.</p>
+              )}
+            </div>
+
+            <div>
+              <Input
+                placeholder="Site du centre"
+                value={patientSite}
+                onChange={(e) => setPatientSite(e.target.value)}
+                aria-required={true}
+              />
+              {!patientSite.trim() && (
+                <p className="text-xs text-red-600 mt-1">Le site du centre est requis.</p>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
