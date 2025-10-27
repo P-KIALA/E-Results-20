@@ -408,13 +408,16 @@ export default function AdminDashboard() {
                       </label>
                       <div className="space-y-2 border rounded-md p-3 bg-muted/30 max-h-48 overflow-y-auto">
                         {sites.map((site) => (
-                          <div key={site.id} className="flex items-center gap-2">
+                          <div
+                            key={site.id}
+                            className="flex items-center gap-2"
+                          >
                             <input
                               type="checkbox"
                               id={`site-${site.id}`}
-                              checked={(formData.accessible_site_ids || []).includes(
-                                site.id
-                              )}
+                              checked={(
+                                formData.accessible_site_ids || []
+                              ).includes(site.id)}
                               onChange={() => toggleAccessibleSite(site.id)}
                               className="rounded border-gray-300"
                             />

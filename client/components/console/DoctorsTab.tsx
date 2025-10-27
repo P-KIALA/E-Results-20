@@ -41,7 +41,10 @@ export default function DoctorsTab() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
         return;
       }
       const res = await fetch("/api/doctors", {
@@ -59,7 +62,8 @@ export default function DoctorsTab() {
       console.error("Error fetching doctors:", error);
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Erreur lors du chargement",
+        text:
+          error instanceof Error ? error.message : "Erreur lors du chargement",
       });
     } finally {
       setLoading(false);
@@ -73,7 +77,10 @@ export default function DoctorsTab() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
         return;
       }
 
@@ -88,7 +95,10 @@ export default function DoctorsTab() {
 
       if (!res.ok) {
         const err = await res.json();
-        setMessage({ type: "error", text: err.error || "Erreur lors de l'ajout" });
+        setMessage({
+          type: "error",
+          text: err.error || "Erreur lors de l'ajout",
+        });
         return;
       }
 
@@ -113,7 +123,10 @@ export default function DoctorsTab() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
         return;
       }
 
@@ -146,7 +159,10 @@ export default function DoctorsTab() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
         return;
       }
 

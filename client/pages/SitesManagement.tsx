@@ -63,7 +63,10 @@ export default function SitesManagement() {
       console.error("Error fetching sites:", error);
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Erreur lors du chargement des sites",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Erreur lors du chargement des sites",
       });
     } finally {
       setLoading(false);
@@ -81,7 +84,7 @@ export default function SitesManagement() {
 
     // Check if site name already exists
     const siteNameExists = sites.some(
-      (site) => site.name.toLowerCase() === newSiteName.trim().toLowerCase()
+      (site) => site.name.toLowerCase() === newSiteName.trim().toLowerCase(),
     );
 
     if (siteNameExists) {
@@ -92,7 +95,10 @@ export default function SitesManagement() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
         return;
       }
 
@@ -119,7 +125,8 @@ export default function SitesManagement() {
       console.error("Error creating site:", error);
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Erreur lors de la création",
+        text:
+          error instanceof Error ? error.message : "Erreur lors de la création",
       });
     }
   };
@@ -127,7 +134,7 @@ export default function SitesManagement() {
   const handleDeleteSite = async (id: string) => {
     if (
       !confirm(
-        "Êtes-vous sûr ? Cette action supprimera le site de tous les utilisateurs."
+        "Êtes-vous sûr ? Cette action supprimera le site de tous les utilisateurs.",
       )
     )
       return;
@@ -136,7 +143,10 @@ export default function SitesManagement() {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
         return;
       }
 
@@ -168,9 +178,7 @@ export default function SitesManagement() {
   return (
     <div className="container py-8 space-y-8">
       <div>
-        <h1 className="text-4xl font-bold tracking-tight">
-          Gestion des sites
-        </h1>
+        <h1 className="text-4xl font-bold tracking-tight">Gestion des sites</h1>
         <p className="text-lg text-muted-foreground mt-2">
           Créez, gérez et supprimez les centres de diagnostic
         </p>
