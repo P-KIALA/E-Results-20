@@ -101,7 +101,7 @@ export default function LoginPage() {
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-black leading-tight tracking-tight">
               Bienvenu au service{" "}
-              <span className="block text-emerald-400">E-Resultat</span>
+              <span className="block text-emerald-400 font-montserrat font-light">E-Result</span>
               <span className="text-2xl md:text-3xl font-bold">
                 CENTRE DE DIAGNOSTIC EYANO
               </span>
