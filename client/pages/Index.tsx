@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, LogIn } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 
@@ -42,7 +42,6 @@ export default function Index() {
 
   return (
     <div className="min-h-[calc(100vh-8rem)]">
-      {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-white to-primary/5">
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="grid gap-12 lg:grid-cols-2 items-center">
@@ -67,7 +66,7 @@ export default function Index() {
 
               <div className="space-y-6">
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-                  Plateforme sécurisée et moderne pour la transmission instantanée des résultats médicaux via WhatsApp.
+                  Plateforme sécurisée et moderne pour la transmission instantanée des résultats médicaux via WhatsApp. 
                   Simplifiez vos processus, améliorez l'expérience patient et garantissez la confidentialité.
                 </p>
 
@@ -88,12 +87,10 @@ export default function Index() {
 
                 {!isAuthenticated && (
                   <div className="pt-4">
-                    <Button
-                      size="lg"
+                    <Button 
+                      size="lg" 
                       onClick={() => navigate('/login')}
-                      className="gap-2"
                     >
-                      <LogIn size={18} />
                       Se connecter
                     </Button>
                   </div>
