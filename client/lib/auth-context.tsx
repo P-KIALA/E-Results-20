@@ -123,12 +123,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Registration failed");
+        throw new Error(data.error || "Registration failed");
       }
 
-      const data = await response.json();
       const session: AuthSession = {
         user: data.user,
         token: data.token,
