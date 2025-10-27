@@ -1,12 +1,58 @@
-/**
- * Shared code between client and server
- * Useful to share types between client and server
- * and/or small pure JS functions that can be used on both client and server
- */
-
-/**
- * Example response type for /api/demo
- */
 export interface DemoResponse {
   message: string;
+}
+
+export interface Doctor {
+  id: string;
+  phone: string;
+  name: string;
+  specialization?: string;
+  whatsapp_verified: boolean;
+  whatsapp_verified_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AddDoctorRequest {
+  phone: string;
+  name: string;
+  specialization?: string;
+}
+
+export interface SendLogEntry {
+  id: string;
+  doctor_id: string;
+  status: 'pending' | 'sent' | 'delivered' | 'read' | 'failed';
+  custom_message?: string;
+  sent_at?: string;
+  delivered_at?: string;
+  read_at?: string;
+  error_message?: string;
+  twilio_message_sid?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SendResultsRequest {
+  doctor_ids: string[];
+  custom_message: string;
+  file_ids: string[];
+}
+
+export interface UploadFileResponse {
+  file_id: string;
+  file_name: string;
+  file_size: number;
+  storage_path: string;
+}
+
+export interface SendLogsResponse {
+  logs: SendLogEntry[];
+  total: number;
+}
+
+export interface VerifyPhoneResponse {
+  is_valid: boolean;
+  is_whatsapp: boolean;
+  formatted_phone: string;
 }
