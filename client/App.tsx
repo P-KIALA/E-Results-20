@@ -27,7 +27,13 @@ const queryClient = new QueryClient();
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="relative min-h-screen flex flex-col">
+      {/* Global background for all pages. Replace '/console-bg.svg' as needed */}
+      <div
+        className="absolute inset-0 -z-10 bg-center bg-no-repeat bg-cover"
+        style={{ backgroundImage: "url('/console-bg.svg')", opacity: 0.06 }}
+      />
+
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
