@@ -69,6 +69,11 @@ export default function SitesManagement() {
 
     try {
       const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        return;
+      }
+
       const res = await fetch("/api/sites", {
         method: "POST",
         headers: {
@@ -89,7 +94,11 @@ export default function SitesManagement() {
       setShowForm(false);
       await fetchSites();
     } catch (error) {
-      setMessage({ type: "error", text: String(error) });
+      console.error("Error creating site:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur lors de la création",
+      });
     }
   };
 
