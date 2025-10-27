@@ -19,6 +19,28 @@ export default function Index() {
 
   return (
     <div className="relative">
+      <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 to-transparent">
+        <div className="container py-12">
+          <div className="grid gap-8 md:grid-cols-2 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-primary mb-4">
+                Bienvenu au service E-Resultat du Centre de Diagnostic EYANO
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Plateforme sécurisée pour la transmission des résultats médicaux via WhatsApp
+              </p>
+            </div>
+            <div className="rounded-xl overflow-hidden shadow-lg">
+              <img
+                src="https://images.pexels.com/photos/6285370/pexels-photo-6285370.jpeg"
+                alt="Centre de diagnostic médical"
+                className="w-full h-96 object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/10 via-primary/5 to-transparent" />
         <div className="container py-20 md:py-28">
