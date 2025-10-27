@@ -141,6 +141,7 @@ export const getMe: RequestHandler = async (req, res) => {
       id: user.id,
       email: user.email,
       role: user.role,
+      permissions: user.permissions || [],
       created_at: user.created_at,
       updated_at: user.updated_at,
     });
