@@ -1,23 +1,27 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
 
 const images = [
   {
-    url: 'https://images.pexels.com/photos/6285370/pexels-photo-6285370.jpeg',
+    url: 'https://images.pexels.com/photos/6285370/pexels-photo-6285370.jpeg?v=1',
     alt: 'Centre de diagnostic médical',
   },
   {
-    url: 'https://images.pexels.com/photos/7734576/pexels-photo-7734576.jpeg',
+    url: 'https://images.pexels.com/photos/7734576/pexels-photo-7734576.jpeg?v=1',
     alt: 'Envoi et partage sécurisé des résultats',
   },
   {
-    url: 'https://images.pexels.com/photos/6011598/pexels-photo-6011598.jpeg',
+    url: 'https://images.pexels.com/photos/6011598/pexels-photo-6011598.jpeg?v=1',
     alt: 'Technologie médicale et gestion numérique',
   },
 ];
 
 export default function Index() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Auto-rotate carousel every 5 seconds
@@ -61,13 +65,13 @@ export default function Index() {
                 </h1>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-                  Plateforme sécurisée et moderne pour la transmission instantanée des résultats médicaux via WhatsApp. 
+                  Plateforme sécurisée et moderne pour la transmission instantanée des résultats médicaux via WhatsApp.
                   Simplifiez vos processus, améliorez l'expérience patient et garantissez la confidentialité.
                 </p>
 
-                <div className="flex gap-4 pt-4">
+                <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-green-500"></div>
                     <span className="text-sm font-medium">Sécurisé & Conforme</span>
@@ -81,6 +85,19 @@ export default function Index() {
                     <span className="text-sm font-medium">Simple</span>
                   </div>
                 </div>
+
+                {!isAuthenticated && (
+                  <div className="pt-4">
+                    <Button
+                      size="lg"
+                      onClick={() => navigate('/login')}
+                      className="gap-2"
+                    >
+                      <LogIn size={18} />
+                      Se connecter
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
