@@ -15,20 +15,47 @@ async function sendViaWhatsApp(
   mediaUrls: string[],
 ): Promise<string> {
   try {
-    const messageParams: any = {
+    // WhatsApp via Twilio supports one media per message reliably.
+    // If multiple media are provided, send the first media with the message body,
+    // then send each remaining media as a separate message (without body).
+
+    if (!mediaUrls || mediaUrls.length === 0) {
+      const result = await twilioClient.messages.create({
+        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+        to: `whatsapp:${to}`,
+        body: message,
+      });
+
+      console.log(`Message sent successfully to ${to}: ${result.sid}`);
+      return result.sid;
+    }
+
+    // Send first message with body + first media
+    const firstParams: any = {
       from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
       to: `whatsapp:${to}`,
       body: message,
+      mediaUrl: [mediaUrls[0]],
     };
 
-    if (mediaUrls.length > 0) {
-      messageParams.mediaUrl = mediaUrls;
+    const firstResult = await twilioClient.messages.create(firstParams);
+    console.log(`Message with first media sent to ${to}: ${firstResult.sid}`);
+
+    // Send remaining media as separate messages
+    for (let i = 1; i < mediaUrls.length; i++) {
+      try {
+        const res = await twilioClient.messages.create({
+          from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+          to: `whatsapp:${to}`,
+          mediaUrl: [mediaUrls[i]],
+        });
+        console.log(`Additional media ${i + 1} sent to ${to}: ${res.sid}`);
+      } catch (err) {
+        console.error(`Failed to send media #${i + 1} to ${to}:`, err);
+      }
     }
 
-    const result = await twilioClient.messages.create(messageParams);
-
-    console.log(`Message sent successfully to ${to}: ${result.sid}`);
-    return result.sid;
+    return firstResult.sid;
   } catch (error) {
     console.error(`Error sending WhatsApp message to ${to}:`, error);
     throw error;
