@@ -33,6 +33,8 @@ export default function DoctorsTab() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [editingDoctorId, setEditingDoctorId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
 
   useEffect(() => {
     fetchDoctors();
@@ -120,7 +122,7 @@ export default function DoctorsTab() {
   };
 
   const handleDeleteDoctor = async (id: string) => {
-    if (!confirm("Êtes-vous sûr ?")) return;
+    if (!confirm("��tes-vous sûr ?")) return;
 
     try {
       const token = localStorage.getItem("auth_token");
