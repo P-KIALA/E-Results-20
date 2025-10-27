@@ -139,6 +139,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(SESSION_KEY, JSON.stringify(session));
       localStorage.setItem("auth_token", data.token);
       setupTimeout();
+    } catch (error) {
+      throw error;
     } finally {
       setIsLoading(false);
     }
