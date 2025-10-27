@@ -70,6 +70,24 @@ export default function AdminDashboard() {
     fetchUsers();
   }, []);
 
+  const fetchSites = async () => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/sites", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch sites");
+
+      const data = await res.json();
+      setSites(data.sites || []);
+    } catch (error) {
+      console.error("Error fetching sites:", error);
+    }
+  };
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
