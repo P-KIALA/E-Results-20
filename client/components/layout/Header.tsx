@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
-import { LogOut, User, Settings } from "lucide-react";
+import { User } from "lucide-react";
 
 export default function Header() {
   const location = useLocation();
