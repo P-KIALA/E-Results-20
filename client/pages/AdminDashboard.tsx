@@ -10,16 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { User, Trash2, Plus, Users, Edit2, X, MapPin } from "lucide-react";
-import type { Site } from "@shared/api";
+import { User, Trash2, Plus, Users, Edit2, X } from "lucide-react";
 
 interface UserItem {
   id: string;
   email: string;
   role: "admin" | "user";
   permissions: string[];
-  primary_site_id?: string | null;
-  primary_site?: Site | null;
   created_at: string;
   updated_at: string;
 }
@@ -35,20 +32,15 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserItem[]>([]);
-  const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(false);
   const [showUserForm, setShowUserForm] = useState(false);
-  const [showSiteForm, setShowSiteForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     role: "user" as const,
     permissions: [] as string[],
-    primary_site_id: "",
-    accessible_site_ids: [] as string[],
   });
-  const [newSiteName, setNewSiteName] = useState("");
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -63,7 +55,6 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchUsers();
-    fetchSites();
   }, []);
 
   const fetchUsers = async () => {
@@ -90,42 +81,12 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchSites = async () => {
-    try {
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/sites", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed to fetch sites");
-
-      const data = await res.json();
-      setSites(data.sites || []);
-    } catch (error) {
-      setMessage({
-        type: "error",
-        text: "Erreur lors du chargement des sites",
-      });
-    }
-  };
-
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
 
     if (!formData.email || (!editingId && !formData.password)) {
       setMessage({ type: "error", text: "Email et mot de passe requis" });
-      return;
-    }
-
-    // For non-admin users, primary site is required
-    if (formData.role !== "admin" && !formData.primary_site_id) {
-      setMessage({
-        type: "error",
-        text: "Site principal requis pour les utilisateurs",
-      });
       return;
     }
 
@@ -143,8 +104,6 @@ export default function AdminDashboard() {
           body: JSON.stringify({
             role: formData.role,
             permissions: formData.permissions,
-            primary_site_id: formData.primary_site_id || null,
-            accessible_site_ids: formData.accessible_site_ids,
           }),
         });
 
@@ -168,7 +127,6 @@ export default function AdminDashboard() {
             password: formData.password,
             role: formData.role,
             permissions: formData.permissions,
-            primary_site_id: formData.primary_site_id || null,
           }),
         });
 
@@ -186,47 +144,10 @@ export default function AdminDashboard() {
         password: "",
         role: "user",
         permissions: [],
-        primary_site_id: "",
-        accessible_site_ids: [],
       });
       setEditingId(null);
       setShowUserForm(false);
       await fetchUsers();
-    } catch (error) {
-      setMessage({ type: "error", text: String(error) });
-    }
-  };
-
-  const handleCreateSite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage(null);
-
-    if (!newSiteName.trim()) {
-      setMessage({ type: "error", text: "Nom du site requis" });
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/sites", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: newSiteName.trim() }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Erreur lors de la création");
-      }
-
-      setMessage({ type: "success", text: "Site créé" });
-      setNewSiteName("");
-      setShowSiteForm(false);
-      await fetchSites();
     } catch (error) {
       setMessage({ type: "error", text: String(error) });
     }
@@ -239,8 +160,6 @@ export default function AdminDashboard() {
       password: "",
       role: u.role,
       permissions: u.permissions || [],
-      primary_site_id: u.primary_site_id || "",
-      accessible_site_ids: [],
     });
     setShowUserForm(true);
   };
@@ -275,15 +194,6 @@ export default function AdminDashboard() {
     }));
   };
 
-  const toggleAccessibleSite = (siteId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      accessible_site_ids: prev.accessible_site_ids.includes(siteId)
-        ? prev.accessible_site_ids.filter((s) => s !== siteId)
-        : [...prev.accessible_site_ids, siteId],
-    }));
-  };
-
   const closeForm = () => {
     setShowUserForm(false);
     setEditingId(null);
@@ -292,8 +202,6 @@ export default function AdminDashboard() {
       password: "",
       role: "user",
       permissions: [],
-      primary_site_id: "",
-      accessible_site_ids: [],
     });
   };
 
@@ -308,10 +216,10 @@ export default function AdminDashboard() {
     <div className="container py-8 space-y-8">
       <div>
         <h1 className="text-4xl font-bold tracking-tight">
-          Gestion des utilisateurs et sites
+          Gestion des utilisateurs
         </h1>
         <p className="text-lg text-muted-foreground mt-2">
-          Gérez les comptes administrateur, utilisateur et les sites
+          Créez, modifiez et supprimez les comptes administrateur et utilisateur
         </p>
       </div>
 
@@ -322,77 +230,6 @@ export default function AdminDashboard() {
           {message.text}
         </div>
       )}
-
-      {/* Sites Management Section */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <MapPin size={24} className="text-primary" />
-            <span className="text-xl font-semibold">
-              {sites.length} site(s)
-            </span>
-          </div>
-          <Button
-            onClick={() => setShowSiteForm(!showSiteForm)}
-            className="gap-2"
-          >
-            <Plus size={16} /> Ajouter un site
-          </Button>
-        </div>
-
-        {showSiteForm && (
-          <Card>
-            <CardHeader className="flex flex-row justify-between items-start">
-              <div>
-                <CardTitle>Ajouter un nouveau site</CardTitle>
-              </div>
-              <button
-                onClick={() => setShowSiteForm(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X size={20} />
-              </button>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleCreateSite} className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Nom du site</label>
-                  <Input
-                    placeholder="Ex: Centre X"
-                    value={newSiteName}
-                    onChange={(e) => setNewSiteName(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <Button type="submit">Créer</Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowSiteForm(false)}
-                  >
-                    Annuler
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
-
-        <div className="grid gap-2">
-          {sites.map((site) => (
-            <Card key={site.id}>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <MapPin size={18} className="text-primary/60" />
-                  <p className="font-medium">{site.name}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
 
       {/* Users Management Section */}
       <div className="space-y-4">
@@ -476,61 +313,6 @@ export default function AdminDashboard() {
                   </select>
                 </div>
 
-                {formData.role !== "admin" && (
-                  <div>
-                    <label className="text-sm font-medium">
-                      Site principal
-                    </label>
-                    <select
-                      value={formData.primary_site_id}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          primary_site_id: e.target.value,
-                        })
-                      }
-                      className="w-full px-3 py-2 rounded-md border bg-background text-sm"
-                      required
-                    >
-                      <option value="">Sélectionner un site</option>
-                      {sites.map((site) => (
-                        <option key={site.id} value={site.id}>
-                          {site.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {formData.role !== "admin" && sites.length > 1 && (
-                  <div>
-                    <label className="text-sm font-medium block mb-3">
-                      Sites supplémentaires accessibles
-                    </label>
-                    <div className="space-y-2 border rounded-md p-3 bg-muted/30">
-                      {sites.map((site) => (
-                        <div key={site.id} className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            id={`site-${site.id}`}
-                            checked={formData.accessible_site_ids.includes(
-                              site.id,
-                            )}
-                            onChange={() => toggleAccessibleSite(site.id)}
-                            className="rounded border-gray-300"
-                          />
-                          <label
-                            htmlFor={`site-${site.id}`}
-                            className="text-sm cursor-pointer"
-                          >
-                            {site.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 <div>
                   <label className="text-sm font-medium block mb-3">
                     Permissions supplémentaires
@@ -595,11 +377,6 @@ export default function AdminDashboard() {
                             ? "Administrateur"
                             : "Utilisateur"}
                         </p>
-                        {u.primary_site && (
-                          <p className="text-sm text-muted-foreground">
-                            Site principal: {u.primary_site.name}
-                          </p>
-                        )}
                         {u.permissions && u.permissions.length > 0 && (
                           <div className="mt-2">
                             <p className="text-xs font-medium text-muted-foreground">
