@@ -178,6 +178,8 @@ export default function AdminDashboard() {
         password: "",
         role: "user",
         permissions: [],
+        primary_site_id: "",
+        accessible_site_ids: [],
       });
       setEditingId(null);
       setShowUserForm(false);
@@ -194,6 +196,8 @@ export default function AdminDashboard() {
       password: "",
       role: u.role,
       permissions: u.permissions || [],
+      primary_site_id: u.primary_site_id || "",
+      accessible_site_ids: [],
     });
     setShowUserForm(true);
   };
