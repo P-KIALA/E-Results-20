@@ -54,14 +54,6 @@ export default function Header() {
                   ({user?.role === "admin" ? "Admin" : "Utilisateur"})
                 </span>
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={logout}
-                className="gap-2"
-              >
-                <LogOut size={16} /> Déconnexion
-              </Button>
             </>
           ) : (
             <Link to="/login">
