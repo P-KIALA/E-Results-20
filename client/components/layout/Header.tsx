@@ -70,6 +70,17 @@ export default function Header() {
                 >
                   Utilisateurs
                 </Link>
+                <Link
+                  to="/sites"
+                  className={cn(
+                    "text-sm transition-colors hover:text-foreground/80",
+                    isActive("/sites")
+                      ? "text-foreground"
+                      : "text-foreground/60",
+                  )}
+                >
+                  Sites
+                </Link>
               </>
             ) : (
               <Link
