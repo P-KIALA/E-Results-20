@@ -82,12 +82,7 @@ export const register: RequestHandler = async (req, res) => {
         .json({ error: "Password must be at least 6 characters" });
     }
 
-    // For non-admin users, primary_site_id is required
-    if (role !== "admin" && !primary_site_id) {
-      return res
-        .status(400)
-        .json({ error: "Site principal requis pour les utilisateurs" });
-    }
+    // primary_site_id is optional - can be assigned later via the sites management page
 
     // Check if user already exists
     const { data: existing } = await supabase
