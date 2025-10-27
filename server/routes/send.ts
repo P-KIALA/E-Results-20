@@ -108,6 +108,7 @@ export const sendResults: RequestHandler = async (req, res) => {
           .insert({
             doctor_id,
             custom_message,
+            patient_name: (req.body as any).patient_name || null,
             status: "pending",
           })
           .select()
