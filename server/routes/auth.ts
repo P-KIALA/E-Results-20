@@ -50,7 +50,7 @@ export const login: RequestHandler = async (req, res) => {
 
 export const register: RequestHandler = async (req, res) => {
   try {
-    const { email, password, role = "user" } = req.body as RegisterRequest;
+    const { email, password, role = "user", permissions = [] } = req.body as RegisterRequest;
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
@@ -83,6 +83,7 @@ export const register: RequestHandler = async (req, res) => {
         email: email.toLowerCase(),
         password_hash: passwordHash,
         role,
+        permissions,
       })
       .select()
       .single();
@@ -98,6 +99,7 @@ export const register: RequestHandler = async (req, res) => {
         id: user.id,
         email: user.email,
         role: user.role,
+        permissions: user.permissions || [],
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
