@@ -357,7 +357,7 @@ export default function UserDashboard() {
 
         <div>
           <label className="text-sm font-medium">
-            Site du centre {user?.site && "(auto-complété)"}
+            Site du centre {user?.primary_site?.name && "(auto-complété)"}
           </label>
           <Input
             placeholder="Site du centre"
