@@ -300,6 +300,11 @@ export default function ResultsTab() {
           <CardTitle>Message personnalisé</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <Input
+            placeholder="Nom du malade (optionnel)"
+            value={patientName}
+            onChange={(e) => setPatientName(e.target.value)}
+          />
           <Textarea
             value={customMessage}
             onChange={(e) => setCustomMessage(e.target.value)}
