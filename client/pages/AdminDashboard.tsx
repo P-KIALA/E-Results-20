@@ -232,6 +232,15 @@ export default function AdminDashboard() {
     }));
   };
 
+  const toggleAccessibleSite = (siteId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      accessible_site_ids: prev.accessible_site_ids.includes(siteId)
+        ? prev.accessible_site_ids.filter((s) => s !== siteId)
+        : [...prev.accessible_site_ids, siteId],
+    }));
+  };
+
   const closeForm = () => {
     setShowUserForm(false);
     setEditingId(null);
@@ -240,6 +249,8 @@ export default function AdminDashboard() {
       password: "",
       role: "user",
       permissions: [],
+      primary_site_id: "",
+      accessible_site_ids: [],
     });
   };
 
