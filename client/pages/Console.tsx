@@ -12,7 +12,7 @@ export default function ConsolePage() {
       {/* Background image behind the console. Replace '/placeholder.svg' in public/ with your image */}
       <div
         className="absolute inset-0 -z-10 bg-center bg-no-repeat bg-cover"
-        style={{ backgroundImage: "url('/placeholder.svg')", opacity: 0.06 }}
+        style={{ backgroundImage: "url('/console-bg.svg')", opacity: 0.08 }}
       />
 
       <div className="container">
