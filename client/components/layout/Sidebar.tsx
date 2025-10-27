@@ -39,10 +39,8 @@ export default function Sidebar() {
             className={navItemClass(isActive("/console"))}
             title="Console"
           >
-            <LayoutDashboard size={22} className="flex-shrink-0" />
-            <span className="hidden group-hover:inline whitespace-nowrap font-medium">
-              Console
-            </span>
+            <LayoutDashboard size={20} className="flex-shrink-0" />
+            {isHovered && <span className="font-medium">Console</span>}
           </Link>
 
           <Link
@@ -50,10 +48,8 @@ export default function Sidebar() {
             className={navItemClass(isActive("/admin"))}
             title="Utilisateurs"
           >
-            <Users size={22} className="flex-shrink-0" />
-            <span className="hidden group-hover:inline whitespace-nowrap font-medium">
-              Utilisateurs
-            </span>
+            <Users size={20} className="flex-shrink-0" />
+            {isHovered && <span className="font-medium">Utilisateurs</span>}
           </Link>
 
           <Link
@@ -61,10 +57,8 @@ export default function Sidebar() {
             className={navItemClass(isActive("/sites"))}
             title="Sites"
           >
-            <MapPin size={22} className="flex-shrink-0" />
-            <span className="hidden group-hover:inline whitespace-nowrap font-medium">
-              Sites
-            </span>
+            <MapPin size={20} className="flex-shrink-0" />
+            {isHovered && <span className="font-medium">Sites</span>}
           </Link>
         </>
       ) : (
@@ -73,10 +67,8 @@ export default function Sidebar() {
           className={navItemClass(isActive("/dashboard"))}
           title="Envois"
         >
-          <LayoutDashboard size={22} className="flex-shrink-0" />
-          <span className="hidden group-hover:inline whitespace-nowrap font-medium">
-            Envois
-          </span>
+          <LayoutDashboard size={20} className="flex-shrink-0" />
+          {isHovered && <span className="font-medium">Envois</span>}
         </Link>
       )}
 
@@ -85,16 +77,14 @@ export default function Sidebar() {
       <button
         onClick={logout}
         className={cn(
-          "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
           "w-full text-left no-underline text-destructive",
-          "hover:bg-destructive/10 hover:text-destructive font-semibold"
+          "hover:bg-destructive/10 hover:text-destructive font-semibold whitespace-nowrap"
         )}
         title="Déconnexion"
       >
-        <LogOut size={22} className="flex-shrink-0" />
-        <span className="hidden group-hover:inline whitespace-nowrap">
-          Déconnexion
-        </span>
+        <LogOut size={20} className="flex-shrink-0" />
+        {isHovered && <span>Déconnexion</span>}
       </button>
     </aside>
   );
