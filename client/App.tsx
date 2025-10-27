@@ -20,6 +20,7 @@ import LoginPage from "./pages/Login";
 import ConsolePage from "./pages/Console";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
+import SitesManagement from "./pages/SitesManagement";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
