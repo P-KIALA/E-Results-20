@@ -79,6 +79,16 @@ export default function SitesManagement() {
       return;
     }
 
+    // Check if site name already exists
+    const siteNameExists = sites.some(
+      (site) => site.name.toLowerCase() === newSiteName.trim().toLowerCase()
+    );
+
+    if (siteNameExists) {
+      setMessage({ type: "error", text: "Nom du site déjà utilisé" });
+      return;
+    }
+
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
