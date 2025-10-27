@@ -99,11 +99,11 @@ export default function LoginPage() {
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-black leading-tight tracking-tight">
               Bienvenu au service{" "}
               <span className="block text-emerald-400">E-Resultat</span>
               <span className="text-2xl md:text-3xl font-bold">
-                du Centre de Diagnostic EYANO
+                CENTRE DE DIAGNOSTIC EYANO
               </span>
             </h1>
           </div>
