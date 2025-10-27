@@ -124,6 +124,7 @@ export default function AdminDashboard() {
             password: formData.password,
             role: formData.role,
             permissions: formData.permissions,
+            site: formData.site || null,
           }),
         });
 
