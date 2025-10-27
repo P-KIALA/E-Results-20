@@ -67,7 +67,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden flex flex-col">
       {/* Background Image Carousel */}
       <div className="absolute inset-0 -z-10">
         {images.map((image, index) => (
@@ -88,7 +88,7 @@ export default function LoginPage() {
       </div>
 
       {/* Content Container */}
-      <div className="container mx-auto px-4 py-12 h-screen flex items-center justify-between relative z-10">
+      <div className="container mx-auto px-4 py-12 flex-1 flex items-center justify-between relative z-10">
         {/* Left Side - Hero Content */}
         <div className="w-full lg:w-1/2 space-y-8 text-white">
           <div className="space-y-4">
