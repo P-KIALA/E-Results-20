@@ -32,10 +32,11 @@ export default function ConsolePage() {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="doctors">Médecins</TabsTrigger>
             <TabsTrigger value="results">Résultats</TabsTrigger>
             <TabsTrigger value="history">Historique</TabsTrigger>
+            <TabsTrigger value="stats">Statistiques</TabsTrigger>
           </TabsList>
 
           <TabsContent value="doctors" className="space-y-6">
@@ -48,6 +49,10 @@ export default function ConsolePage() {
 
           <TabsContent value="history" className="space-y-6">
             <HistoryTab />
+          </TabsContent>
+
+          <TabsContent value="stats" className="space-y-6">
+            <StatsTab />
           </TabsContent>
         </Tabs>
       </div>
