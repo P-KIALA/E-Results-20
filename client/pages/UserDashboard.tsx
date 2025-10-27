@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Upload, Send, Plus, Trash2 } from "lucide-react";
 
 export default function UserDashboard() {
+  const { user } = useAuth();
   const [doctors, setDoctors] = useState<any[]>([]);
   const [selectedDoctors, setSelectedDoctors] = useState<string[]>([]);
   const [customMessage, setCustomMessage] = useState(
@@ -26,6 +27,13 @@ export default function UserDashboard() {
     text: string;
   } | null>(null);
   const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
+  const [showAddDoctor, setShowAddDoctor] = useState(false);
+  const [addingDoctor, setAddingDoctor] = useState(false);
+  const [newDoctor, setNewDoctor] = useState({
+    name: "",
+    phone: "",
+    specialization: "",
+  });
 
   useEffect(() => {
     fetchDoctors();
