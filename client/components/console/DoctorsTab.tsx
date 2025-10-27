@@ -20,7 +20,13 @@ export default function DoctorsTab() {
   const fetchDoctors = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/doctors");
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/doctors", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setDoctors(data.doctors || []);
     } catch (error) {
@@ -60,9 +66,15 @@ export default function DoctorsTab() {
 
   const handleDeleteDoctor = async (id: string) => {
     if (!confirm("Êtes-vous sûr ?")) return;
-    
+
     try {
-      const res = await fetch(`/api/doctors/${id}`, { method: "DELETE" });
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch(`/api/doctors/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (res.ok) {
         setMessage({ type: "success", text: "Médecin supprimé" });
         await fetchDoctors();
@@ -76,7 +88,13 @@ export default function DoctorsTab() {
 
   const handleVerify = async (id: string) => {
     try {
-      const res = await fetch(`/api/doctors/${id}/verify`, { method: "POST" });
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch(`/api/doctors/${id}/verify`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (res.ok) {
         setMessage({ type: "success", text: "Vérification en cours..." });
         await fetchDoctors();
