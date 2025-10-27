@@ -125,7 +125,7 @@ export default function HistoryTab() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3 items-center">
+      <div className="grid gap-4 sm:grid-cols-4 items-center">
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
@@ -152,11 +152,25 @@ export default function HistoryTab() {
           ))}
         </select>
 
+        <select
+          value={filterSite}
+          onChange={(e) => setFilterSite(e.target.value)}
+          className="px-3 py-2 rounded-md border bg-background text-sm"
+        >
+          <option value="">Tous les sites</option>
+          {sites.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+
         <div className="flex gap-2">
           <Button
             onClick={async () => {
               setLoading(true);
               try {
+                await fetchSites();
                 await fetchDoctors();
                 await fetchLogs();
               } finally {
