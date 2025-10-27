@@ -125,6 +125,11 @@ export default function SitesManagement() {
     setDeletingId(id);
     try {
       const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        return;
+      }
+
       const res = await fetch(`/api/sites/${id}`, {
         method: "DELETE",
         headers: {
@@ -133,14 +138,18 @@ export default function SitesManagement() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Erreur de suppression");
       }
 
       setMessage({ type: "success", text: "Site supprimé avec succès" });
       await fetchSites();
     } catch (error) {
-      setMessage({ type: "error", text: String(error) });
+      console.error("Error deleting site:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur de suppression",
+      });
     } finally {
       setDeletingId(null);
     }
@@ -153,7 +162,7 @@ export default function SitesManagement() {
           Gestion des sites
         </h1>
         <p className="text-lg text-muted-foreground mt-2">
-          Cr��ez, gérez et supprimez les centres de diagnostic
+          Créez, gérez et supprimez les centres de diagnostic
         </p>
       </div>
 
