@@ -230,14 +230,6 @@ export default function ResultsTab() {
                   </Button>
                 </div>
               ))}
-
-              <div>
-                <Input
-                  placeholder="Nom du malade (optionnel)"
-                  value={patientName}
-                  onChange={(e) => setPatientName(e.target.value)}
-                />
-              </div>
             </div>
           )}
 
