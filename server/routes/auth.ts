@@ -91,6 +91,7 @@ export const register: RequestHandler = async (req, res) => {
         password_hash: passwordHash,
         role,
         permissions,
+        site,
       })
       .select()
       .single();
