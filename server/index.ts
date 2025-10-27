@@ -43,6 +43,7 @@ export function createServer() {
 
   // Admin routes
   app.get("/api/users", requireAuth, getAllUsers);
+  app.put("/api/users/:id", requireAuth, updateUser);
   app.delete("/api/users/:id", requireAuth, deleteUser);
 
   // Example API routes
