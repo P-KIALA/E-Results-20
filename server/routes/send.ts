@@ -94,12 +94,17 @@ export const sendResults: RequestHandler = async (req, res) => {
           const { data: files, error: filesError } = await supabase
             .from("result_files")
             .select("storage_path")
-            .in("id", file_ids)
-            .eq("send_log_id", sendLog.id);
+            .in("id", file_ids);
 
           if (filesError) throw filesError;
 
-          mediaUrls = files?.map((f) => f.storage_path) || [];
+          // Generate public URLs for Twilio to download files
+          mediaUrls = (files || []).map((f) => {
+            const publicUrl = supabase.storage
+              .from("results")
+              .getPublicUrl(f.storage_path).data.publicUrl;
+            return publicUrl;
+          });
         }
 
         // Send via WhatsApp (mock for now)
