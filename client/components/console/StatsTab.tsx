@@ -221,16 +221,49 @@ export default function StatsTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="text-lg font-semibold">Statistiques par site</h3>
-          <p className="text-sm text-muted-foreground">
-            Analyse des envois et des statuts de livraison
-          </p>
+      <div>
+        <h3 className="text-lg font-semibold">Statistiques par site</h3>
+        <p className="text-sm text-muted-foreground">
+          Analyse des envois et des statuts de livraison
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-4 items-center">
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="px-3 py-2 rounded-md border bg-background text-sm"
+            title="Date de début"
+          />
+
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="px-3 py-2 rounded-md border bg-background text-sm"
+            title="Date de fin"
+          />
+
+          <Button onClick={fetchStats} disabled={loading}>
+            {loading ? "Chargement..." : "Actualiser"}
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+              setStats([]);
+              setStatusSummary([]);
+              setTotalMessages(0);
+            }}
+            className="px-3 py-2"
+          >
+            Réinitialiser les filtres
+          </Button>
         </div>
-        <Button onClick={fetchStats} disabled={loading}>
-          {loading ? "Chargement..." : "Actualiser"}
-        </Button>
       </div>
 
       {/* Total Messages Card */}
