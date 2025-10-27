@@ -59,10 +59,13 @@ export interface VerifyPhoneResponse {
 
 export type UserRole = "admin" | "user";
 
+export type Permission = "manage_doctors" | "view_reports" | "manage_users";
+
 export interface User {
   id: string;
   email: string;
   role: UserRole;
+  permissions: Permission[];
   created_at: string;
   updated_at: string;
 }
