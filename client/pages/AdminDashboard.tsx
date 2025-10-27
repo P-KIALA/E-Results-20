@@ -233,12 +233,15 @@ export default function AdminDashboard() {
   };
 
   const toggleAccessibleSite = (siteId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      accessible_site_ids: prev.accessible_site_ids.includes(siteId)
-        ? prev.accessible_site_ids.filter((s) => s !== siteId)
-        : [...prev.accessible_site_ids, siteId],
-    }));
+    setFormData((prev) => {
+      const currentIds = prev.accessible_site_ids || [];
+      return {
+        ...prev,
+        accessible_site_ids: currentIds.includes(siteId)
+          ? currentIds.filter((s) => s !== siteId)
+          : [...currentIds, siteId],
+      };
+    });
   };
 
   const closeForm = () => {
