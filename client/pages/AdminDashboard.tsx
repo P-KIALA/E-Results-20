@@ -66,6 +66,7 @@ export default function AdminDashboard() {
   }, [user, navigate]);
 
   useEffect(() => {
+    fetchSites();
     fetchUsers();
   }, []);
 
