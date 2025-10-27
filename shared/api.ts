@@ -85,6 +85,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   role?: UserRole;
+  permissions?: Permission[];
 }
 
 export interface AuthSession {
