@@ -78,8 +78,14 @@ export default function StatsTab() {
         return;
       }
 
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append("limit", "10000");
+      if (startDate) params.append("startDate", startDate);
+      if (endDate) params.append("endDate", endDate);
+
       // Fetch all send logs to calculate stats
-      const res = await fetch("/api/send-logs?limit=10000", {
+      const res = await fetch(`/api/send-logs?${params}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
