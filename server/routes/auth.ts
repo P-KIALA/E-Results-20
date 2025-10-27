@@ -181,7 +181,7 @@ export const getAllUsers: RequestHandler = async (req, res) => {
 
     const { data: users, error } = await supabase
       .from("users")
-      .select("id, email, role, created_at, updated_at")
+      .select("id, email, role, site, created_at, updated_at")
       .order("created_at", { ascending: false });
 
     if (error) throw error;
