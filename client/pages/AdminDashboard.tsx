@@ -372,6 +372,63 @@ export default function AdminDashboard() {
                 </select>
               </div>
 
+              {formData.role !== "admin" && sites.length > 0 && (
+                <>
+                  <div>
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <MapPin size={14} />
+                      Site principal
+                    </label>
+                    <select
+                      value={formData.primary_site_id}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          primary_site_id: e.target.value,
+                        })
+                      }
+                      className="w-full px-3 py-2 rounded-md border bg-background text-sm"
+                    >
+                      <option value="">Sélectionner un site</option>
+                      {sites.map((site) => (
+                        <option key={site.id} value={site.id}>
+                          {site.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {sites.length > 1 && (
+                    <div>
+                      <label className="text-sm font-medium block mb-3">
+                        Sites supplémentaires accessibles
+                      </label>
+                      <div className="space-y-2 border rounded-md p-3 bg-muted/30 max-h-48 overflow-y-auto">
+                        {sites.map((site) => (
+                          <div key={site.id} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id={`site-${site.id}`}
+                              checked={formData.accessible_site_ids.includes(
+                                site.id
+                              )}
+                              onChange={() => toggleAccessibleSite(site.id)}
+                              className="rounded border-gray-300"
+                            />
+                            <label
+                              htmlFor={`site-${site.id}`}
+                              className="text-sm cursor-pointer"
+                            >
+                              {site.name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
               <div>
                 <label className="text-sm font-medium block mb-3">
                   Permissions supplémentaires
