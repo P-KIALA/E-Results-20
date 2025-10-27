@@ -219,8 +219,26 @@ export const getSendLogs: RequestHandler = async (req, res) => {
 
     if (error) throw error;
 
+    const logs = data || [];
+
+    // Attach sender user info (email and site) for each log
+    const senderIds = Array.from(new Set(logs.map((l: any) => l.sender_id).filter(Boolean)));
+    let sendersMap: Record<string, any> = {};
+    if (senderIds.length > 0) {
+      const { data: senders } = await supabase
+        .from("users")
+        .select("id, email, site")
+        .in("id", senderIds as string[]);
+      (senders || []).forEach((s: any) => (sendersMap[s.id] = s));
+    }
+
+    const logsWithSender = (logs || []).map((l: any) => ({
+      ...l,
+      sender: l.sender_id ? sendersMap[l.sender_id] || null : null,
+    }));
+
     res.json({
-      logs: data || [],
+      logs: logsWithSender,
       total: count || 0,
       limit: Number(limit),
       offset: Number(offset),
