@@ -5,6 +5,8 @@ import { handleDemo } from "./routes/demo";
 import { getDoctors, addDoctor, updateDoctor, deleteDoctor, verifyDoctor } from "./routes/doctors";
 import { sendResults, getSendLogs, webhookTwilio } from "./routes/send";
 import { uploadFiles, getFileUrl } from "./routes/upload";
+import { login, register, logout, getMe, getAllUsers, deleteUser } from "./routes/auth";
+import { authMiddleware, requireAuth } from "./lib/middleware";
 
 export function createServer() {
   const app = express();
@@ -13,6 +15,17 @@ export function createServer() {
   app.use(cors());
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+  app.use(authMiddleware); // Optional auth middleware (token verification)
+
+  // Auth routes (public)
+  app.post("/api/auth/login", login);
+  app.post("/api/auth/register", register);
+  app.post("/api/auth/logout", logout);
+  app.get("/api/auth/me", requireAuth, getMe);
+
+  // Admin routes
+  app.get("/api/users", requireAuth, getAllUsers);
+  app.delete("/api/users/:id", requireAuth, deleteUser);
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {
@@ -22,22 +35,22 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
-  // Doctors management
-  app.get("/api/doctors", getDoctors);
-  app.post("/api/doctors", addDoctor);
-  app.put("/api/doctors/:id", updateDoctor);
-  app.delete("/api/doctors/:id", deleteDoctor);
-  app.post("/api/doctors/:id/verify", verifyDoctor);
+  // Doctors management (protected)
+  app.get("/api/doctors", requireAuth, getDoctors);
+  app.post("/api/doctors", requireAuth, addDoctor);
+  app.put("/api/doctors/:id", requireAuth, updateDoctor);
+  app.delete("/api/doctors/:id", requireAuth, deleteDoctor);
+  app.post("/api/doctors/:id/verify", requireAuth, verifyDoctor);
 
-  // File upload
-  app.post("/api/upload-files", uploadFiles);
-  app.get("/api/file-url", getFileUrl);
+  // File upload (protected)
+  app.post("/api/upload-files", requireAuth, uploadFiles);
+  app.get("/api/file-url", requireAuth, getFileUrl);
 
-  // Send results
-  app.post("/api/send-results", sendResults);
-  app.get("/api/send-logs", getSendLogs);
+  // Send results (protected)
+  app.post("/api/send-results", requireAuth, sendResults);
+  app.get("/api/send-logs", requireAuth, getSendLogs);
 
-  // Twilio webhook
+  // Twilio webhook (public)
   app.post("/api/webhook/twilio", webhookTwilio);
 
   return app;
