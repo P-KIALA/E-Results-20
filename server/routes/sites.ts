@@ -101,7 +101,10 @@ export const getUserAccessibleSites: RequestHandler = async (req, res) => {
     const { data: sites, error: sitesError } = await supabase
       .from("sites")
       .select("*")
-      .in("id", siteIds.length > 0 ? siteIds : ["00000000-0000-0000-0000-000000000000"]);
+      .in(
+        "id",
+        siteIds.length > 0 ? siteIds : ["00000000-0000-0000-0000-000000000000"],
+      );
 
     if (sitesError) throw sitesError;
 

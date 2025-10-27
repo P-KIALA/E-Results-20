@@ -248,7 +248,9 @@ export const getSendLogs: RequestHandler = async (req, res) => {
     const logs = data || [];
 
     // Attach sender user info (email, site, primary_site) for each log
-    const senderIds = Array.from(new Set(logs.map((l: any) => l.sender_id).filter(Boolean)));
+    const senderIds = Array.from(
+      new Set(logs.map((l: any) => l.sender_id).filter(Boolean)),
+    );
     let sendersMap: Record<string, any> = {};
     if (senderIds.length > 0) {
       const { data: senders } = await supabase
@@ -257,7 +259,9 @@ export const getSendLogs: RequestHandler = async (req, res) => {
         .in("id", senderIds as string[]);
 
       // Fetch sites for the senders
-      const siteIds = (senders || []).map((s: any) => s.primary_site_id).filter(Boolean);
+      const siteIds = (senders || [])
+        .map((s: any) => s.primary_site_id)
+        .filter(Boolean);
       let sitesMap: Record<string, any> = {};
       if (siteIds.length > 0) {
         const { data: sites } = await supabase

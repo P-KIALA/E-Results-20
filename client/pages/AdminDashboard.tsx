@@ -81,7 +81,10 @@ export default function AdminDashboard() {
       const data = await res.json();
       setUsers(data.users || []);
     } catch (error) {
-      setMessage({ type: "error", text: "Erreur lors du chargement des utilisateurs" });
+      setMessage({
+        type: "error",
+        text: "Erreur lors du chargement des utilisateurs",
+      });
     } finally {
       setLoading(false);
     }
@@ -101,7 +104,10 @@ export default function AdminDashboard() {
       const data = await res.json();
       setSites(data.sites || []);
     } catch (error) {
-      setMessage({ type: "error", text: "Erreur lors du chargement des sites" });
+      setMessage({
+        type: "error",
+        text: "Erreur lors du chargement des sites",
+      });
     }
   };
 
@@ -116,7 +122,10 @@ export default function AdminDashboard() {
 
     // For non-admin users, primary site is required
     if (formData.role !== "admin" && !formData.primary_site_id) {
-      setMessage({ type: "error", text: "Site principal requis pour les utilisateurs" });
+      setMessage({
+        type: "error",
+        text: "Site principal requis pour les utilisateurs",
+      });
       return;
     }
 
@@ -323,7 +332,10 @@ export default function AdminDashboard() {
               {sites.length} site(s)
             </span>
           </div>
-          <Button onClick={() => setShowSiteForm(!showSiteForm)} className="gap-2">
+          <Button
+            onClick={() => setShowSiteForm(!showSiteForm)}
+            className="gap-2"
+          >
             <Plus size={16} /> Ajouter un site
           </Button>
         </div>
@@ -391,7 +403,10 @@ export default function AdminDashboard() {
               {users.length} utilisateur(s)
             </span>
           </div>
-          <Button onClick={() => setShowUserForm(!showUserForm)} className="gap-2">
+          <Button
+            onClick={() => setShowUserForm(!showUserForm)}
+            className="gap-2"
+          >
             <Plus size={16} /> Créer utilisateur
           </Button>
         </div>
@@ -463,7 +478,9 @@ export default function AdminDashboard() {
 
                 {formData.role !== "admin" && (
                   <div>
-                    <label className="text-sm font-medium">Site principal</label>
+                    <label className="text-sm font-medium">
+                      Site principal
+                    </label>
                     <select
                       value={formData.primary_site_id}
                       onChange={(e) =>
@@ -497,7 +514,7 @@ export default function AdminDashboard() {
                             type="checkbox"
                             id={`site-${site.id}`}
                             checked={formData.accessible_site_ids.includes(
-                              site.id
+                              site.id,
                             )}
                             onChange={() => toggleAccessibleSite(site.id)}
                             className="rounded border-gray-300"
@@ -574,7 +591,9 @@ export default function AdminDashboard() {
                         <p className="font-semibold">{u.email}</p>
                         <p className="text-sm text-muted-foreground">
                           Rôle:{" "}
-                          {u.role === "admin" ? "Administrateur" : "Utilisateur"}
+                          {u.role === "admin"
+                            ? "Administrateur"
+                            : "Utilisateur"}
                         </p>
                         {u.primary_site && (
                           <p className="text-sm text-muted-foreground">

@@ -351,7 +351,9 @@ export default function UserDashboard() {
             aria-required={true}
           />
           {!patientName.trim() && (
-            <p className="text-xs text-red-600 mt-1">Le nom du malade est requis.</p>
+            <p className="text-xs text-red-600 mt-1">
+              Le nom du malade est requis.
+            </p>
           )}
         </div>
 
@@ -366,7 +368,9 @@ export default function UserDashboard() {
             aria-required={true}
           />
           {!patientSite.trim() && (
-            <p className="text-xs text-red-600 mt-1">Le site du centre est requis.</p>
+            <p className="text-xs text-red-600 mt-1">
+              Le site du centre est requis.
+            </p>
           )}
         </div>
       </div>
@@ -496,7 +500,12 @@ export default function UserDashboard() {
           />
           <Button
             onClick={handleSend}
-            disabled={sending || selectedDoctors.length === 0 || !patientName.trim() || !patientSite.trim()}
+            disabled={
+              sending ||
+              selectedDoctors.length === 0 ||
+              !patientName.trim() ||
+              !patientSite.trim()
+            }
             className="w-full gap-2"
           >
             <Send size={16} />

@@ -232,7 +232,9 @@ export default function HistoryTab() {
                       </p>
 
                       {log.patient_site && (
-                        <p className="text-sm text-muted-foreground">Site du centre: {log.patient_site}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Site du centre: {log.patient_site}
+                        </p>
                       )}
 
                       <div className="flex flex-wrap gap-2 mt-2 text-xs text-muted-foreground">

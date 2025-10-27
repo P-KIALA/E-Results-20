@@ -50,7 +50,11 @@ export function createServer() {
   // Sites management
   app.get("/api/sites", requireAuth, getSites);
   app.post("/api/sites", requireAuth, createSite);
-  app.get("/api/users/:id/accessible-sites", requireAuth, getUserAccessibleSites);
+  app.get(
+    "/api/users/:id/accessible-sites",
+    requireAuth,
+    getUserAccessibleSites,
+  );
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {

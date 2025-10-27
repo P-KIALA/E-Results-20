@@ -279,7 +279,9 @@ export default function ResultsTab() {
                 aria-required={true}
               />
               {!patientName.trim() && (
-                <p className="text-xs text-red-600 mt-1">Le nom du malade est requis.</p>
+                <p className="text-xs text-red-600 mt-1">
+                  Le nom du malade est requis.
+                </p>
               )}
             </div>
 
@@ -294,7 +296,9 @@ export default function ResultsTab() {
                 aria-required={true}
               />
               {!patientSite.trim() && (
-                <p className="text-xs text-red-600 mt-1">Le site du centre est requis.</p>
+                <p className="text-xs text-red-600 mt-1">
+                  Le site du centre est requis.
+                </p>
               )}
             </div>
           </div>
@@ -357,7 +361,9 @@ export default function ResultsTab() {
           />
           <Button
             onClick={handleSend}
-            disabled={sending || selectedDoctors.length === 0 || !patientName.trim()}
+            disabled={
+              sending || selectedDoctors.length === 0 || !patientName.trim()
+            }
             className="w-full gap-2"
           >
             <Send size={16} />

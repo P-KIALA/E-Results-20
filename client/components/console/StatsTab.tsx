@@ -128,7 +128,7 @@ export default function StatsTab() {
       });
 
       const siteStatsList = Object.values(statsMap).filter(
-        (s) => s.total_sent > 0
+        (s) => s.total_sent > 0,
       );
 
       setStats(siteStatsList);
@@ -153,27 +153,32 @@ export default function StatsTab() {
         {
           status: "Envoyé",
           count: statusCounts.sent,
-          percentage: total > 0 ? Math.round((statusCounts.sent / total) * 100) : 0,
+          percentage:
+            total > 0 ? Math.round((statusCounts.sent / total) * 100) : 0,
         },
         {
           status: "Livré",
           count: statusCounts.delivered,
-          percentage: total > 0 ? Math.round((statusCounts.delivered / total) * 100) : 0,
+          percentage:
+            total > 0 ? Math.round((statusCounts.delivered / total) * 100) : 0,
         },
         {
           status: "Lu",
           count: statusCounts.read,
-          percentage: total > 0 ? Math.round((statusCounts.read / total) * 100) : 0,
+          percentage:
+            total > 0 ? Math.round((statusCounts.read / total) * 100) : 0,
         },
         {
           status: "Échec",
           count: statusCounts.failed,
-          percentage: total > 0 ? Math.round((statusCounts.failed / total) * 100) : 0,
+          percentage:
+            total > 0 ? Math.round((statusCounts.failed / total) * 100) : 0,
         },
         {
           status: "En attente",
           count: statusCounts.pending,
-          percentage: total > 0 ? Math.round((statusCounts.pending / total) * 100) : 0,
+          percentage:
+            total > 0 ? Math.round((statusCounts.pending / total) * 100) : 0,
         },
       ];
 
@@ -261,14 +266,27 @@ export default function StatsTab() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                  <XAxis
+                    dataKey="name"
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                  />
                   <YAxis />
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="Envoyé" stackId="a" fill={STATUS_COLORS.sent} />
-                  <Bar dataKey="Livré" stackId="a" fill={STATUS_COLORS.delivered} />
+                  <Bar
+                    dataKey="Livré"
+                    stackId="a"
+                    fill={STATUS_COLORS.delivered}
+                  />
                   <Bar dataKey="Lu" stackId="a" fill={STATUS_COLORS.read} />
-                  <Bar dataKey="Échec" stackId="a" fill={STATUS_COLORS.failed} />
+                  <Bar
+                    dataKey="Échec"
+                    stackId="a"
+                    fill={STATUS_COLORS.failed}
+                  />
                   <Bar
                     dataKey="En attente"
                     stackId="a"
@@ -294,7 +312,9 @@ export default function StatsTab() {
                 <PieChart size={20} />
                 Distribution des statuts
               </CardTitle>
-              <CardDescription>Proportion des statuts de livraison</CardDescription>
+              <CardDescription>
+                Proportion des statuts de livraison
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -313,7 +333,10 @@ export default function StatsTab() {
                     {pieData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={STATUS_COLORS[entry.status.toLowerCase()] || COLORS[index % COLORS.length]}
+                        fill={
+                          STATUS_COLORS[entry.status.toLowerCase()] ||
+                          COLORS[index % COLORS.length]
+                        }
                       />
                     ))}
                   </Pie>

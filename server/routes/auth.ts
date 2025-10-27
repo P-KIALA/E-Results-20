@@ -84,7 +84,9 @@ export const register: RequestHandler = async (req, res) => {
 
     // For non-admin users, primary_site_id is required
     if (role !== "admin" && !primary_site_id) {
-      return res.status(400).json({ error: "Site principal requis pour les utilisateurs" });
+      return res
+        .status(400)
+        .json({ error: "Site principal requis pour les utilisateurs" });
     }
 
     // Check if user already exists
@@ -224,7 +226,9 @@ export const getAllUsers: RequestHandler = async (req, res) => {
 
     const { data: users, error } = await supabase
       .from("users")
-      .select("id, email, role, primary_site_id, permissions, created_at, updated_at")
+      .select(
+        "id, email, role, primary_site_id, permissions, created_at, updated_at",
+      )
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -238,7 +242,9 @@ export const getAllUsers: RequestHandler = async (req, res) => {
 
     const enrichedUsers = (users || []).map((u: any) => ({
       ...u,
-      primary_site: u.primary_site_id ? sitesMap.get(u.primary_site_id) || null : null,
+      primary_site: u.primary_site_id
+        ? sitesMap.get(u.primary_site_id) || null
+        : null,
     }));
 
     res.json({ users: enrichedUsers });
@@ -292,7 +298,8 @@ export const updateUser: RequestHandler = async (req, res) => {
   try {
     const adminId = (req as any).userId;
     const { id: targetUserId } = req.params;
-    const { role, permissions, primary_site_id, accessible_site_ids } = req.body;
+    const { role, permissions, primary_site_id, accessible_site_ids } =
+      req.body;
 
     if (!adminId) {
       return res.status(401).json({ error: "Unauthorized" });
@@ -312,7 +319,8 @@ export const updateUser: RequestHandler = async (req, res) => {
     const updateData: any = {};
     if (role !== undefined) updateData.role = role;
     if (permissions !== undefined) updateData.permissions = permissions;
-    if (primary_site_id !== undefined) updateData.primary_site_id = primary_site_id;
+    if (primary_site_id !== undefined)
+      updateData.primary_site_id = primary_site_id;
 
     const { data: user, error } = await supabase
       .from("users")
@@ -324,7 +332,10 @@ export const updateUser: RequestHandler = async (req, res) => {
     if (error) throw error;
 
     // Update accessible sites if provided
-    if (accessible_site_ids !== undefined && Array.isArray(accessible_site_ids)) {
+    if (
+      accessible_site_ids !== undefined &&
+      Array.isArray(accessible_site_ids)
+    ) {
       // Delete existing access records
       await supabase
         .from("user_site_access")
@@ -338,9 +349,7 @@ export const updateUser: RequestHandler = async (req, res) => {
           site_id,
         }));
 
-        await supabase
-          .from("user_site_access")
-          .insert(accessRecords);
+        await supabase.from("user_site_access").insert(accessRecords);
       }
     }
 
@@ -358,7 +367,9 @@ export const updateUser: RequestHandler = async (req, res) => {
         role: user.role,
         permissions: user.permissions || [],
         primary_site_id: user.primary_site_id || null,
-        primary_site: user.primary_site_id ? sitesMap.get(user.primary_site_id) || null : null,
+        primary_site: user.primary_site_id
+          ? sitesMap.get(user.primary_site_id) || null
+          : null,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
