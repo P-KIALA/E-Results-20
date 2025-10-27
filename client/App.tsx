@@ -1,12 +1,12 @@
 import "./global.css";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -30,16 +30,23 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function RootRedirector() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const hasNavigated = useRef(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/console", { replace: true });
-    } else {
-      navigate("/login", { replace: true });
+    if (isLoading) return;
+
+    if (!hasNavigated.current && location.pathname === "/") {
+      hasNavigated.current = true;
+      if (isAuthenticated) {
+        navigate("/console", { replace: true });
+      } else {
+        navigate("/login", { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isLoading, isAuthenticated, navigate, location.pathname]);
 
   return null;
 }
