@@ -135,6 +135,8 @@ export default function AdminDashboard() {
           body: JSON.stringify({
             role: formData.role,
             permissions: formData.permissions,
+            primary_site_id: formData.primary_site_id || null,
+            accessible_site_ids: formData.accessible_site_ids,
           }),
         });
 
@@ -158,6 +160,7 @@ export default function AdminDashboard() {
             password: formData.password,
             role: formData.role,
             permissions: formData.permissions,
+            primary_site_id: formData.primary_site_id || null,
           }),
         });
 
