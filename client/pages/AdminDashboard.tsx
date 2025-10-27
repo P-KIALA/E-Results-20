@@ -137,7 +137,7 @@ export default function AdminDashboard() {
         setMessage({ type: "success", text: "Utilisateur créé" });
       }
 
-      setFormData({ email: "", password: "", role: "user", permissions: [] });
+      setFormData({ email: "", password: "", role: "user", permissions: [], site: "" });
       setEditingId(null);
       setShowForm(false);
       await fetchUsers();
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
   const closeForm = () => {
     setShowForm(false);
     setEditingId(null);
-    setFormData({ email: "", password: "", role: "user", permissions: [] });
+    setFormData({ email: "", password: "", role: "user", permissions: [], site: "" });
   };
 
   const getPermissionLabel = (permissionId: string) => {
