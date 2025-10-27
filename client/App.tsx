@@ -48,9 +48,7 @@ const App = () => (
             <Route
               path="/login"
               element={
-                <Layout>
-                  <LoginPage />
-                </Layout>
+                <LoginPage />
               }
             />
             <Route
