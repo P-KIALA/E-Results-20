@@ -142,6 +142,7 @@ export default function ResultsTab() {
           doctor_ids: selectedDoctors,
           custom_message: customMessage,
           file_ids: uploadedFileIds,
+          patient_name: patientName || undefined,
         }),
       });
 
