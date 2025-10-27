@@ -59,13 +59,11 @@ export default function HistoryTab() {
     }
   }, [filterStatus, filterDoctor]);
 
-  // Initial load and interval
+  // Load only when user requests (no automatic polling)
   useEffect(() => {
-    fetchDoctors();
-    fetchLogs();
-    const interval = setInterval(() => fetchLogs(), 5000); // Refresh every 5s
-    return () => clearInterval(interval);
-  }, [fetchDoctors, fetchLogs]);
+    // no-op: we don't fetch on mount to avoid automatic sync
+    return;
+  }, []);
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
