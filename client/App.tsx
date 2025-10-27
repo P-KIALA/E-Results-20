@@ -37,7 +37,8 @@ function Layout({ children }: { children: React.ReactNode }) {
       />
 
       <Header />
-      <main className="flex-1">{children}</main>
+      <Sidebar />
+      <main className="flex-1 ml-20">{children}</main>
       <Footer />
     </div>
   );
