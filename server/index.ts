@@ -20,6 +20,7 @@ import {
   deleteUser,
   updateUser,
 } from "./routes/auth";
+import { getSites, createSite, getUserAccessibleSites } from "./routes/sites";
 import { createInitialAdmin } from "./routes/seed";
 import { authMiddleware, requireAuth } from "./lib/middleware";
 
