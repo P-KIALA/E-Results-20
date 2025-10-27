@@ -216,6 +216,15 @@ export default function LoginPage() {
           </Card>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-white/10 bg-black/20 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-6 text-center">
+          <p className="text-white/70 text-sm">
+            © 2025 Centre de Diagnostic EYANO
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
