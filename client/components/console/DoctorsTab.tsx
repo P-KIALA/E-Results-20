@@ -40,16 +40,27 @@ export default function DoctorsTab() {
     setLoading(true);
     try {
       const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        return;
+      }
       const res = await fetch("/api/doctors", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!res.ok) throw new Error("Failed to fetch");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to fetch doctors");
+      }
       const data = await res.json();
       setDoctors(data.doctors || []);
     } catch (error) {
-      setMessage({ type: "error", text: "Erreur lors du chargement" });
+      console.error("Error fetching doctors:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur lors du chargement",
+      });
     } finally {
       setLoading(false);
     }
