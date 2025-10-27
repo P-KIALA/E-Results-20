@@ -6,6 +6,7 @@ import { getDoctors, addDoctor, updateDoctor, deleteDoctor, verifyDoctor } from 
 import { sendResults, getSendLogs, webhookTwilio } from "./routes/send";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import { login, register, logout, getMe, getAllUsers, deleteUser } from "./routes/auth";
+import { createInitialAdmin } from "./routes/seed";
 import { authMiddleware, requireAuth } from "./lib/middleware";
 
 export function createServer() {
@@ -22,6 +23,9 @@ export function createServer() {
   app.post("/api/auth/register", register);
   app.post("/api/auth/logout", logout);
   app.get("/api/auth/me", requireAuth, getMe);
+
+  // Seed endpoint (create initial admin)
+  app.post("/api/seed/create-initial-admin", createInitialAdmin);
 
   // Admin routes
   app.get("/api/users", requireAuth, getAllUsers);
