@@ -16,6 +16,10 @@ export default {
       fontFamily: {
         montserrat: ["Montserrat", "sans-serif"],
       },
+      fontWeight: {
+        light: "300",
+        black: "900",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
