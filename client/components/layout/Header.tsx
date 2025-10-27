@@ -40,21 +40,12 @@ export default function Header() {
             </svg>
           </div>
           <span className="font-extrabold text-lg tracking-tight">
-            E-Resultat CD EYANO
+            E-Result
           </span>
         </Link>
 
         {isAuthenticated && (
           <nav className="hidden gap-6 md:flex">
-            <Link
-              to="/"
-              className={cn(
-                "text-sm transition-colors hover:text-foreground/80",
-                isActive("/") ? "text-foreground" : "text-foreground/60",
-              )}
-            >
-              Accueil
-            </Link>
             {user?.role === "admin" ? (
               <>
                 <Link

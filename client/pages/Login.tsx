@@ -164,7 +164,7 @@ export default function LoginPage() {
                   </svg>
                 </div>
               </div>
-              <CardTitle className="text-2xl">E-Resultat CD EYANO</CardTitle>
+              <CardTitle className="text-2xl">E-Result</CardTitle>
               <CardDescription>Connectez-vous à votre compte</CardDescription>
             </CardHeader>
             <CardContent>
@@ -191,7 +191,7 @@ export default function LoginPage() {
                   <label className="text-sm font-medium">Mot de passe</label>
                   <Input
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="•••••��••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
