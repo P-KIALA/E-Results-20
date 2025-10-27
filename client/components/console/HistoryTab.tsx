@@ -129,47 +129,63 @@ export default function HistoryTab() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-4 items-center">
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 rounded-md border bg-background text-sm"
-        >
-          <option value="">Tous les statuts</option>
-          <option value="pending">En attente</option>
-          <option value="sent">Envoyé</option>
-          <option value="delivered">Livré</option>
-          <option value="read">Lu</option>
-          <option value="failed">Échec</option>
-        </select>
+      <div className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-6 items-center">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-3 py-2 rounded-md border bg-background text-sm"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="pending">En attente</option>
+            <option value="sent">Envoyé</option>
+            <option value="delivered">Livré</option>
+            <option value="read">Lu</option>
+            <option value="failed">Échec</option>
+          </select>
 
-        <select
-          value={filterDoctor}
-          onChange={(e) => setFilterDoctor(e.target.value)}
-          className="px-3 py-2 rounded-md border bg-background text-sm"
-        >
-          <option value="">Tous les médecins</option>
-          {doctors.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
+          <select
+            value={filterDoctor}
+            onChange={(e) => setFilterDoctor(e.target.value)}
+            className="px-3 py-2 rounded-md border bg-background text-sm"
+          >
+            <option value="">Tous les médecins</option>
+            {doctors.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </select>
 
-        <select
-          value={filterSite}
-          onChange={(e) => setFilterSite(e.target.value)}
-          className="px-3 py-2 rounded-md border bg-background text-sm"
-        >
-          <option value="">Tous les sites</option>
-          {sites.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
+          <select
+            value={filterSite}
+            onChange={(e) => setFilterSite(e.target.value)}
+            className="px-3 py-2 rounded-md border bg-background text-sm"
+          >
+            <option value="">Tous les sites</option>
+            {sites.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
 
-        <div className="flex gap-2">
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="px-3 py-2 rounded-md border bg-background text-sm"
+            title="Date de début"
+          />
+
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="px-3 py-2 rounded-md border bg-background text-sm"
+            title="Date de fin"
+          />
+
           <Button
             onClick={async () => {
               setLoading(true);
@@ -185,7 +201,9 @@ export default function HistoryTab() {
           >
             {loading ? "Chargement..." : "Charger l'historique"}
           </Button>
+        </div>
 
+        <div className="flex gap-2">
           <Button
             variant="outline"
             onClick={async () => {
@@ -200,6 +218,20 @@ export default function HistoryTab() {
             className="px-3 py-2"
           >
             Actualiser
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setFilterStatus("");
+              setFilterDoctor("");
+              setFilterSite("");
+              setStartDate("");
+              setEndDate("");
+            }}
+            className="px-3 py-2"
+          >
+            Réinitialiser les filtres
           </Button>
         </div>
       </div>
