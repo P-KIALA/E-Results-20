@@ -144,12 +144,12 @@ export default function ResultsTab() {
         }),
       });
 
+      const result = await res.json();
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
+        throw new Error(result.error || "Send failed");
       }
 
-      const result = await res.json();
       const successCount = result.results.filter((r: any) => r.success).length;
       setMessage({
         type: "success",
