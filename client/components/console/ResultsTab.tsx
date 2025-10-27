@@ -129,6 +129,11 @@ export default function ResultsTab() {
       return;
     }
 
+    if (!patientName.trim()) {
+      setMessage({ type: "error", text: "Le nom du malade est requis" });
+      return;
+    }
+
     setSending(true);
     try {
       const token = localStorage.getItem("auth_token");
@@ -249,6 +254,19 @@ export default function ResultsTab() {
               {uploadedFileIds.length} fichier(s) prêt(s)
             </div>
           )}
+
+          {/* Patient name - always visible and required */}
+          <div className="mt-4">
+            <Input
+              placeholder="Nom du malade"
+              value={patientName}
+              onChange={(e) => setPatientName(e.target.value)}
+              aria-required={true}
+            />
+            {!patientName.trim() && (
+              <p className="text-xs text-red-600 mt-1">Le nom du malade est requis.</p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -308,7 +326,7 @@ export default function ResultsTab() {
           />
           <Button
             onClick={handleSend}
-            disabled={sending || selectedDoctors.length === 0}
+            disabled={sending || selectedDoctors.length === 0 || !patientName.trim()}
             className="w-full gap-2"
           >
             <Send size={16} />
