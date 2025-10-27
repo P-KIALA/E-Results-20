@@ -19,12 +19,19 @@ async function sendViaWhatsApp(
     // If multiple media are provided, send the first media with the message body,
     // then send each remaining media as a separate message (without body).
 
+    const statusCallbackUrl = process.env.APP_BASE_URL
+      ? `${process.env.APP_BASE_URL.replace(/\/$/, "")}/api/webhook/twilio`
+      : process.env.TWILIO_STATUS_CALLBACK_URL || undefined;
+
     if (!mediaUrls || mediaUrls.length === 0) {
-      const result = await twilioClient.messages.create({
+      const msgParams: any = {
         from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
         to: `whatsapp:${to}`,
         body: message,
-      });
+      };
+      if (statusCallbackUrl) msgParams.statusCallback = statusCallbackUrl;
+
+      const result = await twilioClient.messages.create(msgParams);
 
       console.log(`Message sent successfully to ${to}: ${result.sid}`);
       return result.sid;
@@ -37,6 +44,7 @@ async function sendViaWhatsApp(
       body: message,
       mediaUrl: [mediaUrls[0]],
     };
+    if (statusCallbackUrl) firstParams.statusCallback = statusCallbackUrl;
 
     const firstResult = await twilioClient.messages.create(firstParams);
     console.log(`Message with first media sent to ${to}: ${firstResult.sid}`);
@@ -44,11 +52,14 @@ async function sendViaWhatsApp(
     // Send remaining media as separate messages
     for (let i = 1; i < mediaUrls.length; i++) {
       try {
-        const res = await twilioClient.messages.create({
+        const msgParams: any = {
           from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
           to: `whatsapp:${to}`,
           mediaUrl: [mediaUrls[i]],
-        });
+        };
+        if (statusCallbackUrl) msgParams.statusCallback = statusCallbackUrl;
+
+        const res = await twilioClient.messages.create(msgParams);
         console.log(`Additional media ${i + 1} sent to ${to}: ${res.sid}`);
       } catch (err) {
         console.error(`Failed to send media #${i + 1} to ${to}:`, err);
