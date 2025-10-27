@@ -15,6 +15,8 @@ import {
   Plus,
   Trash2,
   RefreshCw,
+  Pencil,
+  X,
 } from "lucide-react";
 
 export default function DoctorsTab() {
