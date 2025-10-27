@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/auth-context";
 import {
   Card,
   CardContent,
@@ -9,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, Send } from "lucide-react";
+import { Upload, Send, Plus, Trash2 } from "lucide-react";
 
 export default function UserDashboard() {
   const [doctors, setDoctors] = useState<any[]>([]);
