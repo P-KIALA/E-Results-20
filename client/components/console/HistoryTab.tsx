@@ -21,6 +21,8 @@ export default function HistoryTab() {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDoctor, setFilterDoctor] = useState("");
   const [filterSite, setFilterSite] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const getToken = () => localStorage.getItem("auth_token");
 
