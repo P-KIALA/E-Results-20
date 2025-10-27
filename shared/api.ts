@@ -38,6 +38,7 @@ export interface SendResultsRequest {
   custom_message: string;
   file_ids: string[];
   patient_name?: string;
+  patient_site?: string;
 }
 
 export interface UploadFileResponse {
