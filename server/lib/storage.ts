@@ -4,7 +4,7 @@ export async function initializeBuckets() {
   try {
     // Check if results bucket exists
     const { data: buckets } = await supabase.storage.listBuckets();
-    
+
     const resultsBucketExists = buckets?.some((b) => b.name === "results");
 
     if (!resultsBucketExists) {

@@ -51,7 +51,12 @@ export const login: RequestHandler = async (req, res) => {
 
 export const register: RequestHandler = async (req, res) => {
   try {
-    const { email, password, role = "user", permissions = [] } = req.body as RegisterRequest;
+    const {
+      email,
+      password,
+      role = "user",
+      permissions = [],
+    } = req.body as RegisterRequest;
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });

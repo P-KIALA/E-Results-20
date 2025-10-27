@@ -257,9 +257,7 @@ export default function UserDashboard() {
           <CardHeader className="flex flex-row justify-between items-start">
             <div>
               <CardTitle>Ajouter un médecin</CardTitle>
-              <CardDescription>
-                Créez un nouveau profil médecin
-              </CardDescription>
+              <CardDescription>Créez un nouveau profil médecin</CardDescription>
             </div>
             <Button
               size="sm"

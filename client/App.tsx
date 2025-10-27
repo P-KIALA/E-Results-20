@@ -6,7 +6,13 @@ import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -59,16 +65,8 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route
-              path="/"
-              element={<RootRedirector />}
-            />
-            <Route
-              path="/login"
-              element={
-                <LoginPage />
-              }
-            />
+            <Route path="/" element={<RootRedirector />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route
               path="/console"
               element={

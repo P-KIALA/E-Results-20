@@ -55,26 +55,20 @@ export async function checkWhatsAppAvailability(
     );
 
     // Use Twilio Lookup API to check WhatsApp availability
-    const phoneNumber = await twilioClient.lookups.v2.phoneNumbers(
-      phone,
-    ).fetch({
-      fields: "line_type_intelligence",
-    });
+    const phoneNumber = await twilioClient.lookups.v2
+      .phoneNumbers(phone)
+      .fetch({
+        fields: "line_type_intelligence",
+      });
 
     // Check if the number has WhatsApp capability
-    const lineType =
-      phoneNumber.lineTypeIntelligence?.line_type || "unknown";
-    console.log(
-      `WhatsApp availability check for ${phone}: ${lineType}`,
-    );
+    const lineType = phoneNumber.lineTypeIntelligence?.line_type || "unknown";
+    console.log(`WhatsApp availability check for ${phone}: ${lineType}`);
 
     // Return true if it's a valid mobile number (WhatsApp typically works on mobile)
     return lineType === "mobile" || lineType === "unknown";
   } catch (error) {
-    console.error(
-      `Error checking WhatsApp availability for ${phone}:`,
-      error,
-    );
+    console.error(`Error checking WhatsApp availability for ${phone}:`, error);
     // If lookup fails, assume the number might be WhatsApp-capable but unverified
     // This is safer than rejecting all numbers on API errors
     return true;

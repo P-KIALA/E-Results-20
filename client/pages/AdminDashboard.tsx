@@ -191,7 +191,10 @@ export default function AdminDashboard() {
   };
 
   const getPermissionLabel = (permissionId: string) => {
-    return AVAILABLE_PERMISSIONS.find((p) => p.id === permissionId)?.label || permissionId;
+    return (
+      AVAILABLE_PERMISSIONS.find((p) => p.id === permissionId)?.label ||
+      permissionId
+    );
   };
 
   return (
@@ -230,10 +233,15 @@ export default function AdminDashboard() {
           <CardHeader className="flex flex-row justify-between items-start">
             <div>
               <CardTitle>
-                {editingId ? "Modifier l'utilisateur" : "Créer un nouvel utilisateur"}
+                {editingId
+                  ? "Modifier l'utilisateur"
+                  : "Créer un nouvel utilisateur"}
               </CardTitle>
             </div>
-            <button onClick={closeForm} className="text-muted-foreground hover:text-foreground">
+            <button
+              onClick={closeForm}
+              className="text-muted-foreground hover:text-foreground"
+            >
               <X size={20} />
             </button>
           </CardHeader>
@@ -299,7 +307,10 @@ export default function AdminDashboard() {
                         onChange={() => togglePermission(perm.id)}
                         className="rounded border-gray-300"
                       />
-                      <label htmlFor={perm.id} className="text-sm cursor-pointer">
+                      <label
+                        htmlFor={perm.id}
+                        className="text-sm cursor-pointer"
+                      >
                         {perm.label}
                       </label>
                     </div>
@@ -311,11 +322,7 @@ export default function AdminDashboard() {
                 <Button type="submit">
                   {editingId ? "Modifier" : "Créer"}
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={closeForm}
-                >
+                <Button type="button" variant="outline" onClick={closeForm}>
                   Annuler
                 </Button>
               </div>
