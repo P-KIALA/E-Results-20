@@ -210,7 +210,8 @@ export const sendResults: RequestHandler = async (req, res) => {
 
 export const getSendLogs: RequestHandler = async (req, res) => {
   try {
-    const { doctor_id, status, limit = 50, offset = 0 } = req.query;
+    const { doctor_id, status, site_id, limit = 50, offset = 0 } = req.query;
+    const userId = (req as any).userId;
 
     let query = supabase
       .from("send_logs")
@@ -226,21 +227,52 @@ export const getSendLogs: RequestHandler = async (req, res) => {
       query = query.eq("status", status);
     }
 
+    // Filter by site - match against patient_site
+    if (site_id) {
+      // First get the site name
+      const { data: site } = await supabase
+        .from("sites")
+        .select("name")
+        .eq("id", site_id)
+        .single();
+
+      if (site) {
+        query = query.eq("patient_site", site.name);
+      }
+    }
+
     const { data, error, count } = await query;
 
     if (error) throw error;
 
     const logs = data || [];
 
-    // Attach sender user info (email and site) for each log
+    // Attach sender user info (email, site, primary_site) for each log
     const senderIds = Array.from(new Set(logs.map((l: any) => l.sender_id).filter(Boolean)));
     let sendersMap: Record<string, any> = {};
     if (senderIds.length > 0) {
       const { data: senders } = await supabase
         .from("users")
-        .select("id, email, site")
+        .select("id, email, primary_site_id")
         .in("id", senderIds as string[]);
-      (senders || []).forEach((s: any) => (sendersMap[s.id] = s));
+
+      // Fetch sites for the senders
+      const siteIds = (senders || []).map((s: any) => s.primary_site_id).filter(Boolean);
+      let sitesMap: Record<string, any> = {};
+      if (siteIds.length > 0) {
+        const { data: sites } = await supabase
+          .from("sites")
+          .select("id, name")
+          .in("id", siteIds as string[]);
+        (sites || []).forEach((s: any) => (sitesMap[s.id] = s));
+      }
+
+      (senders || []).forEach((s: any) => {
+        sendersMap[s.id] = {
+          email: s.email,
+          site: s.primary_site_id ? sitesMap[s.primary_site_id]?.name : null,
+        };
+      });
     }
 
     const logsWithSender = (logs || []).map((l: any) => ({
