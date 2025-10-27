@@ -100,6 +100,7 @@ export default function AdminDashboard() {
           body: JSON.stringify({
             role: formData.role,
             permissions: formData.permissions,
+            site: formData.site || null,
           }),
         });
 
