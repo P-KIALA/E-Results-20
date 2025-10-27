@@ -8,8 +8,8 @@ const images = [
     alt: 'Centre de diagnostic médical',
   },
   {
-    url: 'https://images.pexels.com/photos/3803517/pexels-photo-3803517.jpeg',
-    alt: 'Transmission numérique sécurisée des données',
+    url: 'https://images.pexels.com/photos/7734576/pexels-photo-7734576.jpeg',
+    alt: 'Envoi et partage sécurisé des résultats',
   },
   {
     url: 'https://images.pexels.com/photos/6011598/pexels-photo-6011598.jpeg',
@@ -85,7 +85,7 @@ export default function Index() {
             </div>
 
             {/* Right Carousel */}
-            <div className="relative h-96 md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative h-[480px] md:h-[650px] rounded-2xl overflow-hidden shadow-2xl">
               {/* Carousel Container */}
               <div className="relative w-full h-full">
                 {images.map((image, index) => (
