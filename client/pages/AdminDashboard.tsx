@@ -38,6 +38,7 @@ export default function AdminDashboard() {
     password: "",
     role: "user" as const,
     permissions: [] as string[],
+    site: "",
   });
   const [message, setMessage] = useState<{
     type: "success" | "error";
