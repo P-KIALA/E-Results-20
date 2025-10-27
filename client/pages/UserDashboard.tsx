@@ -54,6 +54,66 @@ export default function UserDashboard() {
     }
   };
 
+  const handleAddDoctor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDoctor.name || !newDoctor.phone) {
+      setMessage({ type: "error", text: "Nom et téléphone requis" });
+      return;
+    }
+
+    setAddingDoctor(true);
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/doctors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: newDoctor.name,
+          phone: newDoctor.phone,
+          specialization: newDoctor.specialization || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error);
+      }
+
+      setMessage({ type: "success", text: "Médecin ajouté" });
+      setNewDoctor({ name: "", phone: "", specialization: "" });
+      setShowAddDoctor(false);
+      await fetchDoctors();
+    } catch (error) {
+      setMessage({ type: "error", text: String(error) });
+    } finally {
+      setAddingDoctor(false);
+    }
+  };
+
+  const handleDeleteDoctor = async (id: string) => {
+    if (!confirm("Êtes-vous sûr ?")) return;
+
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch(`/api/doctors/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Erreur de suppression");
+
+      setMessage({ type: "success", text: "Médecin supprimé" });
+      await fetchDoctors();
+    } catch (error) {
+      setMessage({ type: "error", text: "Erreur" });
+    }
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
     const validFiles = selected.filter((f) => {
