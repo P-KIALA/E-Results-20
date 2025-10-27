@@ -29,6 +29,22 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function HomeRedirect() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  if (isAuthenticated) {
+    navigate("/console", { replace: true });
+    return null;
+  }
+
+  return (
+    <Layout>
+      <Index />
+    </Layout>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -40,9 +56,7 @@ const App = () => (
             <Route
               path="/"
               element={
-                <Layout>
-                  <Index />
-                </Layout>
+                <HomeRedirect />
               }
             />
             <Route
