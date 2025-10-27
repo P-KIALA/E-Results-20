@@ -14,6 +14,7 @@ import { Upload, Send, CheckCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 export default function ResultsTab() {
+  const { user } = useAuth();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedDoctors, setSelectedDoctors] = useState<string[]>([]);
   const [customMessage, setCustomMessage] = useState(
@@ -32,7 +33,11 @@ export default function ResultsTab() {
 
   useEffect(() => {
     fetchDoctors();
-  }, []);
+    // Auto-fill patient site from user's site
+    if (user?.site) {
+      setPatientSite(user.site);
+    }
+  }, [user?.site]);
 
   const fetchDoctors = async () => {
     try {
