@@ -50,6 +50,7 @@ export function createServer() {
   // Sites management
   app.get("/api/sites", requireAuth, getSites);
   app.post("/api/sites", requireAuth, createSite);
+  app.delete("/api/sites/:id", requireAuth, deleteSite);
   app.get(
     "/api/users/:id/accessible-sites",
     requireAuth,
