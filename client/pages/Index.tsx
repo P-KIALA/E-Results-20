@@ -51,7 +51,7 @@ export default function Index() {
                 <div className="inline-block">
                   <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium text-primary">
                     <span className="h-2 w-2 rounded-full bg-primary"></span>
-                    Service E-Resultat
+                    Service E-Result
                   </span>
                 </div>
 
