@@ -27,6 +27,17 @@ export const login: RequestHandler = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
+    // Fetch primary site if exists
+    let primarySite = null;
+    if (user.primary_site_id) {
+      const { data: site } = await supabase
+        .from("sites")
+        .select("*")
+        .eq("id", user.primary_site_id)
+        .single();
+      primarySite = site;
+    }
+
     // Generate token
     const token = generateToken(user.id);
     const expiresIn = 3600; // 1 hour in seconds
@@ -37,6 +48,8 @@ export const login: RequestHandler = async (req, res) => {
         email: user.email,
         role: user.role,
         permissions: user.permissions || [],
+        primary_site_id: user.primary_site_id || null,
+        primary_site: primarySite,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
