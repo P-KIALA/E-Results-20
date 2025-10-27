@@ -123,17 +123,18 @@ export const sendResults: RequestHandler = async (req, res) => {
           .insert({
             doctor_id,
             custom_message,
+            patient_name: patient_name || null,
+            patient_site: (req.body as any).patient_site || null,
+            sender_id: (req as any).userId || null,
             status: "pending",
           })
           .select()
           .single();
 
         if (logError) {
-          // If patient_name column exists, update later (best-effort)
           console.warn("send_logs insert encountered error:", logError);
+          throw logError;
         }
-
-        if (logError) throw logError;
 
         // Get media files if any
         let mediaUrls: string[] = [];
