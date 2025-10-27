@@ -48,7 +48,7 @@ export type Database = {
           file_size: number | null;
           file_type: string | null;
           id: string;
-          send_log_id: string;
+          send_log_id: string | null;
           storage_path: string;
         };
         Insert: {
@@ -57,7 +57,7 @@ export type Database = {
           file_size?: number | null;
           file_type?: string | null;
           id?: string;
-          send_log_id: string;
+          send_log_id?: string | null;
           storage_path: string;
         };
         Update: {
@@ -66,7 +66,7 @@ export type Database = {
           file_size?: number | null;
           file_type?: string | null;
           id?: string;
-          send_log_id?: string;
+          send_log_id?: string | null;
           storage_path?: string;
         };
       };
@@ -78,6 +78,7 @@ export type Database = {
           doctor_id: string;
           error_message: string | null;
           id: string;
+          patient_name: string | null;
           read_at: string | null;
           sent_at: string | null;
           status: string | null;
@@ -91,6 +92,7 @@ export type Database = {
           doctor_id: string;
           error_message?: string | null;
           id?: string;
+          patient_name?: string | null;
           read_at?: string | null;
           sent_at?: string | null;
           status?: string | null;
@@ -104,6 +106,7 @@ export type Database = {
           doctor_id?: string;
           error_message?: string | null;
           id?: string;
+          patient_name?: string | null;
           read_at?: string | null;
           sent_at?: string | null;
           status?: string | null;
