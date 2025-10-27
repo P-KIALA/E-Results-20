@@ -2,10 +2,12 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, Users, MapPin, LogOut } from "lucide-react";
+import { useState } from "react";
 
 export default function Sidebar() {
   const location = useLocation();
   const { user, logout, isAuthenticated } = useAuth();
+  const [isHovered, setIsHovered] = useState(false);
   const isActive = (path: string) => location.pathname === path;
 
   if (!isAuthenticated) {
@@ -14,15 +16,22 @@ export default function Sidebar() {
 
   const navItemClass = (active: boolean) =>
     cn(
-      "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
-      "no-underline text-decoration-none",
+      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+      "no-underline text-decoration-none whitespace-nowrap",
       active
         ? "bg-primary text-primary-foreground font-semibold"
         : "text-foreground hover:bg-muted/60 hover:text-primary"
     );
 
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-64px)] w-20 hover:w-56 bg-background border-r border-border flex flex-col gap-1 p-3 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out group">
+    <aside
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={cn(
+        "fixed left-0 top-16 h-[calc(100vh-64px)] bg-background border-r border-border flex flex-col gap-1 p-2 overflow-hidden transition-all duration-300 ease-in-out",
+        isHovered ? "w-56" : "w-20"
+      )}
+    >
       {user?.role === "admin" ? (
         <>
           <Link
