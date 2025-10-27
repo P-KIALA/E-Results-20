@@ -146,13 +146,14 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleEditUser = (u: UserItem) => {
+  const handleEditUser = (u: UserItem & { site?: string | null }) => {
     setEditingId(u.id);
     setFormData({
       email: u.email,
       password: "",
       role: u.role,
       permissions: u.permissions || [],
+      site: u.site || "",
     });
     setShowForm(true);
   };
