@@ -210,7 +210,15 @@ export const sendResults: RequestHandler = async (req, res) => {
 
 export const getSendLogs: RequestHandler = async (req, res) => {
   try {
-    const { doctor_id, status, site_id, startDate, endDate, limit = 50, offset = 0 } = req.query;
+    const {
+      doctor_id,
+      status,
+      site_id,
+      startDate,
+      endDate,
+      limit = 50,
+      offset = 0,
+    } = req.query;
     const userId = (req as any).userId;
 
     let query = supabase
