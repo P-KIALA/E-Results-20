@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,31 +12,38 @@ export default function HistoryTab() {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDoctor, setFilterDoctor] = useState("");
 
-  useEffect(() => {
-    fetchDoctors();
-    fetchLogs();
-    const interval = setInterval(fetchLogs, 5000); // Refresh every 5s
-    return () => clearInterval(interval);
-  }, []);
+  const getToken = () => localStorage.getItem("auth_token");
 
-  const fetchDoctors = async () => {
+  const fetchDoctors = useCallback(async () => {
     try {
-      const res = await fetch("/api/doctors");
+      const token = getToken();
+      const res = await fetch("/api/doctors", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch doctors");
       const data = await res.json();
       setDoctors(data.doctors || []);
     } catch (error) {
       console.error("Error fetching doctors:", error);
     }
-  };
+  }, []);
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (filterStatus) params.append("status", filterStatus);
       if (filterDoctor) params.append("doctor_id", filterDoctor);
 
-      const res = await fetch(`/api/send-logs?${params}`);
+      const token = getToken();
+      const res = await fetch(`/api/send-logs?${params}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch logs");
       const data = await res.json();
       setLogs(data.logs || []);
     } catch (error) {
@@ -44,11 +51,15 @@ export default function HistoryTab() {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchLogs();
   }, [filterStatus, filterDoctor]);
+
+  // Initial load and interval
+  useEffect(() => {
+    fetchDoctors();
+    fetchLogs();
+    const interval = setInterval(() => fetchLogs(), 5000); // Refresh every 5s
+    return () => clearInterval(interval);
+  }, [fetchDoctors, fetchLogs]);
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
