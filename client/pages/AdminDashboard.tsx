@@ -17,13 +17,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { User, Trash2, Plus, Users, Edit2, X } from "lucide-react";
+import { User, Trash2, Plus, Users, Edit2, X, MapPin } from "lucide-react";
+import type { Site } from "@shared/api";
 
 interface UserItem {
   id: string;
   email: string;
   role: "admin" | "user";
   permissions: string[];
+  primary_site_id?: string | null;
   created_at: string;
   updated_at: string;
 }
