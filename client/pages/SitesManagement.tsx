@@ -41,18 +41,30 @@ export default function SitesManagement() {
     setLoading(true);
     try {
       const token = localStorage.getItem("auth_token");
+      if (!token) {
+        console.error("No auth token found");
+        return;
+      }
+
       const res = await fetch("/api/sites", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch sites");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to fetch sites");
+      }
 
       const data = await res.json();
       setSites(data.sites || []);
     } catch (error) {
-      setMessage({ type: "error", text: "Erreur lors du chargement des sites" });
+      console.error("Error fetching sites:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur lors du chargement des sites",
+      });
     } finally {
       setLoading(false);
     }
@@ -141,7 +153,7 @@ export default function SitesManagement() {
           Gestion des sites
         </h1>
         <p className="text-lg text-muted-foreground mt-2">
-          Créez, gérez et supprimez les centres de diagnostic
+          Cr��ez, gérez et supprimez les centres de diagnostic
         </p>
       </div>
 
