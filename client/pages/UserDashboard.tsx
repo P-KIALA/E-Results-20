@@ -210,12 +210,12 @@ export default function UserDashboard() {
         }),
       });
 
+      const result = await res.json();
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
+        throw new Error(result.error || "Erreur lors de l'envoi");
       }
 
-      const result = await res.json();
       const successCount = result.results.filter((r: any) => r.success).length;
       setMessage({
         type: "success",
