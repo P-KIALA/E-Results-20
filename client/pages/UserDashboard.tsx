@@ -39,7 +39,11 @@ export default function UserDashboard() {
 
   useEffect(() => {
     fetchDoctors();
-  }, []);
+    // Auto-fill patient site from user's site
+    if (user?.site) {
+      setPatientSite(user.site);
+    }
+  }, [user?.site]);
 
   const fetchDoctors = async () => {
     try {
