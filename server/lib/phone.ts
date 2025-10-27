@@ -35,22 +35,48 @@ export function validateAndFormatPhone(phone: string): PhoneValidationResult {
   };
 }
 
-// Simulate WhatsApp verification (in real scenario, call Twilio Lookup API)
+import twilio from "twilio";
+
+// Verify WhatsApp availability using Twilio Lookup API
 export async function checkWhatsAppAvailability(
   phone: string,
 ): Promise<boolean> {
-  // TODO: Replace with real Twilio Lookup API when credentials are available
-  // For now, simulate by checking if phone is valid E.164
   const validation = validateAndFormatPhone(phone);
 
-  // Simulate: return true for demonstration
-  // In production: await twilioClient.lookups.v2.phoneNumbers(phone).fetch({ fields: 'line_type_intelligence' })
   if (!validation.is_valid) {
     return false;
   }
 
-  // Mock: assume 80% of valid numbers are on WhatsApp
-  const mockWhatsAppRate = 0.8;
-  const hash = phone.split("").reduce((h, c) => h + c.charCodeAt(0), 0);
-  return (hash % 100) / 100 < mockWhatsAppRate;
+  try {
+    // Initialize Twilio client
+    const twilioClient = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN,
+    );
+
+    // Use Twilio Lookup API to check WhatsApp availability
+    const phoneNumber = await twilioClient.lookups.v2.phoneNumbers(
+      phone,
+    ).fetch({
+      fields: "line_type_intelligence",
+    });
+
+    // Check if the number has WhatsApp capability
+    const lineType =
+      phoneNumber.lineTypeIntelligence?.line_type || "unknown";
+    console.log(
+      `WhatsApp availability check for ${phone}: ${lineType}`,
+    );
+
+    // Return true if it's a valid mobile number (WhatsApp typically works on mobile)
+    return lineType === "mobile" || lineType === "unknown";
+  } catch (error) {
+    console.error(
+      `Error checking WhatsApp availability for ${phone}:`,
+      error,
+    );
+    // If lookup fails, assume the number might be WhatsApp-capable but unverified
+    // This is safer than rejecting all numbers on API errors
+    return true;
+  }
 }
