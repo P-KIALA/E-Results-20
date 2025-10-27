@@ -18,6 +18,7 @@ export default function ResultsTab() {
   const [customMessage, setCustomMessage] = useState(
     "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
   );
+  const [patientName, setPatientName] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
