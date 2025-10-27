@@ -117,6 +117,7 @@ export type Database = {
           email: string;
           password_hash: string;
           role: "admin" | "user";
+          permissions: string[];
           created_at: string;
           updated_at: string;
         };
@@ -125,6 +126,7 @@ export type Database = {
           email: string;
           password_hash: string;
           role?: "admin" | "user";
+          permissions?: string[];
           created_at?: string;
           updated_at?: string;
         };
@@ -133,6 +135,7 @@ export type Database = {
           email?: string;
           password_hash?: string;
           role?: "admin" | "user";
+          permissions?: string[];
           created_at?: string;
           updated_at?: string;
         };
