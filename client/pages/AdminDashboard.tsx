@@ -41,6 +41,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserItem[]>([]);
+  const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(false);
   const [showUserForm, setShowUserForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -49,6 +50,8 @@ export default function AdminDashboard() {
     password: "",
     role: "user" as const,
     permissions: [] as string[],
+    primary_site_id: "",
+    accessible_site_ids: [] as string[],
   });
   const [message, setMessage] = useState<{
     type: "success" | "error";
