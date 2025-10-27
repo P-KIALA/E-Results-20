@@ -297,6 +297,15 @@ export default function AdminDashboard() {
               </div>
 
               <div>
+                <label className="text-sm font-medium">Site d'affectation</label>
+                <Input
+                  placeholder="Ex: Centre X"
+                  value={formData.site}
+                  onChange={(e) => setFormData({ ...formData, site: e.target.value })}
+                />
+              </div>
+
+              <div>
                 <label className="text-sm font-medium block mb-3">
                   Permissions supplémentaires
                 </label>
