@@ -185,11 +185,21 @@ export default function HistoryTab() {
                       <p className="font-medium">
                         {getDoctorName(log.doctor_id)}
                       </p>
-                      {log.custom_message && (
+                      {log.patient_name && (
                         <p className="text-sm text-muted-foreground line-clamp-2">
-                          "{log.custom_message}"
+                          Patient: {log.patient_name}
                         </p>
                       )}
+
+                      <p className="text-sm text-muted-foreground">
+                        Envoyé par: {log.sender?.email || "Inconnu"}
+                        {log.sender?.site ? ` — ${log.sender.site}` : ""}
+                      </p>
+
+                      {log.patient_site && (
+                        <p className="text-sm text-muted-foreground">Site du centre: {log.patient_site}</p>
+                      )}
+
                       <div className="flex flex-wrap gap-2 mt-2 text-xs text-muted-foreground">
                         {log.sent_at && (
                           <span>
