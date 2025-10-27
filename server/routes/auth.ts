@@ -116,6 +116,17 @@ export const register: RequestHandler = async (req, res) => {
 
     if (error) throw error;
 
+    // Fetch primary site if exists
+    let primarySite = null;
+    if (user.primary_site_id) {
+      const { data: site } = await supabase
+        .from("sites")
+        .select("*")
+        .eq("id", user.primary_site_id)
+        .single();
+      primarySite = site;
+    }
+
     // Generate token
     const token = generateToken(user.id);
     const expiresIn = 3600;
@@ -127,6 +138,7 @@ export const register: RequestHandler = async (req, res) => {
         role: user.role,
         permissions: user.permissions || [],
         primary_site_id: user.primary_site_id || null,
+        primary_site: primarySite,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
