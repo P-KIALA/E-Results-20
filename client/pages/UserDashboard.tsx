@@ -164,12 +164,12 @@ export default function UserDashboard() {
         body: JSON.stringify({ files: fileDataList }),
       });
 
+      const result = await res.json();
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
+        throw new Error(result.error || "Erreur lors de l'upload");
       }
 
-      const result = await res.json();
       setUploadedFileIds(result.files.map((f: any) => f.id));
       setMessage({
         type: "success",
