@@ -99,7 +99,7 @@ export default function HistoryTab() {
     } finally {
       setLoading(false);
     }
-  }, [filterStatus, filterDoctor, filterSite, startDate, endDate]);
+  }, [filterStatus, filterDoctor, filterSite, filterSender, startDate, endDate]);
 
   // Load only when user requests (no automatic polling)
   useEffect(() => {
