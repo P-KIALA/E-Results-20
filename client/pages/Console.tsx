@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DoctorsTab from "@/components/console/DoctorsTab";
 import ResultsTab from "@/components/console/ResultsTab";
@@ -6,7 +7,15 @@ import HistoryTab from "@/components/console/HistoryTab";
 import StatsTab from "@/components/console/StatsTab";
 
 export default function ConsolePage() {
-  const [activeTab, setActiveTab] = useState("doctors");
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(tabParam || "doctors");
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   return (
     <div className="relative py-8">
