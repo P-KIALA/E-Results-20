@@ -77,7 +77,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <AuthProvider>
-        <BrowserRouter>
+        <SidebarProvider>
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<RootRedirector />} />
             <Route path="/login" element={<LoginPage />} />
@@ -131,7 +132,8 @@ const App = () => (
               }
             />
           </Routes>
-        </BrowserRouter>
+          </BrowserRouter>
+        </SidebarProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
