@@ -114,11 +114,27 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
     }
   }, [filterStatus, filterDoctor, filterSite, filterSender, startDate, endDate, page, pageSize]);
 
-  // Load only when user requests (no automatic polling)
+  // When the history tab becomes active, default to today's stats and fetch logs
   useEffect(() => {
-    // no-op: we don't fetch on mount to avoid automatic sync
-    return;
-  }, []);
+    if (active) {
+      const today = new Date().toISOString().split("T")[0];
+      setStartDate(today);
+      setEndDate(today);
+      setPage(1);
+      // load supporting lists then logs
+      (async () => {
+        setLoading(true);
+        try {
+          await fetchSites();
+          await fetchDoctors();
+          await fetchUsers();
+          await fetchLogs();
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+  }, [active]);
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
