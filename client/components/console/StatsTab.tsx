@@ -254,15 +254,15 @@ export default function StatsTab() {
           <Button
             variant="outline"
             onClick={() => {
-              setStartDate("");
-              setEndDate("");
+              setStartDate(today);
+              setEndDate(today);
               setStats([]);
               setStatusSummary([]);
               setTotalMessages(0);
             }}
             className="px-3 py-2"
           >
-            Réinitialiser les filtres
+            Réinitialiser aux statistiques d'aujourd'hui
           </Button>
         </div>
       </div>
