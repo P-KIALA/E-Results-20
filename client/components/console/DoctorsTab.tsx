@@ -47,6 +47,8 @@ export default function DoctorsTab() {
     specialization: "",
     cnom: "",
   });
+  const [deletingDoctorId, setDeletingDoctorId] = useState<string | null>(null);
+  const [deletingDoctorName, setDeletingDoctorName] = useState("");
 
   useEffect(() => {
     fetchDoctors();
