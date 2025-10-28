@@ -24,7 +24,7 @@ export const getDoctors: RequestHandler = async (req, res) => {
 
 export const addDoctor: RequestHandler = async (req, res) => {
   try {
-    const { phone, name, specialization } = req.body as AddDoctorRequest;
+    const { phone, name, specialization, cnom } = req.body as AddDoctorRequest;
 
     if (!phone || !name) {
       return res.status(400).json({ error: "Phone and name are required" });
@@ -38,6 +38,30 @@ export const addDoctor: RequestHandler = async (req, res) => {
 
     const formatted_phone = phoneValidation.formatted_phone;
 
+    // Check if phone already exists
+    const { data: existingPhone } = await supabase
+      .from("doctors")
+      .select("id")
+      .eq("phone", formatted_phone)
+      .single();
+
+    if (existingPhone) {
+      return res.status(409).json({ error: "Ce numéro de téléphone existe déjà" });
+    }
+
+    // Check if CNOM already exists (if provided)
+    if (cnom && cnom.trim()) {
+      const { data: existingCnom } = await supabase
+        .from("doctors")
+        .select("id")
+        .eq("cnom", cnom.trim())
+        .single();
+
+      if (existingCnom) {
+        return res.status(409).json({ error: "Ce numéro CNOM existe déjà" });
+      }
+    }
+
     // Check WhatsApp availability
     const is_whatsapp = await checkWhatsAppAvailability(formatted_phone);
 
@@ -47,6 +71,7 @@ export const addDoctor: RequestHandler = async (req, res) => {
         phone: formatted_phone,
         name,
         specialization,
+        cnom: cnom && cnom.trim() ? cnom.trim() : null,
         whatsapp_verified: is_whatsapp,
         whatsapp_verified_at: is_whatsapp ? new Date().toISOString() : null,
       })
@@ -54,9 +79,6 @@ export const addDoctor: RequestHandler = async (req, res) => {
       .single();
 
     if (error) {
-      if (error.code === "23505") {
-        return res.status(409).json({ error: "Phone number already exists" });
-      }
       throw error;
     }
 
