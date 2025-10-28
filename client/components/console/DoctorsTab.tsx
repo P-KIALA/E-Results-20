@@ -89,6 +89,7 @@ export default function DoctorsTab() {
   const handleAddDoctor = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setMessage(null);
 
     try {
       const token = localStorage.getItem("auth_token");
@@ -97,6 +98,25 @@ export default function DoctorsTab() {
           type: "error",
           text: "Session expirée. Veuillez vous reconnecter.",
         });
+        return;
+      }
+
+      // Check for duplicates locally
+      if (doctors.some(d => d.phone === formData.phone)) {
+        setMessage({
+          type: "error",
+          text: "Ce numéro de téléphone existe déjà",
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      if (formData.cnom && doctors.some(d => d.cnom === formData.cnom)) {
+        setMessage({
+          type: "error",
+          text: "Ce numéro CNOM existe déjà",
+        });
+        setSubmitting(false);
         return;
       }
 
@@ -119,8 +139,8 @@ export default function DoctorsTab() {
       }
 
       setMessage({ type: "success", text: "Médecin ajouté avec succès" });
-      setFormData({ phone: "", name: "", specialization: "" });
-      setShowForm(false);
+      setFormData({ phone: "", name: "", specialization: "", cnom: "" });
+      setShowAddForm(false);
       await fetchDoctors();
     } catch (error) {
       console.error("Error adding doctor:", error);
