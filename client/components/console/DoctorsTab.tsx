@@ -333,6 +333,50 @@ export default function DoctorsTab() {
         </Card>
       )}
 
+      <Dialog open={editingDoctorId !== null} onOpenChange={(open) => {
+        if (!open) {
+          setEditingDoctorId(null);
+          setEditName("");
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier le médecin</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations du médecin
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Nom *</label>
+              <Input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Nom du médecin"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditingDoctorId(null);
+                  setEditName("");
+                }}
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={() => editingDoctorId && handleEditDoctor(editingDoctorId)}
+              >
+                Enregistrer
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="grid gap-4">
         {loading ? (
           <p className="text-center text-muted-foreground">Chargement...</p>
@@ -346,97 +390,65 @@ export default function DoctorsTab() {
           doctors.map((doctor) => (
             <Card key={doctor.id}>
               <CardContent className="pt-6">
-                {editingDoctorId === doctor.id ? (
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium">Modifier le nom</label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        placeholder="Nouveau nom"
-                        autoFocus
-                      />
-                      <Button
-                        size="sm"
-                        onClick={() => handleEditDoctor(doctor.id)}
-                        className="gap-2"
-                      >
-                        Enregistrer
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setEditingDoctorId(null);
-                          setEditName("");
-                        }}
-                      >
-                        <X size={14} />
-                      </Button>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className="font-semibold">{doctor.name}</h4>
+                      {doctor.whatsapp_verified ? (
+                        <CheckCircle
+                          size={16}
+                          className="text-green-600"
+                          title="Vérifié WhatsApp"
+                        />
+                      ) : (
+                        <AlertCircle
+                          size={16}
+                          className="text-amber-600"
+                          title="Non vérifié WhatsApp"
+                        />
+                      )}
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold">{doctor.name}</h4>
-                        {doctor.whatsapp_verified ? (
-                          <CheckCircle
-                            size={16}
-                            className="text-green-600"
-                            title="Vérifié WhatsApp"
-                          />
-                        ) : (
-                          <AlertCircle
-                            size={16}
-                            className="text-amber-600"
-                            title="Non vérifié WhatsApp"
-                          />
-                        )}
-                      </div>
+                    <p className="text-sm text-muted-foreground">
+                      {doctor.phone}
+                    </p>
+                    {doctor.specialization && (
                       <p className="text-sm text-muted-foreground">
-                        {doctor.phone}
+                        {doctor.specialization}
                       </p>
-                      {doctor.specialization && (
-                        <p className="text-sm text-muted-foreground">
-                          {doctor.specialization}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditingDoctorId(doctor.id);
+                        setEditName(doctor.name);
+                      }}
+                      className="gap-2"
+                    >
+                      <Pencil size={14} /> Modifier
+                    </Button>
+                    {!doctor.whatsapp_verified && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => {
-                          setEditingDoctorId(doctor.id);
-                          setEditName(doctor.name);
-                        }}
+                        onClick={() => handleVerify(doctor.id)}
                         className="gap-2"
                       >
-                        <Pencil size={14} /> Modifier
+                        <RefreshCw size={14} /> Vérifier
                       </Button>
-                      {!doctor.whatsapp_verified && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleVerify(doctor.id)}
-                          className="gap-2"
-                        >
-                          <RefreshCw size={14} /> Vérifier
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDeleteDoctor(doctor.id)}
-                        className="gap-2"
-                      >
-                        <Trash2 size={14} />
-                      </Button>
-                    </div>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDeleteDoctor(doctor.id)}
+                      className="gap-2"
+                    >
+                      <Trash2 size={14} />
+                    </Button>
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           ))
