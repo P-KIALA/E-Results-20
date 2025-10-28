@@ -44,7 +44,9 @@ function Layout({ children }: { children: React.ReactNode }) {
       <main className={`flex-1 transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}>
         {children}
       </main>
-      <Footer />
+      <footer className={`transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}>
+        <Footer />
+      </footer>
     </div>
   );
 }
