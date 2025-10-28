@@ -29,6 +29,8 @@ import Footer from "@/components/layout/Footer";
 const queryClient = new QueryClient();
 
 function Layout({ children }: { children: React.ReactNode }) {
+  const { isMinimized } = useSidebar();
+
   return (
     <div className="relative min-h-screen flex flex-col">
       {/* Global background for all pages. Replace '/console-bg.svg' as needed */}
@@ -39,7 +41,9 @@ function Layout({ children }: { children: React.ReactNode }) {
 
       <Header />
       <Sidebar />
-      <main className="flex-1 ml-20">{children}</main>
+      <main className={`flex-1 transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}>
+        {children}
+      </main>
       <Footer />
     </div>
   );
