@@ -390,7 +390,7 @@ export default function DoctorsTab() {
       <Dialog open={editingDoctorId !== null} onOpenChange={(open) => {
         if (!open) {
           setEditingDoctorId(null);
-          setEditName("");
+          setEditFormData({ name: "", phone: "", specialization: "", cnom: "" });
         }
       }}>
         <DialogContent>
@@ -405,10 +405,37 @@ export default function DoctorsTab() {
               <label className="text-sm font-medium">Nom *</label>
               <Input
                 type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
+                value={editFormData.name}
+                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
                 placeholder="Nom du médecin"
                 autoFocus
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Téléphone</label>
+              <Input
+                type="tel"
+                value={editFormData.phone}
+                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                placeholder="+243 (format international)"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Spécialité</label>
+              <Input
+                type="text"
+                value={editFormData.specialization}
+                onChange={(e) => setEditFormData({ ...editFormData, specialization: e.target.value })}
+                placeholder="Cardiologue"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">CNOM</label>
+              <Input
+                type="text"
+                value={editFormData.cnom}
+                onChange={(e) => setEditFormData({ ...editFormData, cnom: e.target.value })}
+                placeholder="Numéro d'ordre au CNOM"
               />
             </div>
             <div className="flex gap-2 justify-end">
@@ -416,7 +443,7 @@ export default function DoctorsTab() {
                 variant="outline"
                 onClick={() => {
                   setEditingDoctorId(null);
-                  setEditName("");
+                  setEditFormData({ name: "", phone: "", specialization: "", cnom: "" });
                 }}
               >
                 Annuler
