@@ -319,11 +319,13 @@ export const getSendLogs: RequestHandler = async (req, res) => {
 export const webhookTwilio: RequestHandler = async (req, res) => {
   try {
     // Handle Twilio webhook for message status updates
-    const { MessageSid, MessageStatus } = req.body;
+    const { MessageSid, MessageStatus, ErrorCode, ErrorMessage } = req.body;
 
     if (!MessageSid) {
       return res.status(400).json({ error: "MessageSid is required" });
     }
+
+    console.log(`Twilio webhook: MessageSid=${MessageSid}, Status=${MessageStatus}, ErrorCode=${ErrorCode}, ErrorMessage=${ErrorMessage}`);
 
     // Map Twilio status to our status
     const statusMap: Record<string, string> = {
@@ -338,6 +340,11 @@ export const webhookTwilio: RequestHandler = async (req, res) => {
 
     // Update send log
     const updateData: any = { status: mappedStatus };
+
+    // Store error message if available
+    if (ErrorMessage) {
+      updateData.error_message = `${ErrorCode}: ${ErrorMessage}`;
+    }
 
     if (mappedStatus === "sent") {
       updateData.sent_at = new Date().toISOString();
