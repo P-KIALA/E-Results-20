@@ -315,9 +315,17 @@ export const getSendLogs: RequestHandler = async (req, res) => {
       limit: Number(limit),
       offset: Number(offset),
     });
-  } catch (error) {
-    console.error("Error fetching send logs:", error);
-    res.status(500).json({ error: "Failed to fetch send logs" });
+  } catch (error: any) {
+    try {
+      console.error("Error fetching send logs:", error, {
+        message: error?.message,
+        stack: error?.stack,
+        details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+      });
+    } catch (e) {
+      console.error("Error fetching send logs (failed to stringify):", error);
+    }
+    res.status(500).json({ error: error?.message || "Failed to fetch send logs" });
   }
 };
 
