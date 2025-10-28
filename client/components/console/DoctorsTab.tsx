@@ -28,11 +28,12 @@ import {
 export default function DoctorsTab() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     phone: "",
     name: "",
     specialization: "",
+    cnom: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{
@@ -40,7 +41,12 @@ export default function DoctorsTab() {
     text: string;
   } | null>(null);
   const [editingDoctorId, setEditingDoctorId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    phone: "",
+    specialization: "",
+    cnom: "",
+  });
 
   useEffect(() => {
     fetchDoctors();
