@@ -1,15 +1,15 @@
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
+import { useSidebar } from "@/lib/sidebar-context";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, Users, MapPin, LogOut, Stethoscope, Send, Clock, BarChart3, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function Sidebar() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user, logout, isAuthenticated } = useAuth();
-  const [isMinimized, setIsMinimized] = useState(false);
+  const { isMinimized, setIsMinimized } = useSidebar();
   const isActive = (path: string) => location.pathname === path;
   const isConsoleActive = isActive("/console");
   const currentTab = searchParams.get("tab") || "doctors";
