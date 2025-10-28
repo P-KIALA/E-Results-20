@@ -1,0 +1,84 @@
+name: CI/CD Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+      - name: Upload image info
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-tags
+          path: |
+            # small file with tag info
+            ./
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ secrets.SSH_HOST != '' }}
+    steps:
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            echo "Deploying to ${{ secrets.SSH_HOST }}"
+            mkdir -p ${{ secrets.SSH_DEPLOY_DIR }}
+            if [ -d "${{ secrets.SSH_DEPLOY_DIR }}/.git" ]; then
+              cd ${{ secrets.SSH_DEPLOY_DIR }}
+              git fetch --all
+              git reset --hard ${{ github.sha }}
+            else
+              git clone https://github.com/${{ github.repository }} ${{ secrets.SSH_DEPLOY_DIR }}
+              cd ${{ secrets.SSH_DEPLOY_DIR }}
+              git checkout ${{ github.sha }} || true
+            fi
+
+            # Ensure .env is present (you should manage secrets on the server)
+            # Pull images and bring up the stack
+            docker compose pull || true
+            docker compose up -d --build --remove-orphans
+            docker image prune -f || true
+
+            echo "Deployed"
