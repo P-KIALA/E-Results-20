@@ -93,6 +93,10 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
       if (endDate) params.append("endDate", endDate);
       if (filterSender) params.append("sender_id", filterSender);
 
+      // pagination
+      params.append("limit", String(pageSize));
+      params.append("offset", String((page - 1) * pageSize));
+
       const token = getToken();
       const res = await fetch(`/api/send-logs?${params}`, {
         headers: {
@@ -102,12 +106,13 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
       if (!res.ok) throw new Error("Failed to fetch logs");
       const data = await res.json();
       setLogs(data.logs || []);
+      setTotal(data.total || 0);
     } catch (error) {
       console.error("Error fetching logs:", error);
     } finally {
       setLoading(false);
     }
-  }, [filterStatus, filterDoctor, filterSite, filterSender, startDate, endDate]);
+  }, [filterStatus, filterDoctor, filterSite, filterSender, startDate, endDate, page, pageSize]);
 
   // Load only when user requests (no automatic polling)
   useEffect(() => {
