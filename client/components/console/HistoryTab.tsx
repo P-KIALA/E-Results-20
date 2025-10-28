@@ -219,20 +219,6 @@ export default function HistoryTab() {
           >
             Actualiser
           </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => {
-              setFilterStatus("");
-              setFilterDoctor("");
-              setFilterSite("");
-              setStartDate("");
-              setEndDate("");
-            }}
-            className="px-3 py-2"
-          >
-            Réinitialiser les filtres
-          </Button>
         </div>
       </div>
 
