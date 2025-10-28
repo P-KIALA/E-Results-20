@@ -411,6 +411,39 @@ export default function DoctorsTab() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={deletingDoctorId !== null} onOpenChange={(open) => {
+        if (!open) {
+          setDeletingDoctorId(null);
+          setDeletingDoctorName("");
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmer la suppression</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer le médecin <strong>{deletingDoctorName}</strong> ? Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeletingDoctorId(null);
+                setDeletingDoctorName("");
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteDoctor}
+            >
+              Supprimer
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={editingDoctorId !== null} onOpenChange={(open) => {
         if (!open) {
           setEditingDoctorId(null);
