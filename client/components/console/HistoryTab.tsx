@@ -136,6 +136,13 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
     }
   }, [active]);
 
+  // Refetch logs when filters or pagination change while active
+  useEffect(() => {
+    if (active) {
+      fetchLogs();
+    }
+  }, [active, filterStatus, filterDoctor, filterSite, filterSender, page, pageSize]);
+
   const getStatusIcon = (status?: string) => {
     switch (status) {
       case "sent":
