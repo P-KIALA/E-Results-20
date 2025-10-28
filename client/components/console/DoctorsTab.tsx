@@ -598,7 +598,7 @@ export default function DoctorsTab() {
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => handleDeleteDoctor(doctor.id)}
+                      onClick={() => handleDeleteDoctor(doctor.id, doctor.name)}
                       className="gap-2"
                     >
                       <Trash2 size={14} />
