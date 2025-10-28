@@ -7,6 +7,7 @@ export interface Doctor {
   phone: string;
   name: string;
   specialization?: string;
+  cnom?: string;
   whatsapp_verified: boolean;
   whatsapp_verified_at?: string;
   created_at: string;
@@ -17,6 +18,7 @@ export interface AddDoctorRequest {
   phone: string;
   name: string;
   specialization?: string;
+  cnom?: string;
 }
 
 export interface SendLogEntry {
