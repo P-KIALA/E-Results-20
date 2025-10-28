@@ -46,62 +46,42 @@ export default function Sidebar() {
       {user?.role === "admin" ? (
         <>
           <Link
-            to="/console"
-            className={navItemClass(isActive("/console"))}
-            title="Console"
+            to="/console?tab=doctors"
+            className={navItemClass(isConsoleActive && currentTab === "doctors")}
+            title="Médecins"
           >
-            <LayoutDashboard size={20} className="flex-shrink-0" />
-            {isHovered && <span className="font-medium">Console</span>}
+            <Stethoscope size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Médecins</span>}
           </Link>
 
-          {isHovered && isActive("/console") && (
-            <div className="flex flex-col gap-1 pl-2 border-l-2 border-primary/30">
-              <Link
-                to="/console?tab=doctors"
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200",
-                  "text-sm text-foreground hover:bg-muted/60 hover:text-primary"
-                )}
-                title="Médecins"
-              >
-                <Stethoscope size={16} className="flex-shrink-0" />
-                <span>Médecins</span>
-              </Link>
-              <Link
-                to="/console?tab=results"
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200",
-                  "text-sm text-foreground hover:bg-muted/60 hover:text-primary"
-                )}
-                title="Envoi résultat"
-              >
-                <Send size={16} className="flex-shrink-0" />
-                <span>Envoi résultat</span>
-              </Link>
-              <Link
-                to="/console?tab=history"
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200",
-                  "text-sm text-foreground hover:bg-muted/60 hover:text-primary"
-                )}
-                title="Historique"
-              >
-                <Clock size={16} className="flex-shrink-0" />
-                <span>Historique</span>
-              </Link>
-              <Link
-                to="/console?tab=stats"
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200",
-                  "text-sm text-foreground hover:bg-muted/60 hover:text-primary"
-                )}
-                title="Statistiques"
-              >
-                <BarChart3 size={16} className="flex-shrink-0" />
-                <span>Statistiques</span>
-              </Link>
-            </div>
-          )}
+          <Link
+            to="/console?tab=results"
+            className={navItemClass(isConsoleActive && currentTab === "results")}
+            title="Envoi résultat"
+          >
+            <Send size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Envoi résultat</span>}
+          </Link>
+
+          <Link
+            to="/console?tab=history"
+            className={navItemClass(isConsoleActive && currentTab === "history")}
+            title="Historique"
+          >
+            <Clock size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Historique</span>}
+          </Link>
+
+          <Link
+            to="/console?tab=stats"
+            className={navItemClass(isConsoleActive && currentTab === "stats")}
+            title="Statistiques"
+          >
+            <BarChart3 size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Statistiques</span>}
+          </Link>
+
+          <div className="my-2 border-t border-border" />
 
           <Link
             to="/admin"
@@ -109,7 +89,7 @@ export default function Sidebar() {
             title="Utilisateurs"
           >
             <Users size={20} className="flex-shrink-0" />
-            {isHovered && <span className="font-medium">Utilisateurs</span>}
+            {!isMinimized && <span className="font-medium">Utilisateurs</span>}
           </Link>
 
           <Link
@@ -118,7 +98,7 @@ export default function Sidebar() {
             title="Sites"
           >
             <MapPin size={20} className="flex-shrink-0" />
-            {isHovered && <span className="font-medium">Sites</span>}
+            {!isMinimized && <span className="font-medium">Sites</span>}
           </Link>
         </>
       ) : (
@@ -128,7 +108,7 @@ export default function Sidebar() {
           title="Envois"
         >
           <LayoutDashboard size={20} className="flex-shrink-0" />
-          {isHovered && <span className="font-medium">Envois</span>}
+          {!isMinimized && <span className="font-medium">Envois</span>}
         </Link>
       )}
 
