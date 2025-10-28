@@ -124,7 +124,7 @@ export default function Sidebar() {
         title="Déconnexion"
       >
         <LogOut size={20} className="flex-shrink-0" />
-        {isHovered && <span>Déconnexion</span>}
+        {!isMinimized && <span>Déconnexion</span>}
       </button>
     </aside>
   );
