@@ -98,12 +98,27 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
       params.append("offset", String((page - 1) * pageSize));
 
       const token = getToken();
+      if (!token) {
+        throw new Error("No auth token");
+      }
+
       const res = await fetch(`/api/send-logs?${params}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!res.ok) throw new Error("Failed to fetch logs");
+
+      if (!res.ok) {
+        let errMsg = `Failed to fetch logs: ${res.status}`;
+        try {
+          const errBody = await res.json();
+          if (errBody && errBody.error) errMsg = errBody.error;
+        } catch (e) {
+          // ignore
+        }
+        throw new Error(errMsg);
+      }
+
       const data = await res.json();
       setLogs(data.logs || []);
       setTotal(data.total || 0);
