@@ -147,7 +147,7 @@ export default function HistoryTab() {
       </div>
 
       <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-6 items-center">
+        <div className="grid gap-4 sm:grid-cols-7 items-center">
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -187,6 +187,19 @@ export default function HistoryTab() {
             ))}
           </select>
 
+          <select
+            value={filterSender}
+            onChange={(e) => setFilterSender(e.target.value)}
+            className="px-3 py-2 rounded-md border bg-background text-sm"
+          >
+            <option value="">Tous les expéditeurs</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.email}
+              </option>
+            ))}
+          </select>
+
           <input
             type="date"
             value={startDate}
@@ -209,6 +222,7 @@ export default function HistoryTab() {
               try {
                 await fetchSites();
                 await fetchDoctors();
+                await fetchUsers();
                 await fetchLogs();
               } finally {
                 setLoading(false);
