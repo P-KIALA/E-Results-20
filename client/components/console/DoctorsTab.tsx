@@ -228,7 +228,7 @@ export default function DoctorsTab() {
   };
 
   const handleEditDoctor = async (id: string) => {
-    if (!editName.trim()) {
+    if (!editFormData.name.trim()) {
       setMessage({
         type: "error",
         text: "Le nom ne peut pas être vide",
@@ -246,13 +246,33 @@ export default function DoctorsTab() {
         return;
       }
 
+      // Check for duplicates (excluding current doctor)
+      const currentDoctor = doctors.find(d => d.id === id);
+      if (editFormData.phone && editFormData.phone !== currentDoctor?.phone &&
+          doctors.some(d => d.id !== id && d.phone === editFormData.phone)) {
+        setMessage({
+          type: "error",
+          text: "Ce numéro de téléphone existe déjà",
+        });
+        return;
+      }
+
+      if (editFormData.cnom && editFormData.cnom !== currentDoctor?.cnom &&
+          doctors.some(d => d.id !== id && d.cnom === editFormData.cnom)) {
+        setMessage({
+          type: "error",
+          text: "Ce numéro CNOM existe déjà",
+        });
+        return;
+      }
+
       const res = await fetch(`/api/doctors/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: editName }),
+        body: JSON.stringify(editFormData),
       });
 
       if (!res.ok) {
@@ -266,7 +286,7 @@ export default function DoctorsTab() {
 
       setMessage({ type: "success", text: "Médecin modifié avec succès" });
       setEditingDoctorId(null);
-      setEditName("");
+      setEditFormData({ name: "", phone: "", specialization: "", cnom: "" });
       await fetchDoctors();
     } catch (error) {
       console.error("Error editing doctor:", error);
