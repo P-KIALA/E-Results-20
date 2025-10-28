@@ -155,8 +155,8 @@ export default function DoctorsTab() {
     }
   };
 
-  const handleDeleteDoctor = async (id: string) => {
-    if (!confirm("Êtes-vous sûr ?")) return;
+  const confirmDeleteDoctor = async () => {
+    if (!deletingDoctorId) return;
 
     try {
       const token = localStorage.getItem("auth_token");
@@ -168,14 +168,14 @@ export default function DoctorsTab() {
         return;
       }
 
-      const res = await fetch(`/api/doctors/${id}`, {
+      const res = await fetch(`/api/doctors/${deletingDoctorId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       if (res.ok) {
-        setMessage({ type: "success", text: "Médecin supprimé" });
+        setMessage({ type: "success", text: "Médecin supprimé avec succès" });
         await fetchDoctors();
       } else {
         const err = await res.json().catch(() => ({}));
@@ -190,7 +190,15 @@ export default function DoctorsTab() {
         type: "error",
         text: error instanceof Error ? error.message : "Erreur de suppression",
       });
+    } finally {
+      setDeletingDoctorId(null);
+      setDeletingDoctorName("");
     }
+  };
+
+  const handleDeleteDoctor = (id: string, name: string) => {
+    setDeletingDoctorId(id);
+    setDeletingDoctorName(name);
   };
 
   const handleVerify = async (id: string) => {
