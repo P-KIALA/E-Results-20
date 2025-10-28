@@ -92,7 +92,7 @@ export const addDoctor: RequestHandler = async (req, res) => {
 export const updateDoctor: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const { phone, name, specialization } = req.body;
+    const { phone, name, specialization, cnom } = req.body;
 
     const updateData: any = {};
     if (name) updateData.name = name;
@@ -105,6 +105,19 @@ export const updateDoctor: RequestHandler = async (req, res) => {
       if (!phoneValidation.is_valid) {
         return res.status(400).json({ error: "Invalid phone number format" });
       }
+
+      // Check if phone already exists on another doctor
+      const { data: existingPhone } = await supabase
+        .from("doctors")
+        .select("id")
+        .eq("phone", phoneValidation.formatted_phone)
+        .neq("id", id)
+        .single();
+
+      if (existingPhone) {
+        return res.status(409).json({ error: "Ce numéro de téléphone existe déjà" });
+      }
+
       const is_whatsapp = await checkWhatsAppAvailability(
         phoneValidation.formatted_phone,
       );
@@ -115,6 +128,26 @@ export const updateDoctor: RequestHandler = async (req, res) => {
         : null;
     }
 
+    // If CNOM is being updated, check for duplicates
+    if (cnom !== undefined) {
+      if (cnom && cnom.trim()) {
+        const { data: existingCnom } = await supabase
+          .from("doctors")
+          .select("id")
+          .eq("cnom", cnom.trim())
+          .neq("id", id)
+          .single();
+
+        if (existingCnom) {
+          return res.status(409).json({ error: "Ce numéro CNOM existe déjà" });
+        }
+
+        updateData.cnom = cnom.trim();
+      } else {
+        updateData.cnom = null;
+      }
+    }
+
     const { data, error } = await supabase
       .from("doctors")
       .update(updateData)
@@ -123,9 +156,6 @@ export const updateDoctor: RequestHandler = async (req, res) => {
       .single();
 
     if (error) {
-      if (error.code === "23505") {
-        return res.status(409).json({ error: "Phone number already exists" });
-      }
       throw error;
     }
 
