@@ -249,6 +249,11 @@ export const getSendLogs: RequestHandler = async (req, res) => {
       }
     }
 
+    // Filter by sender (user who sent the message)
+    if (req.query.sender_id) {
+      query = query.eq("sender_id", req.query.sender_id as string);
+    }
+
     // Filter by date range
     if (startDate) {
       query = query.gte("created_at", startDate as string);
