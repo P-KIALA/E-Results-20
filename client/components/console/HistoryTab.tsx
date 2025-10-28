@@ -12,7 +12,11 @@ import { Input } from "@/components/ui/input";
 import { SendLogEntry, Doctor, Site } from "@shared/api";
 import { Clock, CheckCircle, AlertCircle, Loader, MapPin } from "lucide-react";
 
-export default function HistoryTab() {
+interface HistoryTabProps {
+  active?: boolean;
+}
+
+export default function HistoryTab({ active = false }: HistoryTabProps) {
   const { user } = useAuth();
   const [logs, setLogs] = useState<(SendLogEntry & { doctors?: any })[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -23,8 +27,12 @@ export default function HistoryTab() {
   const [filterSite, setFilterSite] = useState("");
   const [filterSender, setFilterSender] = useState("");
   const [users, setUsers] = useState<any[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const today = new Date().toISOString().split("T")[0];
+  const [startDate, setStartDate] = useState(today);
+  const [endDate, setEndDate] = useState(today);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [total, setTotal] = useState(0);
 
   const getToken = () => localStorage.getItem("auth_token");
 
