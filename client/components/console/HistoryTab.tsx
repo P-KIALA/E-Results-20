@@ -60,6 +60,20 @@ export default function HistoryTab() {
     }
   }, []);
 
+  const fetchUsers = useCallback(async () => {
+    try {
+      const token = getToken();
+      const res = await fetch("/api/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const data = await res.json();
+      setUsers(data.users || []);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }, []);
+
   const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
