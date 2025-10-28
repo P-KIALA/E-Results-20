@@ -229,22 +229,6 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
             title="Date de fin"
           />
 
-          <Button
-            onClick={async () => {
-              setLoading(true);
-              try {
-                await fetchSites();
-                await fetchDoctors();
-                await fetchUsers();
-                await fetchLogs();
-              } finally {
-                setLoading(false);
-              }
-            }}
-            className="px-3 py-2"
-          >
-            {loading ? "Chargement..." : "Charger l'historique"}
-          </Button>
         </div>
 
         <div className="flex gap-2">
