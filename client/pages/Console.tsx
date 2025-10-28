@@ -57,7 +57,7 @@ export default function ConsolePage() {
           </TabsContent>
 
           <TabsContent value="history" className="space-y-6">
-            <HistoryTab />
+            <HistoryTab active={activeTab === 'history'} />
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">
