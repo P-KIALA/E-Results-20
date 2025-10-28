@@ -306,7 +306,7 @@ export default function DoctorsTab() {
             Ajoutez et gérez les médecins destinataires
           </p>
         </div>
-        <Button onClick={() => setShowForm(!showForm)} className="gap-2">
+        <Button onClick={() => setShowAddForm(true)} className="gap-2">
           <Plus size={16} /> Ajouter médecin
         </Button>
       </div>
@@ -319,65 +319,73 @@ export default function DoctorsTab() {
         </div>
       )}
 
-      {showForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Ajouter un médecin</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddDoctor} className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Téléphone *</label>
-                <Input
-                  type="tel"
-                  placeholder="+33 6 12 34 56 78"
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  required
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Format international (ex: +33612345678)
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Nom *</label>
-                <Input
-                  placeholder="Dr. Martin Dupont"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Spécialité</label>
-                <Input
-                  placeholder="Cardiologue"
-                  value={formData.specialization}
-                  onChange={(e) =>
-                    setFormData({ ...formData, specialization: e.target.value })
-                  }
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? "Ajout..." : "Ajouter"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowForm(false)}
-                >
-                  Annuler
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ajouter un médecin</DialogTitle>
+            <DialogDescription>
+              Ajoutez un nouveau médecin au système
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddDoctor} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Téléphone *</label>
+              <Input
+                type="tel"
+                placeholder="+243 (format international)"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Nom *</label>
+              <Input
+                placeholder="Dr. Martin Dupont"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Spécialité</label>
+              <Input
+                placeholder="Cardiologue"
+                value={formData.specialization}
+                onChange={(e) =>
+                  setFormData({ ...formData, specialization: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">CNOM</label>
+              <Input
+                placeholder="Numéro d'ordre au CNOM"
+                value={formData.cnom}
+                onChange={(e) =>
+                  setFormData({ ...formData, cnom: e.target.value })
+                }
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowAddForm(false)}
+              >
+                Annuler
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Ajout..." : "Ajouter"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={editingDoctorId !== null} onOpenChange={(open) => {
         if (!open) {
