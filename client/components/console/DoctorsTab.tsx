@@ -319,7 +319,14 @@ export default function DoctorsTab() {
         </div>
       )}
 
-      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+      <Dialog open={showAddForm} onOpenChange={(open) => {
+        if (!open) {
+          setShowAddForm(false);
+          setMessage(null);
+        } else {
+          setShowAddForm(true);
+        }
+      }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Ajouter un médecin</DialogTitle>
