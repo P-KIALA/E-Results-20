@@ -41,10 +41,14 @@ function Layout({ children }: { children: React.ReactNode }) {
 
       <Header />
       <Sidebar />
-      <main className={`flex-1 transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}>
+      <main
+        className={`flex-1 transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}
+      >
         {children}
       </main>
-      <footer className={`transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}>
+      <footer
+        className={`transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}
+      >
         <Footer />
       </footer>
     </div>
@@ -81,59 +85,59 @@ const App = () => (
       <AuthProvider>
         <SidebarProvider>
           <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<RootRedirector />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route
-              path="/console"
-              element={
-                <Layout>
-                  <ProtectedRoute requiredRole="admin">
-                    <ConsolePage />
-                  </ProtectedRoute>
-                </Layout>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <Layout>
-                  <ProtectedRoute requiredRole="admin">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                </Layout>
-              }
-            />
-            <Route
-              path="/sites"
-              element={
-                <Layout>
-                  <ProtectedRoute requiredRole="admin">
-                    <SitesManagement />
-                  </ProtectedRoute>
-                </Layout>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <Layout>
-                  <ProtectedRoute requiredRole="user">
-                    <UserDashboard />
-                  </ProtectedRoute>
-                </Layout>
-              }
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route
-              path="*"
-              element={
-                <Layout>
-                  <NotFound />
-                </Layout>
-              }
-            />
-          </Routes>
+            <Routes>
+              <Route path="/" element={<RootRedirector />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route
+                path="/console"
+                element={
+                  <Layout>
+                    <ProtectedRoute requiredRole="admin">
+                      <ConsolePage />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <Layout>
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
+              <Route
+                path="/sites"
+                element={
+                  <Layout>
+                    <ProtectedRoute requiredRole="admin">
+                      <SitesManagement />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <Layout>
+                    <ProtectedRoute requiredRole="user">
+                      <UserDashboard />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route
+                path="*"
+                element={
+                  <Layout>
+                    <NotFound />
+                  </Layout>
+                }
+              />
+            </Routes>
           </BrowserRouter>
         </SidebarProvider>
       </AuthProvider>

@@ -46,7 +46,9 @@ export const addDoctor: RequestHandler = async (req, res) => {
       .single();
 
     if (existingPhone) {
-      return res.status(409).json({ error: "Ce numéro de téléphone existe déjà" });
+      return res
+        .status(409)
+        .json({ error: "Ce numéro de téléphone existe déjà" });
     }
 
     // Check if CNOM already exists (if provided)
@@ -115,7 +117,9 @@ export const updateDoctor: RequestHandler = async (req, res) => {
         .single();
 
       if (existingPhone) {
-        return res.status(409).json({ error: "Ce numéro de téléphone existe déjà" });
+        return res
+          .status(409)
+          .json({ error: "Ce numéro de téléphone existe déjà" });
       }
 
       const is_whatsapp = await checkWhatsAppAvailability(

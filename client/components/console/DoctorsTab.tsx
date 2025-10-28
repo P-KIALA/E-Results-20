@@ -104,7 +104,7 @@ export default function DoctorsTab() {
       }
 
       // Check for duplicates locally
-      if (doctors.some(d => d.phone === formData.phone)) {
+      if (doctors.some((d) => d.phone === formData.phone)) {
         setMessage({
           type: "error",
           text: "Ce numéro de téléphone existe déjà",
@@ -113,7 +113,7 @@ export default function DoctorsTab() {
         return;
       }
 
-      if (formData.cnom && doctors.some(d => d.cnom === formData.cnom)) {
+      if (formData.cnom && doctors.some((d) => d.cnom === formData.cnom)) {
         setMessage({
           type: "error",
           text: "Ce numéro CNOM existe déjà",
@@ -257,9 +257,12 @@ export default function DoctorsTab() {
       }
 
       // Check for duplicates (excluding current doctor)
-      const currentDoctor = doctors.find(d => d.id === id);
-      if (editFormData.phone && editFormData.phone !== currentDoctor?.phone &&
-          doctors.some(d => d.id !== id && d.phone === editFormData.phone)) {
+      const currentDoctor = doctors.find((d) => d.id === id);
+      if (
+        editFormData.phone &&
+        editFormData.phone !== currentDoctor?.phone &&
+        doctors.some((d) => d.id !== id && d.phone === editFormData.phone)
+      ) {
         setMessage({
           type: "error",
           text: "Ce numéro de téléphone existe déjà",
@@ -267,8 +270,11 @@ export default function DoctorsTab() {
         return;
       }
 
-      if (editFormData.cnom && editFormData.cnom !== currentDoctor?.cnom &&
-          doctors.some(d => d.id !== id && d.cnom === editFormData.cnom)) {
+      if (
+        editFormData.cnom &&
+        editFormData.cnom !== currentDoctor?.cnom &&
+        doctors.some((d) => d.id !== id && d.cnom === editFormData.cnom)
+      ) {
         setMessage({
           type: "error",
           text: "Ce numéro CNOM existe déjà",
@@ -302,7 +308,10 @@ export default function DoctorsTab() {
       console.error("Error editing doctor:", error);
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Erreur lors de la modification",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Erreur lors de la modification",
       });
     }
   };
@@ -329,14 +338,17 @@ export default function DoctorsTab() {
         </div>
       )}
 
-      <Dialog open={showAddForm} onOpenChange={(open) => {
-        if (!open) {
-          setShowAddForm(false);
-          setMessage(null);
-        } else {
-          setShowAddForm(true);
-        }
-      }}>
+      <Dialog
+        open={showAddForm}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowAddForm(false);
+            setMessage(null);
+          } else {
+            setShowAddForm(true);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Ajouter un médecin</DialogTitle>
@@ -411,17 +423,22 @@ export default function DoctorsTab() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={deletingDoctorId !== null} onOpenChange={(open) => {
-        if (!open) {
-          setDeletingDoctorId(null);
-          setDeletingDoctorName("");
-        }
-      }}>
+      <Dialog
+        open={deletingDoctorId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeletingDoctorId(null);
+            setDeletingDoctorName("");
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirmer la suppression</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer le médecin <strong>{deletingDoctorName}</strong> ? Cette action est irréversible.
+              Êtes-vous sûr de vouloir supprimer le médecin{" "}
+              <strong>{deletingDoctorName}</strong> ? Cette action est
+              irréversible.
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end">
@@ -434,23 +451,28 @@ export default function DoctorsTab() {
             >
               Annuler
             </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDeleteDoctor}
-            >
+            <Button variant="destructive" onClick={confirmDeleteDoctor}>
               Supprimer
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={editingDoctorId !== null} onOpenChange={(open) => {
-        if (!open) {
-          setEditingDoctorId(null);
-          setEditFormData({ name: "", phone: "", specialization: "", cnom: "" });
-          setMessage(null);
-        }
-      }}>
+      <Dialog
+        open={editingDoctorId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingDoctorId(null);
+            setEditFormData({
+              name: "",
+              phone: "",
+              specialization: "",
+              cnom: "",
+            });
+            setMessage(null);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Modifier le médecin</DialogTitle>
@@ -471,7 +493,9 @@ export default function DoctorsTab() {
               <Input
                 type="text"
                 value={editFormData.name}
-                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, name: e.target.value })
+                }
                 placeholder="Nom du médecin"
                 autoFocus
               />
@@ -481,7 +505,9 @@ export default function DoctorsTab() {
               <Input
                 type="tel"
                 value={editFormData.phone}
-                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, phone: e.target.value })
+                }
                 placeholder="+243 (format international)"
               />
             </div>
@@ -490,7 +516,12 @@ export default function DoctorsTab() {
               <Input
                 type="text"
                 value={editFormData.specialization}
-                onChange={(e) => setEditFormData({ ...editFormData, specialization: e.target.value })}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    specialization: e.target.value,
+                  })
+                }
                 placeholder="Cardiologue"
               />
             </div>
@@ -499,7 +530,9 @@ export default function DoctorsTab() {
               <Input
                 type="text"
                 value={editFormData.cnom}
-                onChange={(e) => setEditFormData({ ...editFormData, cnom: e.target.value })}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, cnom: e.target.value })
+                }
                 placeholder="Numéro d'ordre au CNOM"
               />
             </div>
@@ -508,13 +541,20 @@ export default function DoctorsTab() {
                 variant="outline"
                 onClick={() => {
                   setEditingDoctorId(null);
-                  setEditFormData({ name: "", phone: "", specialization: "", cnom: "" });
+                  setEditFormData({
+                    name: "",
+                    phone: "",
+                    specialization: "",
+                    cnom: "",
+                  });
                 }}
               >
                 Annuler
               </Button>
               <Button
-                onClick={() => editingDoctorId && handleEditDoctor(editingDoctorId)}
+                onClick={() =>
+                  editingDoctorId && handleEditDoctor(editingDoctorId)
+                }
               >
                 Enregistrer
               </Button>
