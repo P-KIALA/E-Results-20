@@ -494,7 +494,12 @@ export default function DoctorsTab() {
                     </p>
                     {doctor.specialization && (
                       <p className="text-sm text-muted-foreground">
-                        {doctor.specialization}
+                        Spécialité: {doctor.specialization}
+                      </p>
+                    )}
+                    {doctor.cnom && (
+                      <p className="text-sm text-muted-foreground">
+                        CNOM: {doctor.cnom}
                       </p>
                     )}
                   </div>
@@ -504,7 +509,12 @@ export default function DoctorsTab() {
                       variant="outline"
                       onClick={() => {
                         setEditingDoctorId(doctor.id);
-                        setEditName(doctor.name);
+                        setEditFormData({
+                          name: doctor.name,
+                          phone: doctor.phone,
+                          specialization: doctor.specialization || "",
+                          cnom: doctor.cnom || "",
+                        });
                       }}
                       className="gap-2"
                     >
