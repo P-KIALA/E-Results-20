@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, MapPin, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, MapPin, LogOut, Stethoscope, Send, Clock, BarChart3 } from "lucide-react";
 import { useState } from "react";
 
 export default function Sidebar() {
