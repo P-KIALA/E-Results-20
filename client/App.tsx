@@ -14,6 +14,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { SidebarProvider, useSidebar } from "@/lib/sidebar-context";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/Login";
