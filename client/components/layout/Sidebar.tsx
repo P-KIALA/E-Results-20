@@ -1,14 +1,18 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, MapPin, LogOut, Stethoscope, Send, Clock, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Users, MapPin, LogOut, Stethoscope, Send, Clock, BarChart3, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Sidebar() {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { user, logout, isAuthenticated } = useAuth();
-  const [isHovered, setIsHovered] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const isActive = (path: string) => location.pathname === path;
+  const isConsoleActive = isActive("/console");
+  const currentTab = searchParams.get("tab") || "doctors";
 
   if (!isAuthenticated) {
     return null;
@@ -25,13 +29,20 @@ export default function Sidebar() {
 
   return (
     <aside
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "fixed left-0 top-16 h-[calc(100vh-64px)] bg-background border-r border-border flex flex-col gap-1 p-2 overflow-hidden transition-all duration-300 ease-in-out",
-        isHovered ? "w-56" : "w-20"
+        "fixed left-0 top-16 h-[calc(100vh-64px)] bg-background border-r border-border flex flex-col gap-1 p-2 overflow-y-auto transition-all duration-300 ease-in-out",
+        isMinimized ? "w-20" : "w-56"
       )}
     >
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsMinimized(!isMinimized)}
+        className="w-full justify-center mb-2"
+        title={isMinimized ? "Afficher le menu" : "Masquer le menu"}
+      >
+        {isMinimized ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+      </Button>
       {user?.role === "admin" ? (
         <>
           <Link
