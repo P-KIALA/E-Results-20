@@ -16,6 +16,7 @@ export type Database = {
           name: string;
           phone: string;
           specialization: string | null;
+          cnom: string | null;
           updated_at: string | null;
           whatsapp_verified: boolean | null;
           whatsapp_verified_at: string | null;
@@ -26,6 +27,7 @@ export type Database = {
           name: string;
           phone: string;
           specialization?: string | null;
+          cnom?: string | null;
           updated_at?: string | null;
           whatsapp_verified?: boolean | null;
           whatsapp_verified_at?: string | null;
@@ -36,6 +38,7 @@ export type Database = {
           name?: string;
           phone?: string;
           specialization?: string | null;
+          cnom?: string | null;
           updated_at?: string | null;
           whatsapp_verified?: boolean | null;
           whatsapp_verified_at?: string | null;
