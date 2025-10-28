@@ -398,6 +398,7 @@ export default function DoctorsTab() {
         if (!open) {
           setEditingDoctorId(null);
           setEditFormData({ name: "", phone: "", specialization: "", cnom: "" });
+          setMessage(null);
         }
       }}>
         <DialogContent>
@@ -407,6 +408,13 @@ export default function DoctorsTab() {
               Modifiez les informations du médecin
             </DialogDescription>
           </DialogHeader>
+          {message && editingDoctorId !== null && (
+            <div
+              className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+            >
+              {message.text}
+            </div>
+          )}
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium">Nom *</label>
