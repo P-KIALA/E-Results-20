@@ -83,6 +83,7 @@ export default function HistoryTab() {
       if (filterSite) params.append("site_id", filterSite);
       if (startDate) params.append("startDate", startDate);
       if (endDate) params.append("endDate", endDate);
+      if (filterSender) params.append("sender_id", filterSender);
 
       const token = getToken();
       const res = await fetch(`/api/send-logs?${params}`, {
