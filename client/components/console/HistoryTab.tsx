@@ -276,71 +276,65 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
             </CardContent>
           </Card>
         ) : (
-          logs.map((log) => (
-            <Card key={log.id}>
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className="mt-1">{getStatusIcon(log.status)}</div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium">
-                        {getDoctorName(log.doctor_id)}
-                      </p>
-                      {log.patient_name && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          Patient: {log.patient_name}
-                        </p>
-                      )}
-
-                      <p className="text-sm text-muted-foreground">
-                        Envoyé par: {log.sender?.email || "Inconnu"}
-                        {log.sender?.site ? ` — ${log.sender.site}` : ""}
-                      </p>
-
-                      {log.patient_site && (
-                        <p className="text-sm text-muted-foreground">
-                          Site du centre: {log.patient_site}
-                        </p>
-                      )}
-
-                      <div className="flex flex-wrap gap-2 mt-2 text-xs text-muted-foreground">
-                        {log.sent_at && (
-                          <span>
-                            Envoyé:{" "}
-                            {new Date(log.sent_at).toLocaleString("fr-FR")}
-                          </span>
+          <>
+            {logs.map((log) => (
+              <Card key={log.id}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="mt-1">{getStatusIcon(log.status)}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium">{getDoctorName(log.doctor_id)}</p>
+                        {log.patient_name && (
+                          <p className="text-sm text-muted-foreground line-clamp-2">Patient: {log.patient_name}</p>
                         )}
-                        {log.delivered_at && (
-                          <span>
-                            Livré:{" "}
-                            {new Date(log.delivered_at).toLocaleString("fr-FR")}
-                          </span>
+
+                        <p className="text-sm text-muted-foreground">Envoyé par: {log.sender?.email || "Inconnu"}{log.sender?.site ? ` — ${log.sender.site}` : ""}</p>
+
+                        {log.patient_site && (
+                          <p className="text-sm text-muted-foreground">Site du centre: {log.patient_site}</p>
                         )}
-                        {log.read_at && (
-                          <span>
-                            Lu: {new Date(log.read_at).toLocaleString("fr-FR")}
-                          </span>
-                        )}
+
+                        <div className="flex flex-wrap gap-2 mt-2 text-xs text-muted-foreground">
+                          {log.sent_at && (<span>Envoyé: {new Date(log.sent_at).toLocaleString("fr-FR")}</span>)}
+                          {log.delivered_at && (<span>Livré: {new Date(log.delivered_at).toLocaleString("fr-FR")}</span>)}
+                          {log.read_at && (<span>Lu: {new Date(log.read_at).toLocaleString("fr-FR")}</span>)}
+                        </div>
                       </div>
                     </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">{getStatusLabel(log.status)}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(log.created_at).toLocaleString("fr-FR")}</p>
+                      {log.error_message && (<p className="text-xs text-red-600 mt-1">{log.error_message}</p>)}
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">
-                      {getStatusLabel(log.status)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(log.created_at).toLocaleString("fr-FR")}
-                    </p>
-                    {log.error_message && (
-                      <p className="text-xs text-red-600 mt-1">
-                        {log.error_message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+                </CardContent>
+              </Card>
+            ))}
+
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-2">
+                <label className="text-sm">Afficher</label>
+                <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }} className="px-2 py-1 border rounded">
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-sm">par page</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button className="px-3 py-1 border rounded" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                  Précédent
+                </button>
+                <div className="text-sm">Page {page} / {Math.max(1, Math.ceil(total / pageSize))}</div>
+                <button className="px-3 py-1 border rounded" onClick={() => setPage((p) => Math.min(Math.max(1, Math.ceil(total / pageSize)), p + 1))} disabled={page >= Math.ceil(total / pageSize)}>
+                  Suivant
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>
