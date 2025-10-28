@@ -311,7 +311,7 @@ export default function DoctorsTab() {
         </Button>
       </div>
 
-      {message && (
+      {message && !showAddForm && editingDoctorId === null && (
         <div
           className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
         >
@@ -327,6 +327,13 @@ export default function DoctorsTab() {
               Ajoutez un nouveau médecin au système
             </DialogDescription>
           </DialogHeader>
+          {message && showAddForm && (
+            <div
+              className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+            >
+              {message.text}
+            </div>
+          )}
           <form onSubmit={handleAddDoctor} className="space-y-4">
             <div>
               <label className="text-sm font-medium">Téléphone *</label>
