@@ -124,7 +124,7 @@ export const claimQueue: RequestHandler = async (req, res) => {
       .eq("id", id)
       .select();
 
-    if (error) return res.status(500).json({ error });
+    if (error) return res.status(500).json({ error: error?.message || error });
     return res.json({ data: data?.[0] });
   } catch (err) {
     console.error(err);
