@@ -181,18 +181,25 @@ export default function PatientsTab() {
     try {
       setMessage(null);
       const token = getToken();
+      if (!token) {
+        setMessage({ type: "error", text: "Vous n'êtes pas connecté" });
+        return;
+      }
       const res = await fetch(`/api/queue`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ patient_id: patientId }),
       });
       const parsed = await readResponse(res);
-      if (!parsed.ok) throw new Error(parsed.json?.error || parsed.text || "Erreur ajout file");
+      if (!parsed.ok) {
+        const srvErr = parsed.json?.error;
+        const msg = typeof srvErr === 'string' ? srvErr : (srvErr && srvErr.message) || parsed.text || 'Erreur ajout file';
+        throw new Error(msg);
+      }
       setMessage({ type: "success", text: "Patient ajouté à la file" });
-      // refresh queue if needed by navigating or calling fetch
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: "error", text: "Impossible d'ajouter à la file" });
+    } catch (err: any) {
+      console.error('addToQueue error', err, err?.stack);
+      setMessage({ type: "error", text: String(err.message || err) || "Impossible d'ajouter à la file" });
     }
   };
 
