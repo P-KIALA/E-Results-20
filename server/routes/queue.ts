@@ -38,7 +38,7 @@ export const listQueue: RequestHandler = async (req, res) => {
     if (collector_id) query = query.eq("collector_id", collector_id);
 
     const { data, error } = await query;
-    if (error) return res.status(500).json({ error });
+    if (error) return res.status(500).json({ error: error?.message || error });
     return res.json({ data });
   } catch (err) {
     console.error(err);
