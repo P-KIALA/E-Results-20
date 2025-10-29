@@ -195,20 +195,43 @@ export default function PatientsTab() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ patient_id: patientId }),
       });
-      const parsed = await readResponse(res);
-      if (!parsed.ok) {
-        console.error('addToQueue server response', JSON.stringify(parsed, null, 2));
-        // handle common statuses
-        if (parsed.status === 401) {
-          setMessage({ type: 'error', text: "Authentification requise. Connectez-vous." });
-          return;
-        }
-        const srvErr = parsed.json?.error;
-        const msg = typeof srvErr === 'string' ? srvErr : (srvErr && (srvErr.message || JSON.stringify(srvErr))) || parsed.text || 'Erreur ajout file';
-        setMessage({ type: 'error', text: msg });
+      if (res.ok) {
+        setMessage({ type: "success", text: "Patient ajouté à la file" });
         return;
       }
-      setMessage({ type: "success", text: "Patient ajouté à la file" });
+
+      // Attempt to read response body safely for error details
+      let bodyText: string | null = null;
+      try {
+        // try cloning first
+        try {
+          bodyText = await (res.clone() as Response).text();
+        } catch (_) {
+          bodyText = await res.text();
+        }
+      } catch (e) {
+        console.warn('Could not read error body', e);
+      }
+
+      // Parse JSON if possible
+      let parsedErr: any = null;
+      if (bodyText) {
+        try {
+          parsedErr = JSON.parse(bodyText);
+        } catch (_) {
+          parsedErr = bodyText;
+        }
+      }
+
+      console.error('addToQueue server response', { status: res.status, body: parsedErr });
+
+      if (res.status === 401) {
+        setMessage({ type: 'error', text: "Authentification requise. Connectez-vous." });
+        return;
+      }
+
+      const srvMsg = parsedErr && (typeof parsedErr === 'string' ? parsedErr : (parsedErr.error || parsedErr.message)) || `Erreur ajout file (status ${res.status})`;
+      setMessage({ type: 'error', text: String(srvMsg) });
     } catch (err: any) {
       console.error('addToQueue error', err, err?.stack);
       setMessage({ type: "error", text: String(err.message || err) || "Impossible d'ajouter à la file" });
