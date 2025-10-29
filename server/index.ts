@@ -55,6 +55,17 @@ export function createServer() {
   app.use(express.urlencoded({ extended: true, limit: "50mb" }));
   app.use(authMiddleware); // Optional auth middleware (token verification)
 
+  // Simple request logger to help debug network failures and missing auth
+  app.use((req, _res, next) => {
+    try {
+      const auth = Boolean(req.headers.authorization);
+      console.log(`[HTTP] ${req.method} ${req.path} auth=${auth}`);
+    } catch (e) {
+      // ignore logging errors
+    }
+    next();
+  });
+
   // Auth routes (public)
   app.post("/api/auth/login", login);
   app.post("/api/auth/register", register);
