@@ -155,6 +155,38 @@ export type Database = {
           updated_at?: string | null;
         };
       };
+      patients: {
+        Row: {
+          id: string;
+          name: string;
+          phone: string | null;
+          dob: string | null;
+          site: string | null;
+          metadata: { [key: string]: any } | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          phone?: string | null;
+          dob?: string | null;
+          site?: string | null;
+          metadata?: { [key: string]: any } | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          phone?: string | null;
+          dob?: string | null;
+          site?: string | null;
+          metadata?: { [key: string]: any } | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
       users: {
         Row: {
           id: string;
