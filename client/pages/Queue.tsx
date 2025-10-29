@@ -298,11 +298,11 @@ export default function QueuePage() {
       </div>
 
       {/* Assign dialog */}
-      <Dialog open={!!activeItem} onOpenChange={(open) => { if (!open) setActiveItem(null); }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Affecter un préleveur</DialogTitle>
-          </DialogHeader>
+      <DialogUI.Dialog open={!!activeItem} onOpenChange={(open) => { if (!open) setActiveItem(null); }}>
+        <DialogUI.DialogContent className="sm:max-w-md">
+          <DialogUI.DialogHeader>
+            <DialogUI.DialogTitle>Affecter un préleveur</DialogUI.DialogTitle>
+          </DialogUI.DialogHeader>
           <div className="space-y-4">
             <p>
               Patient: <strong>{activeItem?.patient?.name || activeItem?.patient_id}</strong>
@@ -325,8 +325,8 @@ export default function QueuePage() {
               <p className="text-sm text-muted-foreground">Aucun préleveur disponible</p>
             )}
           </div>
-        </DialogContent>
-      </Dialog>
+        </DialogUI.DialogContent>
+      </DialogUI.Dialog>
     </div>
   );
 }
