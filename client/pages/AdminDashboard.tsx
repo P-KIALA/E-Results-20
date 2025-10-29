@@ -498,6 +498,8 @@ export default function AdminDashboard() {
                           Rôle:{" "}
                           {u.role === "admin"
                             ? "Administrateur"
+                            : u.role === "prelevement"
+                            ? "Préleveur"
                             : "Utilisateur"}
                         </p>
                         {u.permissions && u.permissions.length > 0 && (
