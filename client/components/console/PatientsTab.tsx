@@ -105,14 +105,37 @@ export default function PatientsTab() {
 
   // QR scanning using BarcodeDetector if available
   const startScanner = async () => {
+    setMessage(null);
+    // Ensure BarcodeDetector is available before requesting camera
+    const BarcodeDetectorClass = (window as any).BarcodeDetector;
+    if (!BarcodeDetectorClass) {
+      setMessage({ type: "error", text: "Scanner non supporté par ce navigateur. Collez le contenu du QR dans la zone prévue." });
+      return;
+    }
+
+    // Stop any existing stream
+    try {
+      if (videoRef.current && (videoRef.current.srcObject as MediaStream | null)) {
+        const prevTracks = (videoRef.current.srcObject as MediaStream).getTracks() || [];
+        prevTracks.forEach((t) => t.stop());
+        videoRef.current.srcObject = null;
+      }
+    } catch (e) {
+      // ignore
+    }
+
     setShowScanner(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      await (videoRef.current as HTMLVideoElement).play();
+      const constraints: MediaStreamConstraints = { video: { facingMode: { ideal: "environment" } } };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (!videoRef.current) throw new Error("Pas d'élément vidéo disponible");
 
-      const BarcodeDetectorClass = (window as any).BarcodeDetector;
-      if (!BarcodeDetectorClass) return;
+      videoRef.current.srcObject = stream;
+      videoRef.current.muted = true;
+      // allow inline playback on mobile browsers
+      (videoRef.current as any).playsInline = true;
+      await videoRef.current.play();
+
       const bd = new BarcodeDetectorClass({ formats: ["qr_code"] });
       detectorRef.current = bd;
 
@@ -129,14 +152,30 @@ export default function PatientsTab() {
             }
           }
         } catch (e) {
-          // ignore detection errors
+          // If detector fails, log and stop scanner to avoid infinite loop
+          console.error('Barcode detection error', e);
         }
-        requestAnimationFrame(scanLoop);
+        if (showScanner) requestAnimationFrame(scanLoop);
       };
       requestAnimationFrame(scanLoop);
-    } catch (error) {
-      console.error("Scanner error", error);
-      setMessage({ type: "error", text: "Impossible d'accéder à la caméra" });
+    } catch (err: any) {
+      console.error("Scanner error Could not start video source", err);
+      // Map common errors to user-friendly messages
+      let text = "Impossible d'accéder à la caméra";
+      if (err && err.name === 'NotAllowedError') text = "Permission refusée pour la caméra. Autorisez l'accès et réessayez.";
+      if (err && err.name === 'NotFoundError') text = "Pas de caméra trouvée sur cet appareil.";
+      if (err && err.name === 'NotReadableError') text = "La caméra est occupée par une autre application.";
+      if (err && err.name === 'OverconstrainedError') text = "Aucun périphérique vidéo ne répond aux contraintes demandées.";
+      setMessage({ type: "error", text });
+      setShowScanner(false);
+      try {
+        // Ensure tracks stopped
+        const tracks = (videoRef.current?.srcObject as MediaStream | null)?.getTracks() || [];
+        tracks.forEach((t) => t.stop());
+        if (videoRef.current) videoRef.current.srcObject = null;
+      } catch (e) {
+        // ignore
+      }
     }
   };
 
