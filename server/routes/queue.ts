@@ -203,7 +203,7 @@ export const getCollectors: RequestHandler = async (_req, res) => {
       .from("users")
       .select("id,email")
       .eq("is_collector", true);
-    if (error) return res.status(500).json({ error });
+    if (error) return res.status(500).json({ error: error?.message || error });
     return res.json({ data });
   } catch (err) {
     console.error(err);
