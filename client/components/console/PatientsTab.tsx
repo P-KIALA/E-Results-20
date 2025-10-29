@@ -136,10 +136,14 @@ export default function PatientsTab() {
 
         // If still no video element, check if device has camera inputs
         if (!videoRef.current) {
-          const devices = await navigator.mediaDevices.enumerateDevices().catch(() => []);
+          const devices = (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) ? await navigator.mediaDevices.enumerateDevices().catch(() => []) : [];
           const hasCamera = devices.some((d: any) => d.kind === 'videoinput');
-          if (!hasCamera) throw new Error('Camera not found');
-          throw new Error('Pas d\'élément vidéo disponible');
+          if (!hasCamera) {
+            setMessage({ type: 'error', text: 'Pas de caméra trouvée sur cet appareil. Collez le contenu du QR.' });
+            return;
+          }
+          setMessage({ type: 'error', text: "Impossible d'initialiser l'élément vidéo. Collez le contenu du QR." });
+          return;
         }
 
         const mod = await import('qr-scanner');
@@ -152,13 +156,22 @@ export default function PatientsTab() {
 
         // Check camera availability in library
         const hasCam = await ((QrScanner as any).hasCamera ? (QrScanner as any).hasCamera() : Promise.resolve(true));
-        if (!hasCam) throw new Error('Camera not found');
+        if (!hasCam) {
+          setMessage({ type: 'error', text: 'Pas de caméra trouvée sur cet appareil. Collez le contenu du QR.' });
+          return;
+        }
 
         const scanner = new (QrScanner as any)(videoRef.current, async (result: string) => {
           await handleQRPayload(result);
         });
         detectorRef.current = scanner;
-        await (scanner as any).start();
+        try {
+          await (scanner as any).start();
+        } catch (startErr) {
+          console.warn('qr-scanner failed to start', startErr);
+          setMessage({ type: 'error', text: 'Impossible de démarrer le scanner. Collez le contenu du QR.' });
+          detectorRef.current = null;
+        }
         return;
       } catch (err: any) {
         console.error('Fallback scanner failed', err);
