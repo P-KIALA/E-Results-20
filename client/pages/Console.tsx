@@ -26,27 +26,13 @@ export default function ConsolePage() {
       />
 
       <div className="container">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">
-            Console d'administration
-          </h1>
-          <p className="text-lg text-muted-foreground mt-2">
-            Gérez les médecins, envoyez les résultats et suivez l'historique en
-            temps réel
-          </p>
-        </div>
+
 
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="grid w-full max-w-2xl grid-cols-4">
-            <TabsTrigger value="doctors">Médecins</TabsTrigger>
-            <TabsTrigger value="results">Résultats</TabsTrigger>
-            <TabsTrigger value="history">Historique</TabsTrigger>
-            <TabsTrigger value="stats">Statistiques</TabsTrigger>
-          </TabsList>
 
           <TabsContent value="doctors" className="space-y-6">
             <DoctorsTab />
