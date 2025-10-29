@@ -29,7 +29,7 @@ import Footer from "@/components/layout/Footer";
 
 const queryClient = new QueryClient();
 
-function Layout({ children }: { children: React.ReactNode }) {
+function Layout({ children }: { children: ReactNode }) {
   const { isMinimized } = useSidebar();
 
   return (
