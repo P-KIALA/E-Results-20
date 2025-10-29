@@ -130,14 +130,22 @@ export default function Sidebar() {
           </Link>
         </>
       ) : (
-        <Link
-          to="/dashboard"
-          className={navItemClass(isActive("/dashboard"))}
-          title="Envois"
-        >
-          <LayoutDashboard size={20} className="flex-shrink-0" />
-          {!isMinimized && <span className="font-medium">Envois</span>}
-        </Link>
+        <>
+          <Link
+            to="/dashboard"
+            className={navItemClass(isActive("/dashboard"))}
+            title="Envois"
+          >
+            <LayoutDashboard size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Envois</span>}
+          </Link>
+          {user?.is_collector && (
+            <Link to="/queue" className={navItemClass(isActive("/queue"))} title="File d'attente">
+              <Clock size={20} className="flex-shrink-0" />
+              {!isMinimized && <span className="font-medium">File d'attente</span>}
+            </Link>
+          )}
+        </>
       )}
 
       <div className="flex-1" />
