@@ -162,6 +162,10 @@ export type Database = {
           phone: string | null;
           dob: string | null;
           site: string | null;
+          sex: string | null;
+          doctor: string | null;
+          patient_ref: string | null;
+          analyses: { name: string; status: string | null; validated_at?: string | null }[] | null;
           metadata: { [key: string]: any } | null;
           created_at: string | null;
           updated_at: string | null;
@@ -172,6 +176,10 @@ export type Database = {
           phone?: string | null;
           dob?: string | null;
           site?: string | null;
+          sex?: string | null;
+          doctor?: string | null;
+          patient_ref?: string | null;
+          analyses?: { name: string; status: string | null; validated_at?: string | null }[] | null;
           metadata?: { [key: string]: any } | null;
           created_at?: string | null;
           updated_at?: string | null;
@@ -182,6 +190,10 @@ export type Database = {
           phone?: string | null;
           dob?: string | null;
           site?: string | null;
+          sex?: string | null;
+          doctor?: string | null;
+          patient_ref?: string | null;
+          analyses?: { name: string; status: string | null; validated_at?: string | null }[] | null;
           metadata?: { [key: string]: any } | null;
           created_at?: string | null;
           updated_at?: string | null;

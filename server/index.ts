@@ -92,6 +92,9 @@ export function createServer() {
   app.post("/api/patients", requireAuth, addPatient);
   app.put("/api/patients/:id", requireAuth, updatePatient);
   app.delete("/api/patients/:id", requireAuth, deletePatient);
+  // QR scan and per-analysis validation
+  app.post("/api/patients/scan", requireAuth, scanPatientFromQR);
+  app.patch("/api/patients/:id/analyses/:index", requireAuth, validateAnalysis);
 
   // File upload (protected)
   app.post("/api/upload-files", requireAuth, uploadFiles);
