@@ -111,7 +111,7 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
       if (!res.ok) {
         let errMsg = `Failed to fetch logs: ${res.status}`;
         try {
-          const errBody = await res.json();
+          const errBody = await res.clone().json().catch(() => ({}));
           if (errBody && errBody.error) errMsg = errBody.error;
         } catch (e) {
           // ignore
