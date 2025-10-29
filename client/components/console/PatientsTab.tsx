@@ -128,8 +128,11 @@ export default function PatientsTab() {
         body: JSON.stringify(payload),
       });
       const parsed = await readResponse(res);
-      if (!parsed.ok)
-        throw new Error(parsed.json?.error || parsed.text || "Erreur");
+      if (!parsed.ok) {
+        console.error('Failed create patient response:', parsed);
+        const msg = parsed.json?.error || parsed.text || "Erreur";
+        throw new Error(msg);
+      }
       setMessage({
         type: "success",
         text: editingId ? "Patient modifié" : "Patient ajouté",
