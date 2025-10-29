@@ -71,7 +71,10 @@ export default function DoctorsTab() {
         },
       });
       if (!res.ok) {
-        const errorData = await res.clone().json().catch(() => ({}));
+        const errorData = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         throw new Error(errorData.error || "Failed to fetch doctors");
       }
       const data = await res.json();
@@ -132,7 +135,10 @@ export default function DoctorsTab() {
       });
 
       if (!res.ok) {
-        const err = await res.clone().json().catch(() => ({}));
+        const err = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         setMessage({
           type: "error",
           text: err.error || "Erreur lors de l'ajout",
@@ -178,7 +184,10 @@ export default function DoctorsTab() {
         setMessage({ type: "success", text: "Médecin supprimé avec succès" });
         await fetchDoctors();
       } else {
-        const err = await res.clone().json().catch(() => ({}));
+        const err = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         setMessage({
           type: "error",
           text: err.error || "Erreur de suppression",
@@ -222,7 +231,10 @@ export default function DoctorsTab() {
         setMessage({ type: "success", text: "Vérification en cours..." });
         await fetchDoctors();
       } else {
-        const err = await res.clone().json().catch(() => ({}));
+        const err = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         setMessage({
           type: "error",
           text: err.error || "Erreur de vérification",
@@ -292,7 +304,10 @@ export default function DoctorsTab() {
       });
 
       if (!res.ok) {
-        const err = await res.clone().json().catch(() => ({}));
+        const err = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         setMessage({
           type: "error",
           text: err.error || "Erreur lors de la modification",

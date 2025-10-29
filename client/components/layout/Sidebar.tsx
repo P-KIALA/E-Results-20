@@ -97,7 +97,9 @@ export default function Sidebar() {
             title="File d'attente"
           >
             <Clock size={20} className="flex-shrink-0" />
-            {!isMinimized && <span className="font-medium">File d'attente</span>}
+            {!isMinimized && (
+              <span className="font-medium">File d'attente</span>
+            )}
           </Link>
 
           <Link
@@ -151,9 +153,15 @@ export default function Sidebar() {
             {!isMinimized && <span className="font-medium">Envois</span>}
           </Link>
           {user?.is_collector && (
-            <Link to="/queue" className={navItemClass(isActive("/queue"))} title="File d'attente">
+            <Link
+              to="/queue"
+              className={navItemClass(isActive("/queue"))}
+              title="File d'attente"
+            >
               <Clock size={20} className="flex-shrink-0" />
-              {!isMinimized && <span className="font-medium">File d'attente</span>}
+              {!isMinimized && (
+                <span className="font-medium">File d'attente</span>
+              )}
             </Link>
           )}
         </>

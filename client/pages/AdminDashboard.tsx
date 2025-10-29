@@ -499,8 +499,8 @@ export default function AdminDashboard() {
                           {u.role === "admin"
                             ? "Administrateur"
                             : u.role === "prelevement"
-                            ? "Préleveur"
-                            : "Utilisateur"}
+                              ? "Préleveur"
+                              : "Utilisateur"}
                         </p>
                         {u.permissions && u.permissions.length > 0 && (
                           <div className="mt-2">

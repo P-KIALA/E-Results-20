@@ -53,7 +53,10 @@ export default function SitesManagement() {
       });
 
       if (!res.ok) {
-        const errorData = await res.clone().json().catch(() => ({}));
+        const errorData = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         throw new Error(errorData.error || "Failed to fetch sites");
       }
 
@@ -158,7 +161,10 @@ export default function SitesManagement() {
       });
 
       if (!res.ok) {
-        const data = await res.clone().json().catch(() => ({}));
+        const data = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         throw new Error(data.error || "Erreur de suppression");
       }
 

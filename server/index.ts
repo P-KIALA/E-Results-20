@@ -27,7 +27,14 @@ import {
   deleteSite,
 } from "./routes/sites";
 import { createInitialAdmin } from "./routes/seed";
-import { getPatients, addPatient, updatePatient, deletePatient, scanPatientFromQR, validateAnalysis } from "./routes/patients";
+import {
+  getPatients,
+  addPatient,
+  updatePatient,
+  deletePatient,
+  scanPatientFromQR,
+  validateAnalysis,
+} from "./routes/patients";
 import { authMiddleware, requireAuth } from "./lib/middleware";
 import {
   createQueueItem,

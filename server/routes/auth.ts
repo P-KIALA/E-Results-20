@@ -294,8 +294,13 @@ export const updateUser: RequestHandler = async (req, res) => {
   try {
     const adminId = (req as any).userId;
     const { id: targetUserId } = req.params;
-    const { role, permissions, primary_site_id, accessible_site_ids, is_collector } =
-      req.body;
+    const {
+      role,
+      permissions,
+      primary_site_id,
+      accessible_site_ids,
+      is_collector,
+    } = req.body;
 
     if (!adminId) {
       return res.status(401).json({ error: "Unauthorized" });

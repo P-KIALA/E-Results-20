@@ -93,7 +93,10 @@ export default function StatsTab() {
       });
 
       if (!res.ok) {
-        const errorData = await res.clone().json().catch(() => ({}));
+        const errorData = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         throw new Error(errorData.error || "Failed to fetch logs");
       }
 
@@ -108,7 +111,10 @@ export default function StatsTab() {
       });
 
       if (!sitesRes.ok) {
-        const errorData = await sitesRes.clone().json().catch(() => ({}));
+        const errorData = await sitesRes
+          .clone()
+          .json()
+          .catch(() => ({}));
         throw new Error(errorData.error || "Failed to fetch sites");
       }
 

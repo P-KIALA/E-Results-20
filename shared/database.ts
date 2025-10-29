@@ -138,7 +138,12 @@ export type Database = {
           id?: string;
           patient_id: string;
           collector_id?: string | null;
-          status?: "waiting" | "assigned" | "in_progress" | "done" | "cancelled";
+          status?:
+            | "waiting"
+            | "assigned"
+            | "in_progress"
+            | "done"
+            | "cancelled";
           eta?: string | null;
           notes?: string | null;
           created_at?: string | null;
@@ -148,7 +153,12 @@ export type Database = {
           id?: string;
           patient_id?: string;
           collector_id?: string | null;
-          status?: "waiting" | "assigned" | "in_progress" | "done" | "cancelled";
+          status?:
+            | "waiting"
+            | "assigned"
+            | "in_progress"
+            | "done"
+            | "cancelled";
           eta?: string | null;
           notes?: string | null;
           created_at?: string | null;
@@ -165,7 +175,13 @@ export type Database = {
           sex: string | null;
           doctor: string | null;
           patient_ref: string | null;
-          analyses: { name: string; status: string | null; validated_at?: string | null }[] | null;
+          analyses:
+            | {
+                name: string;
+                status: string | null;
+                validated_at?: string | null;
+              }[]
+            | null;
           metadata: { [key: string]: any } | null;
           created_at: string | null;
           updated_at: string | null;
@@ -179,7 +195,13 @@ export type Database = {
           sex?: string | null;
           doctor?: string | null;
           patient_ref?: string | null;
-          analyses?: { name: string; status: string | null; validated_at?: string | null }[] | null;
+          analyses?:
+            | {
+                name: string;
+                status: string | null;
+                validated_at?: string | null;
+              }[]
+            | null;
           metadata?: { [key: string]: any } | null;
           created_at?: string | null;
           updated_at?: string | null;
@@ -193,7 +215,13 @@ export type Database = {
           sex?: string | null;
           doctor?: string | null;
           patient_ref?: string | null;
-          analyses?: { name: string; status: string | null; validated_at?: string | null }[] | null;
+          analyses?:
+            | {
+                name: string;
+                status: string | null;
+                validated_at?: string | null;
+              }[]
+            | null;
           metadata?: { [key: string]: any } | null;
           created_at?: string | null;
           updated_at?: string | null;

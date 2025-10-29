@@ -27,14 +27,11 @@ export default function ConsolePage() {
       />
 
       <div className="container">
-
-
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-
           <TabsContent value="doctors" className="space-y-6">
             <DoctorsTab />
           </TabsContent>
@@ -48,7 +45,7 @@ export default function ConsolePage() {
           </TabsContent>
 
           <TabsContent value="history" className="space-y-6">
-            <HistoryTab active={activeTab === 'history'} />
+            <HistoryTab active={activeTab === "history"} />
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">

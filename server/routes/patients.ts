@@ -2,10 +2,15 @@ import { supabase } from "../lib/supabase";
 
 export const getPatients: RequestHandler = async (_req, res) => {
   try {
-    const { data, error } = await supabase.from("patients").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("patients")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (error) {
       if ((error as any).code === "PGRST205") {
-        console.warn("patients table not found. Please run the migration scripts/migrations/006-add-patient-fields.sql on your database.");
+        console.warn(
+          "patients table not found. Please run the migration scripts/migrations/006-add-patient-fields.sql on your database.",
+        );
         return res.json({ patients: [] });
       }
       throw error;
@@ -19,7 +24,17 @@ export const getPatients: RequestHandler = async (_req, res) => {
 
 export const addPatient: RequestHandler = async (req, res) => {
   try {
-    const { name, phone, dob, site, metadata, sex, doctor, patient_ref, analyses } = req.body;
+    const {
+      name,
+      phone,
+      dob,
+      site,
+      metadata,
+      sex,
+      doctor,
+      patient_ref,
+      analyses,
+    } = req.body;
     if (!name) return res.status(400).json({ error: "Name required" });
 
     const insert = {
@@ -34,12 +49,20 @@ export const addPatient: RequestHandler = async (req, res) => {
       analyses: Array.isArray(analyses) ? analyses : [],
     };
 
-    const { data, error } = await supabase.from("patients").insert([insert]).select().single();
+    const { data, error } = await supabase
+      .from("patients")
+      .insert([insert])
+      .select()
+      .single();
 
     if (error) {
       if ((error as any).code === "PGRST205") {
-        console.warn("patients table not found. Please run the migration scripts/migrations/006-add-patient-fields.sql on your database.");
-        return res.status(500).json({ error: "Missing patients table. Run migration." });
+        console.warn(
+          "patients table not found. Please run the migration scripts/migrations/006-add-patient-fields.sql on your database.",
+        );
+        return res
+          .status(500)
+          .json({ error: "Missing patients table. Run migration." });
       }
       throw error;
     }
@@ -53,7 +76,17 @@ export const addPatient: RequestHandler = async (req, res) => {
 export const updatePatient: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, phone, dob, site, metadata, sex, doctor, patient_ref, analyses } = req.body;
+    const {
+      name,
+      phone,
+      dob,
+      site,
+      metadata,
+      sex,
+      doctor,
+      patient_ref,
+      analyses,
+    } = req.body;
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone;
@@ -66,11 +99,20 @@ export const updatePatient: RequestHandler = async (req, res) => {
     if (analyses !== undefined) updateData.analyses = analyses;
     updateData.updated_at = new Date().toISOString();
 
-    const { data, error } = await supabase.from("patients").update(updateData).eq("id", id).select().single();
+    const { data, error } = await supabase
+      .from("patients")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .single();
     if (error) {
       if ((error as any).code === "PGRST205") {
-        console.warn("patients table not found. Please run the migration scripts/migrations/006-add-patient-fields.sql on your database.");
-        return res.status(500).json({ error: "Missing patients table. Run migration." });
+        console.warn(
+          "patients table not found. Please run the migration scripts/migrations/006-add-patient-fields.sql on your database.",
+        );
+        return res
+          .status(500)
+          .json({ error: "Missing patients table. Run migration." });
       }
       throw error;
     }
@@ -87,8 +129,12 @@ export const deletePatient: RequestHandler = async (req, res) => {
     const { error } = await supabase.from("patients").delete().eq("id", id);
     if (error) {
       if ((error as any).code === "PGRST205") {
-        console.warn("patients table not found. Please run the migration scripts/migrations/006-add-patient-fields.sql on your database.");
-        return res.status(500).json({ error: "Missing patients table. Run migration." });
+        console.warn(
+          "patients table not found. Please run the migration scripts/migrations/006-add-patient-fields.sql on your database.",
+        );
+        return res
+          .status(500)
+          .json({ error: "Missing patients table. Run migration." });
       }
       throw error;
     }
@@ -111,7 +157,10 @@ export const scanPatientFromQR: RequestHandler = async (req, res) => {
     } catch (_) {
       // Try parsing k=v pairs separated by ; or newlines
       const obj: any = {};
-      const parts = qr.split(/;|\n|\|/).map((s: string) => s.trim()).filter(Boolean);
+      const parts = qr
+        .split(/;|\n|\|/)
+        .map((s: string) => s.trim())
+        .filter(Boolean);
       for (const p of parts) {
         const [k, ...rest] = p.split(/:|=/);
         if (!k) continue;
@@ -121,9 +170,12 @@ export const scanPatientFromQR: RequestHandler = async (req, res) => {
     }
 
     // Normalize analyses field
-    let analyses = parsed.analyses || parsed.analysis || parsed.tests || parsed.tests_list;
+    let analyses =
+      parsed.analyses || parsed.analysis || parsed.tests || parsed.tests_list;
     if (typeof analyses === "string") {
-      analyses = analyses.split(/,|;/).map((s: string) => ({ name: s.trim(), status: "pending" }));
+      analyses = analyses
+        .split(/,|;/)
+        .map((s: string) => ({ name: s.trim(), status: "pending" }));
     }
     if (!Array.isArray(analyses)) analyses = [];
 
@@ -149,16 +201,31 @@ export const validateAnalysis: RequestHandler = async (req, res) => {
   try {
     const { id, index } = req.params;
     const idx = Number(index);
-    if (!id || Number.isNaN(idx)) return res.status(400).json({ error: "Invalid parameters" });
+    if (!id || Number.isNaN(idx))
+      return res.status(400).json({ error: "Invalid parameters" });
     const { status } = req.body;
-    const { data, error } = await supabase.from("patients").select("analyses").eq("id", id).single();
+    const { data, error } = await supabase
+      .from("patients")
+      .select("analyses")
+      .eq("id", id)
+      .single();
     if (error) throw error;
     const analyses = (data?.analyses as any[]) || [];
-    if (idx < 0 || idx >= analyses.length) return res.status(400).json({ error: "Invalid analysis index" });
+    if (idx < 0 || idx >= analyses.length)
+      return res.status(400).json({ error: "Invalid analysis index" });
     const updated = [...analyses];
-    updated[idx] = { ...updated[idx], status: status || "validated", validated_at: new Date().toISOString() };
+    updated[idx] = {
+      ...updated[idx],
+      status: status || "validated",
+      validated_at: new Date().toISOString(),
+    };
 
-    const { data: updatedRow, error: updateError } = await supabase.from("patients").update({ analyses: updated, updated_at: new Date().toISOString() }).eq("id", id).select().single();
+    const { data: updatedRow, error: updateError } = await supabase
+      .from("patients")
+      .update({ analyses: updated, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
     if (updateError) throw updateError;
     return res.json({ patient: updatedRow });
   } catch (error) {

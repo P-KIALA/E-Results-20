@@ -134,7 +134,9 @@ const App = () => (
                 element={
                   <Layout>
                     <ProtectedRoute>
-                      <Suspense fallback={<div className="p-6">Chargement...</div>}>
+                      <Suspense
+                        fallback={<div className="p-6">Chargement...</div>}
+                      >
                         {/* Queue page lazy loaded */}
                         <QueuePageLazy />
                       </Suspense>
