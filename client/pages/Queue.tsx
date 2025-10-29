@@ -9,21 +9,32 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import * as DialogUI from "@/components/ui/dialog";
 
-const authFetch = (input: RequestInfo, init: RequestInit = {}) => {
+const authFetch = async (input: RequestInfo, init: RequestInit = {}) => {
   const token = localStorage.getItem("auth_token");
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  return fetch(input, { ...init, headers });
+
+  // First attempt: direct fetch
+  try {
+    return await fetch(input, { ...init, headers });
+  } catch (err) {
+    // Network failure — attempt Netlify functions prefix fallback if path starts with /api
+    try {
+      const base = (window && (window as any).location) ? `${window.location.origin}` : "";
+      const asStr = typeof input === "string" ? input : (input as Request).url;
+      if (asStr && asStr.startsWith("/api")) {
+        const fallback = `/.netlify/functions/api${asStr}`;
+        return await fetch(fallback, { ...init, headers });
+      }
+    } catch (e) {
+      // ignore
+    }
+    throw err;
+  }
 };
 
 export default function QueuePage() {
