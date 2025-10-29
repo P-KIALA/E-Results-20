@@ -25,6 +25,7 @@ export default function QueuePage() {
   const [selectedCollector, setSelectedCollector] = useState<string | null>(
     null,
   );
+  const [activeItem, setActiveItem] = useState<any | null>(null);
 
   const isAdmin = user?.role === "admin";
   const isCollector = !!user?.is_collector;
@@ -110,11 +111,21 @@ export default function QueuePage() {
   const waiting: any[] = waitingData?.data ?? [];
   const mine: any[] = myData?.data ?? [];
 
+  const ageFromDob = (dob: string | null) => {
+    if (!dob) return "-";
+    try {
+      const date = new Date(dob);
+      const diff = Date.now() - date.getTime();
+      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+      return String(years);
+    } catch {
+      return "-";
+    }
+  };
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">
-        File d'attente des prélèvements
-      </h1>
+      <h1 className="text-2xl font-bold mb-4">File d'attente des prélèvements</h1>
 
       {isAdmin && (
         <Card className="mb-6">
@@ -123,7 +134,7 @@ export default function QueuePage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-3">
-              Affecter un préleveur à une entrée de la file.
+              Cliquez sur le nom d'un patient pour affecter un préleveur.
             </p>
             <div className="flex gap-3 items-center">
               <label className="text-sm">Sélectionner préleveur</label>
@@ -141,125 +152,163 @@ export default function QueuePage() {
               </select>
             </div>
           </CardContent>
-          <CardFooter>
-            <p className="text-sm text-muted-foreground">
-              Après sélection, utilisez le bouton "Affecter" sur une entrée.
-            </p>
-          </CardFooter>
         </Card>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h2 className="text-lg font-semibold mb-2">En attente</h2>
-          <div className="space-y-3">
-            {waiting.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                Aucune entrée en attente
-              </p>
-            )}
-            {waiting.map((item) => (
-              <Card key={item.id}>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-semibold">
-                        Patient: {item.patient_id}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Créé: {new Date(item.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      {isAdmin && (
-                        <Button
-                          variant="secondary"
-                          onClick={() => {
-                            if (!selectedCollector)
-                              return alert("Sélectionnez un préleveur");
-                            assignMutation.mutate({
-                              id: item.id,
-                              collector_id: selectedCollector,
-                            });
-                          }}
-                        >
-                          Affecter
-                        </Button>
-                      )}
-                      {isCollector && (
-                        <Button
-                          variant="default"
-                          onClick={() => claimMutation.mutate(item.id)}
-                        >
-                          Prendre
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>{item.notes && <p>{item.notes}</p>}</CardContent>
-              </Card>
-            ))}
+          <div className="overflow-x-auto bg-white rounded shadow">
+            <table className="min-w-full divide-y">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left">Nom</th>
+                  <th className="px-4 py-2 text-left">Sexe</th>
+                  <th className="px-4 py-2 text-left">Âge</th>
+                  <th className="px-4 py-2 text-left">Analyses</th>
+                  <th className="px-4 py-2 text-left">Médecin demandé</th>
+                  <th className="px-4 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {waiting.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2">
+                      <button
+                        className="text-left text-blue-600 underline"
+                        onClick={() => setActiveItem(item)}
+                      >
+                        {item.patient?.name || item.patient_id}
+                      </button>
+                    </td>
+                    <td className="px-4 py-2">{item.patient?.sex || "-"}</td>
+                    <td className="px-4 py-2">{ageFromDob(item.patient?.dob)}</td>
+                    <td className="px-4 py-2">
+                      {(item.patient?.analyses || [])
+                        .map((a: any) => a.name)
+                        .join(", ")}
+                    </td>
+                    <td className="px-4 py-2">{item.patient?.doctor || "-"}</td>
+                    <td className="px-4 py-2">
+                      <div className="flex gap-2">
+                        {isAdmin && (
+                          <Button
+                            variant="secondary"
+                            onClick={() => {
+                              if (!selectedCollector)
+                                return alert("Sélectionnez un préleveur");
+                              assignMutation.mutate({
+                                id: item.id,
+                                collector_id: selectedCollector,
+                              });
+                            }}
+                          >
+                            Affecter
+                          </Button>
+                        )}
+                        {isCollector && (
+                          <Button variant="default" onClick={() => claimMutation.mutate(item.id)}>
+                            Prendre
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {waiting.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
+                      Aucune entrée en attente
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
         <div>
           <h2 className="text-lg font-semibold mb-2">Mes tâches</h2>
-          <div className="space-y-3">
-            {mine.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                Aucune tâche assignée
-              </p>
-            )}
-            {mine.map((item) => (
-              <Card key={item.id}>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-semibold">
-                        Patient: {item.patient_id}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Statut: {item.status}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Créé: {new Date(item.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      {item.status !== "in_progress" && (
-                        <Button
-                          variant="default"
-                          onClick={() => claimMutation.mutate(item.id)}
-                        >
-                          Prendre
-                        </Button>
-                      )}
-                      {item.status === "in_progress" && (
-                        <>
-                          <Button
-                            variant="outline"
-                            onClick={() => releaseMutation.mutate(item.id)}
-                          >
-                            Relâcher
+          <div className="overflow-x-auto bg-white rounded shadow">
+            <table className="min-w-full divide-y">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left">Nom</th>
+                  <th className="px-4 py-2 text-left">Statut</th>
+                  <th className="px-4 py-2 text-left">Créé</th>
+                  <th className="px-4 py-2 text-left">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {mine.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2">{item.patient?.name || item.patient_id}</td>
+                    <td className="px-4 py-2">{item.status}</td>
+                    <td className="px-4 py-2">{new Date(item.created_at).toLocaleString()}</td>
+                    <td className="px-4 py-2">
+                      <div className="flex gap-2">
+                        {item.status !== "in_progress" && (
+                          <Button variant="default" onClick={() => claimMutation.mutate(item.id)}>
+                            Prendre
                           </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={() => completeMutation.mutate(item.id)}
-                          >
-                            Terminer
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>{item.notes && <p>{item.notes}</p>}</CardContent>
-              </Card>
-            ))}
+                        )}
+                        {item.status === "in_progress" && (
+                          <>
+                            <Button variant="outline" onClick={() => releaseMutation.mutate(item.id)}>
+                              Relâcher
+                            </Button>
+                            <Button variant="destructive" onClick={() => completeMutation.mutate(item.id)}>
+                              Terminer
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {mine.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
+                      Aucune tâche assignée
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
+
+      {/* Assign dialog */}
+      <Dialog open={!!activeItem} onOpenChange={(open) => { if (!open) setActiveItem(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Affecter un préleveur</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>
+              Patient: <strong>{activeItem?.patient?.name || activeItem?.patient_id}</strong>
+            </p>
+            {collectors?.data?.length ? (
+              <div className="flex gap-2 items-center">
+                <select className="border rounded px-2 py-1 flex-1" value={selectedCollector ?? ""} onChange={(e) => setSelectedCollector(e.target.value || null)}>
+                  <option value="">-- Choisir --</option>
+                  {collectors?.data?.map((c) => (
+                    <option key={c.id} value={c.id}>{c.email}</option>
+                  ))}
+                </select>
+                <Button onClick={() => {
+                  if (!selectedCollector) return alert("Sélectionnez un préleveur");
+                  assignMutation.mutate({ id: activeItem.id, collector_id: selectedCollector });
+                  setActiveItem(null);
+                }}>Affecter</Button>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Aucun préleveur disponible</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
