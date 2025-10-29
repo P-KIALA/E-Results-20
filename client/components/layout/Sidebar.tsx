@@ -81,6 +81,15 @@ export default function Sidebar() {
           </Link>
 
           <Link
+            to="/queue"
+            className={navItemClass(isActive("/queue"))}
+            title="File d'attente"
+          >
+            <Clock size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">File d'attente</span>}
+          </Link>
+
+          <Link
             to="/console?tab=history"
             className={navItemClass(
               isConsoleActive && currentTab === "history",
