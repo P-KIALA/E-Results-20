@@ -39,6 +39,10 @@ export default function ConsolePage() {
             <DoctorsTab />
           </TabsContent>
 
+          <TabsContent value="patients" className="space-y-6">
+            <PatientsTab />
+          </TabsContent>
+
           <TabsContent value="results" className="space-y-6">
             <ResultsTab />
           </TabsContent>
