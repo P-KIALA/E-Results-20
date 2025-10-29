@@ -48,8 +48,11 @@ export default function PatientsTab() {
       const url = editingId ? `/api/patients/${editingId}` : "/api/patients";
       const method = editingId ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) });
+      if (!res.ok) {
+        const err = await res.clone().json().catch(() => ({}));
+        throw new Error(err.error || "Erreur");
+      }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erreur");
       setMessage({ type: "success", text: editingId ? "Patient modifié" : "Patient ajouté" });
       setShowForm(false);
       await fetchPatients();
