@@ -192,7 +192,7 @@ export default function PatientsTab() {
       });
       const parsed = await readResponse(res);
       if (!parsed.ok) {
-        console.error('addToQueue server response', parsed);
+        console.error('addToQueue server response', JSON.stringify(parsed, null, 2));
         // handle common statuses
         if (parsed.status === 401) {
           setMessage({ type: 'error', text: "Authentification requise. Connectez-vous." });
