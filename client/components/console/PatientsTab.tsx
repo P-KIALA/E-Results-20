@@ -280,6 +280,7 @@ export default function PatientsTab() {
             type: "error",
             text: "Pas de caméra trouvée sur cet appareil. Collez le contenu du QR.",
           });
+          try { fileInputRef.current?.click(); } catch (e) {}
           return;
         }
 
