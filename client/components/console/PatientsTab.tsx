@@ -160,9 +160,16 @@ export default function PatientsTab() {
         detectorRef.current = scanner;
         await (scanner as any).start();
         return;
-      } catch (err) {
+      } catch (err: any) {
         console.error('Fallback scanner failed', err);
-        setMessage({ type: "error", text: "Scanner non supporté par ce navigateur. Collez le contenu du QR dans la zone prévue." });
+        const msg = String(err && (err.message || err));
+        if (msg.includes('Camera not found')) {
+          setMessage({ type: 'error', text: 'Pas de caméra trouvée sur cet appareil.' });
+        } else if (msg.includes("élément vidéo")) {
+          setMessage({ type: 'error', text: "Impossible d'initialiser l'élément vidéo. Réessayez." });
+        } else {
+          setMessage({ type: "error", text: "Scanner non supporté par ce navigateur. Collez le contenu du QR dans la zone prévue." });
+        }
         return;
       }
     }
