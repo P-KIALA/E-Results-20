@@ -9,6 +9,13 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const authFetch = (input: RequestInfo, init: RequestInit = {}) => {
   const token = localStorage.getItem("auth_token");
