@@ -9,7 +9,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import * as DialogUI from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const authFetch = async (input: RequestInfo, init: RequestInit = {}) => {
   const token = localStorage.getItem("auth_token");
@@ -18,16 +18,14 @@ const authFetch = async (input: RequestInfo, init: RequestInit = {}) => {
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  // First attempt: direct fetch
   try {
     return await fetch(input, { ...init, headers });
   } catch (err) {
-    // Network failure — attempt Netlify functions prefix fallback if path starts with /api
+    // Network failure — attempt Netlify functions prefix fallback for /api paths
     try {
-      const base = (window && (window as any).location) ? `${window.location.origin}` : "";
       const asStr = typeof input === "string" ? input : (input as Request).url;
       if (asStr && asStr.startsWith("/api")) {
-        const fallback = `/.netlify/functions/api${asStr}`;
+        const fallback = `/.netlify/functions/api${asStr.replace(/^\/api/, "")}`;
         return await fetch(fallback, { ...init, headers });
       }
     } catch (e) {
