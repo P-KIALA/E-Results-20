@@ -61,7 +61,7 @@ export interface VerifyPhoneResponse {
   formatted_phone: string;
 }
 
-export type UserRole = "admin" | "user";
+export type UserRole = "admin" | "user" | "prelevement";
 
 export type Permission =
   | "manage_doctors"
