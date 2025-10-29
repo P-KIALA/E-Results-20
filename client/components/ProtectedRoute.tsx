@@ -29,6 +29,9 @@ export default function ProtectedRoute({
     if (user?.role === "user") {
       return <Navigate to="/dashboard" replace />;
     }
+    if (user?.role === "prelevement") {
+      return <Navigate to="/queue" replace />;
+    }
     return <Navigate to="/login" replace />;
   }
 
