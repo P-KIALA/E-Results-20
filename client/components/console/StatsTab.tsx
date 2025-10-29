@@ -108,7 +108,7 @@ export default function StatsTab() {
       });
 
       if (!sitesRes.ok) {
-        const errorData = await sitesRes.json().catch(() => ({}));
+        const errorData = await sitesRes.clone().json().catch(() => ({}));
         throw new Error(errorData.error || "Failed to fetch sites");
       }
 
