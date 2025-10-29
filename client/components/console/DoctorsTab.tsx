@@ -54,6 +54,21 @@ export default function DoctorsTab() {
     fetchDoctors();
   }, []);
 
+  const readResponse = async (res: Response) => {
+    try {
+      if ((res as any).bodyUsed) return { ok: res.ok, status: res.status, json: null, text: null };
+      const text = await res.text();
+      try {
+        const json = text ? JSON.parse(text) : null;
+        return { ok: res.ok, status: res.status, json, text };
+      } catch (e) {
+        return { ok: res.ok, status: res.status, json: null, text };
+      }
+    } catch (e) {
+      return { ok: res.ok, status: res.status, json: null, text: null };
+    }
+  };
+
   const fetchDoctors = async () => {
     setLoading(true);
     try {
@@ -70,15 +85,11 @@ export default function DoctorsTab() {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!res.ok) {
-        const errorData = await res
-          .clone()
-          .json()
-          .catch(() => ({}));
-        throw new Error(errorData.error || "Failed to fetch doctors");
+      const parsed = await readResponse(res);
+      if (!parsed.ok) {
+        throw new Error(parsed.json?.error || parsed.text || "Failed to fetch doctors");
       }
-      const data = await res.json();
-      setDoctors(data.doctors || []);
+      setDoctors(parsed.json?.doctors || []);
     } catch (error) {
       console.error("Error fetching doctors:", error);
       setMessage({
@@ -134,14 +145,11 @@ export default function DoctorsTab() {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) {
-        const err = await res
-          .clone()
-          .json()
-          .catch(() => ({}));
+      const parsed = await readResponse(res);
+      if (!parsed.ok) {
         setMessage({
           type: "error",
-          text: err.error || "Erreur lors de l'ajout",
+          text: parsed.json?.error || parsed.text || "Erreur lors de l'ajout",
         });
         return;
       }
@@ -184,13 +192,10 @@ export default function DoctorsTab() {
         setMessage({ type: "success", text: "Médecin supprimé avec succès" });
         await fetchDoctors();
       } else {
-        const err = await res
-          .clone()
-          .json()
-          .catch(() => ({}));
+        const parsed = await readResponse(res);
         setMessage({
           type: "error",
-          text: err.error || "Erreur de suppression",
+          text: parsed.json?.error || parsed.text || "Erreur de suppression",
         });
       }
     } catch (error) {
@@ -231,13 +236,10 @@ export default function DoctorsTab() {
         setMessage({ type: "success", text: "Vérification en cours..." });
         await fetchDoctors();
       } else {
-        const err = await res
-          .clone()
-          .json()
-          .catch(() => ({}));
+        const parsed = await readResponse(res);
         setMessage({
           type: "error",
-          text: err.error || "Erreur de vérification",
+          text: parsed.json?.error || parsed.text || "Erreur de vérification",
         });
       }
     } catch (error) {
