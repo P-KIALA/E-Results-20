@@ -108,10 +108,6 @@ export default function PatientsTab() {
     setMessage(null);
     // Ensure BarcodeDetector is available before requesting camera
     const BarcodeDetectorClass = (window as any).BarcodeDetector;
-    if (!BarcodeDetectorClass) {
-      setMessage({ type: "error", text: "Scanner non supporté par ce navigateur. Collez le contenu du QR dans la zone prévue." });
-      return;
-    }
 
     // Stop any existing stream
     try {
@@ -122,6 +118,32 @@ export default function PatientsTab() {
       }
     } catch (e) {
       // ignore
+    }
+
+    // If BarcodeDetector not available, try dynamic import of qr-scanner as a fallback
+    if (!BarcodeDetectorClass) {
+      try {
+        setMessage({ type: "info", text: "Utilisation du scanner de secours..." });
+        const mod = await import('qr-scanner');
+        const QrScanner = (mod && (mod as any).default) || mod;
+        try {
+          (QrScanner as any).WORKER_PATH = new URL('qr-scanner/qr-scanner-worker.min.js', import.meta.url).toString();
+        } catch (_) {
+          try { (QrScanner as any).WORKER_PATH = '/node_modules/qr-scanner/qr-scanner-worker.min.js'; } catch (_) {}
+        }
+        if (!videoRef.current) throw new Error('Pas d\'élément vidéo disponible');
+        const scanner = new (QrScanner as any)(videoRef.current, async (result: string) => {
+          await handleQRPayload(result);
+        });
+        detectorRef.current = scanner;
+        setShowScanner(true);
+        await (scanner as any).start();
+        return;
+      } catch (err) {
+        console.error('Fallback scanner failed', err);
+        setMessage({ type: "error", text: "Scanner non supporté par ce navigateur. Collez le contenu du QR dans la zone prévue." });
+        return;
+      }
     }
 
     setShowScanner(true);
