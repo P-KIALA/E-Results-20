@@ -1,6 +1,6 @@
 import "./global.css";
 
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef, lazy, Suspense, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
