@@ -42,7 +42,28 @@ export const listQueue: RequestHandler = async (req, res) => {
 
     const { data, error } = await query;
     if (error) return res.status(500).json({ error: error?.message || error });
-    return res.json({ data });
+
+    // Attach patient details for each queue item to simplify client rendering
+    const items: any[] = data || [];
+    const patientIds = Array.from(new Set(items.map((i) => i.patient_id).filter(Boolean)));
+    let patientsMap: Record<string, any> = {};
+    if (patientIds.length > 0) {
+      const { data: patientsData, error: patientsError } = await supabase
+        .from("patients")
+        .select("id,name,sex,dob,analyses,doctor,patient_ref")
+        .in("id", patientIds);
+      if (patientsError) {
+        console.warn('Could not fetch patients for queue merge', patientsError);
+      } else if (patientsData) {
+        patientsMap = (patientsData as any[]).reduce((acc, p) => {
+          acc[p.id] = p;
+          return acc;
+        }, {} as Record<string, any>);
+      }
+    }
+
+    const merged = items.map((it) => ({ ...it, patient: patientsMap[it.patient_id] || null }));
+    return res.json({ data: merged });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "internal" });
