@@ -158,7 +158,7 @@ export default function SitesManagement() {
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+        const data = await res.clone().json().catch(() => ({}));
         throw new Error(data.error || "Erreur de suppression");
       }
 
