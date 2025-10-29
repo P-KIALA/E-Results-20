@@ -260,6 +260,25 @@ export default function PatientsTab() {
     }
   };
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const mod = await import('qr-scanner');
+      const QrScanner = (mod && (mod as any).default) || mod;
+      // attempt to scan the image file directly
+      const result = await (QrScanner as any).scanImage(file, { returnDetailedScanResult: false });
+      if (result) await handleQRPayload(result as string);
+    } catch (err) {
+      console.error('Image scan failed', err);
+      setMessage({ type: 'error', text: "Impossible de lire l'image QR. Collez le contenu du QR." });
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const handleQRPayload = async (raw: string) => {
     try {
       const token = getToken();
