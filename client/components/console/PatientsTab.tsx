@@ -578,6 +578,13 @@ export default function PatientsTab() {
                   </Button>
                   <Button
                     size="sm"
+                    variant="secondary"
+                    onClick={async () => await addToQueue(p.id)}
+                  >
+                    Ajouter à la file
+                  </Button>
+                  <Button
+                    size="sm"
                     variant="destructive"
                     onClick={() => handleDelete(p.id)}
                   >
