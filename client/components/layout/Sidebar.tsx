@@ -68,6 +68,17 @@ export default function Sidebar() {
           </Link>
 
           <Link
+            to="/console?tab=patients"
+            className={navItemClass(
+              isConsoleActive && currentTab === "patients",
+            )}
+            title="Patients"
+          >
+            <Users size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Patients</span>}
+          </Link>
+
+          <Link
             to="/console?tab=results"
             className={navItemClass(
               isConsoleActive && currentTab === "results",
