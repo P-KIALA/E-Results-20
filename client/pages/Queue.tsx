@@ -243,56 +243,6 @@ export default function QueuePage() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-lg font-semibold mb-2">Mes tâches</h2>
-          <div className="overflow-x-auto bg-white rounded shadow">
-            <table className="min-w-full divide-y">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2 text-left">Nom</th>
-                  <th className="px-4 py-2 text-left">Statut</th>
-                  <th className="px-4 py-2 text-left">Créé</th>
-                  <th className="px-4 py-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {mine.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2">{item.patient?.name || item.patient_id}</td>
-                    <td className="px-4 py-2">{item.status}</td>
-                    <td className="px-4 py-2">{new Date(item.created_at).toLocaleString()}</td>
-                    <td className="px-4 py-2">
-                      <div className="flex gap-2">
-                        {item.status !== "in_progress" && (
-                          <Button variant="default" onClick={() => claimMutation.mutate(item.id)}>
-                            Prendre
-                          </Button>
-                        )}
-                        {item.status === "in_progress" && (
-                          <>
-                            <Button variant="outline" onClick={() => releaseMutation.mutate(item.id)}>
-                              Relâcher
-                            </Button>
-                            <Button variant="destructive" onClick={() => completeMutation.mutate(item.id)}>
-                              Terminer
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {mine.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-muted-foreground">
-                      Aucune tâche assignée
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
 
       {/* Assign dialog */}
