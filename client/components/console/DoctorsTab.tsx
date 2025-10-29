@@ -56,7 +56,19 @@ export default function DoctorsTab() {
 
   const readResponse = async (res: Response) => {
     try {
-      if ((res as any).bodyUsed) return { ok: res.ok, status: res.status, json: null, text: null };
+      if ((res as any).bodyUsed) {
+        try {
+          const cloneText = await (res.clone() as Response).text();
+          try {
+            const json = cloneText ? JSON.parse(cloneText) : null;
+            return { ok: res.ok, status: res.status, json, text: cloneText };
+          } catch (e) {
+            return { ok: res.ok, status: res.status, json: null, text: cloneText };
+          }
+        } catch (e) {
+          return { ok: res.ok, status: res.status, json: null, text: null };
+        }
+      }
       const text = await res.text();
       try {
         const json = text ? JSON.parse(text) : null;
