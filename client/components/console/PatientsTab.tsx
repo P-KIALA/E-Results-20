@@ -136,6 +136,15 @@ export default function PatientsTab() {
       });
       setShowForm(false);
       await fetchPatients();
+
+      // Automatically add newly created patient to the queue
+      if (!editingId && parsed?.json?.patient?.id) {
+        try {
+          await addToQueue(parsed.json.patient.id);
+        } catch (e) {
+          console.warn("Failed to auto-add patient to queue", e);
+        }
+      }
     } catch (err: any) {
       console.error(err);
       setMessage({ type: "error", text: String(err.message || err) });
