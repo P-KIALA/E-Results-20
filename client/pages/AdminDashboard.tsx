@@ -372,6 +372,7 @@ export default function AdminDashboard() {
                 >
                   <option value="user">Utilisateur</option>
                   <option value="admin">Administrateur</option>
+                  <option value="prelevement">Préleveur</option>
                 </select>
               </div>
 
