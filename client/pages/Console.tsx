@@ -5,6 +5,7 @@ import DoctorsTab from "@/components/console/DoctorsTab";
 import ResultsTab from "@/components/console/ResultsTab";
 import HistoryTab from "@/components/console/HistoryTab";
 import StatsTab from "@/components/console/StatsTab";
+import PatientsTab from "@/components/console/PatientsTab";
 
 export default function ConsolePage() {
   const [searchParams] = useSearchParams();
