@@ -97,5 +97,14 @@ export function createServer() {
   // Twilio webhook (public)
   app.post("/api/webhook/twilio", webhookTwilio);
 
+  // Queue management
+  app.post("/api/queue", requireAuth, createQueueItem);
+  app.get("/api/queue", requireAuth, listQueue);
+  app.post("/api/queue/:id/assign", requireAuth, assignQueue); // admin assigns
+  app.post("/api/queue/:id/claim", requireAuth, claimQueue); // collector claims
+  app.post("/api/queue/:id/release", requireAuth, releaseQueue);
+  app.post("/api/queue/:id/complete", requireAuth, completeQueue);
+  app.get("/api/collectors", requireAuth, getCollectors);
+
   return app;
 }
