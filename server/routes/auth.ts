@@ -107,6 +107,7 @@ export const register: RequestHandler = async (req, res) => {
         role,
         permissions,
         primary_site_id,
+        is_collector: req.body.is_collector || false,
       })
       .select()
       .single();
