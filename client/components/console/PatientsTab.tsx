@@ -40,13 +40,18 @@ export default function PatientsTab() {
   const readResponse = async (res: Response) => {
     try {
       if ((res as any).bodyUsed) {
-        return {
-          ok: res.ok,
-          status: res.status,
-          json: null,
-          text: null,
-          error: "body already used",
-        };
+        // try to read from a clone as last resort
+        try {
+          const cloneText = await (res.clone() as Response).text();
+          try {
+            const json = cloneText ? JSON.parse(cloneText) : null;
+            return { ok: res.ok, status: res.status, json, text: cloneText };
+          } catch (e) {
+            return { ok: res.ok, status: res.status, json: null, text: cloneText };
+          }
+        } catch (e) {
+          return { ok: res.ok, status: res.status, json: null, text: null, error: 'body already used' };
+        }
       }
       const text = await res.text();
       try {
