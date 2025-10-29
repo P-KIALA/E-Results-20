@@ -434,6 +434,8 @@ export default function PatientsTab() {
                   <div className="flex gap-2 mt-2">
                     <Button type="button" onClick={() => { startScanner(); }}>Démarrer</Button>
                     <Button type="button" variant="outline" onClick={() => { stopScanner(); }}>Arrêter</Button>
+                    <Button type="button" onClick={() => fileInputRef.current?.click()}>Importer photo</Button>
+                    <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileSelect} />
                   </div>
                   <label className="text-sm font-medium mt-2">Ou coller le contenu du QR (JSON ou clé:valeur)</label>
                   <textarea placeholder='{"name":"Jean", "phone":"+241...", "analyses":"NFS;Glycémie"}' className="w-full px-3 py-2 rounded border" onBlur={async (e) => { if (e.target.value.trim()) await handleQRPayload(e.target.value.trim()); }} />
