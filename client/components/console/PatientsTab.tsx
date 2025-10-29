@@ -192,9 +192,16 @@ export default function PatientsTab() {
       });
       const parsed = await readResponse(res);
       if (!parsed.ok) {
+        console.error('addToQueue server response', parsed);
+        // handle common statuses
+        if (parsed.status === 401) {
+          setMessage({ type: 'error', text: "Authentification requise. Connectez-vous." });
+          return;
+        }
         const srvErr = parsed.json?.error;
-        const msg = typeof srvErr === 'string' ? srvErr : (srvErr && srvErr.message) || parsed.text || 'Erreur ajout file';
-        throw new Error(msg);
+        const msg = typeof srvErr === 'string' ? srvErr : (srvErr && (srvErr.message || JSON.stringify(srvErr))) || parsed.text || 'Erreur ajout file';
+        setMessage({ type: 'error', text: msg });
+        return;
       }
       setMessage({ type: "success", text: "Patient ajouté à la file" });
     } catch (err: any) {
