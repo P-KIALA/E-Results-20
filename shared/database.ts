@@ -123,6 +123,38 @@ export type Database = {
           updated_at?: string | null;
         };
       };
+      sample_queue: {
+        Row: {
+          id: string;
+          patient_id: string;
+          collector_id: string | null;
+          status: "waiting" | "assigned" | "in_progress" | "done" | "cancelled";
+          eta: string | null;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          patient_id: string;
+          collector_id?: string | null;
+          status?: "waiting" | "assigned" | "in_progress" | "done" | "cancelled";
+          eta?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          patient_id?: string;
+          collector_id?: string | null;
+          status?: "waiting" | "assigned" | "in_progress" | "done" | "cancelled";
+          eta?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
       users: {
         Row: {
           id: string;
@@ -130,6 +162,7 @@ export type Database = {
           password_hash: string;
           role: "admin" | "user";
           permissions: string[];
+          is_collector: boolean;
           site: string | null;
           created_at: string;
           updated_at: string;
@@ -140,6 +173,7 @@ export type Database = {
           password_hash: string;
           role?: "admin" | "user";
           permissions?: string[];
+          is_collector?: boolean;
           site?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -150,6 +184,7 @@ export type Database = {
           password_hash?: string;
           role?: "admin" | "user";
           permissions?: string[];
+          is_collector?: boolean;
           site?: string | null;
           created_at?: string;
           updated_at?: string;
