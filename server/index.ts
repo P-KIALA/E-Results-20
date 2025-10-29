@@ -28,6 +28,15 @@ import {
 } from "./routes/sites";
 import { createInitialAdmin } from "./routes/seed";
 import { authMiddleware, requireAuth } from "./lib/middleware";
+import {
+  createQueueItem,
+  listQueue,
+  assignQueue,
+  claimQueue,
+  releaseQueue,
+  completeQueue,
+  getCollectors,
+} from "./routes/queue";
 
 export function createServer() {
   const app = express();
