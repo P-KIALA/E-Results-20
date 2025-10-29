@@ -160,7 +160,7 @@ export type Database = {
           id: string;
           email: string;
           password_hash: string;
-          role: "admin" | "user";
+          role: "admin" | "user" | "prelevement";
           permissions: string[];
           is_collector: boolean;
           site: string | null;
