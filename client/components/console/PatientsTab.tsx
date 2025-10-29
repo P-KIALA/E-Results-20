@@ -202,25 +202,39 @@ export default function PatientsTab() {
 
       // Attempt to read response body safely for error details
       let bodyText: string | null = null;
+      let parsedErr: any = null;
       try {
-        // try cloning first
-        try {
-          bodyText = await (res.clone() as Response).text();
-        } catch (_) {
-          bodyText = await res.text();
+        if ((res as any).bodyUsed) {
+          // If body already used, try cloning as a last resort
+          try {
+            const clone = (res as any).clone && (res as any).clone();
+            if (clone) bodyText = await (clone as Response).text();
+          } catch (e) {
+            console.warn('Could not clone response to read body', e);
+          }
+        } else {
+          try {
+            bodyText = await res.text();
+          } catch (e) {
+            console.warn('Could not read response text directly', e);
+            try {
+              const clone = (res as any).clone && (res as any).clone();
+              if (clone) bodyText = await (clone as Response).text();
+            } catch (e2) {
+              console.warn('Could not read response body by cloning either', e2);
+            }
+          }
+        }
+
+        if (bodyText) {
+          try {
+            parsedErr = JSON.parse(bodyText);
+          } catch (_) {
+            parsedErr = bodyText;
+          }
         }
       } catch (e) {
         console.warn('Could not read error body', e);
-      }
-
-      // Parse JSON if possible
-      let parsedErr: any = null;
-      if (bodyText) {
-        try {
-          parsedErr = JSON.parse(bodyText);
-        } catch (_) {
-          parsedErr = bodyText;
-        }
       }
 
       console.error('addToQueue server response', { status: res.status, body: parsedErr });
