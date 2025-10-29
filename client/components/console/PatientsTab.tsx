@@ -210,6 +210,9 @@ export default function PatientsTab() {
         try { videoRef.current.pause(); } catch (e) {}
         videoRef.current.srcObject = null;
       }
+      if (detectorRef.current && typeof detectorRef.current.stop === 'function') {
+        try { detectorRef.current.stop(); } catch (e) {}
+      }
       detectorRef.current = null;
     } catch (e) {
       // ignore
