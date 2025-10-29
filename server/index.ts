@@ -87,6 +87,12 @@ export function createServer() {
   app.delete("/api/doctors/:id", requireAuth, deleteDoctor);
   app.post("/api/doctors/:id/verify", requireAuth, verifyDoctor);
 
+  // Patients management (protected)
+  app.get("/api/patients", requireAuth, getPatients);
+  app.post("/api/patients", requireAuth, addPatient);
+  app.put("/api/patients/:id", requireAuth, updatePatient);
+  app.delete("/api/patients/:id", requireAuth, deletePatient);
+
   // File upload (protected)
   app.post("/api/upload-files", requireAuth, uploadFiles);
   app.get("/api/file-url", requireAuth, getFileUrl);
