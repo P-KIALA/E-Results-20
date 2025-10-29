@@ -124,6 +124,11 @@ export default function PatientsTab() {
     if (!BarcodeDetectorClass) {
       try {
         setMessage({ type: "info", text: "Utilisation du scanner de secours..." });
+        // Ensure the video element is rendered
+        setShowScanner(true);
+        // Wait for the DOM to update and ref to be attached
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+
         const mod = await import('qr-scanner');
         const QrScanner = (mod && (mod as any).default) || mod;
         try {
@@ -136,7 +141,6 @@ export default function PatientsTab() {
           await handleQRPayload(result);
         });
         detectorRef.current = scanner;
-        setShowScanner(true);
         await (scanner as any).start();
         return;
       } catch (err) {
