@@ -20,12 +20,19 @@ export default function PatientsTab() {
 
   // Helper to safely read a Response body once and parse JSON if possible
   const readResponse = async (res: Response) => {
-    const text = await res.text();
     try {
-      const json = text ? JSON.parse(text) : null;
-      return { ok: res.ok, status: res.status, json, text };
+      if ((res as any).bodyUsed) {
+        return { ok: res.ok, status: res.status, json: null, text: null, error: 'body already used' };
+      }
+      const text = await res.text();
+      try {
+        const json = text ? JSON.parse(text) : null;
+        return { ok: res.ok, status: res.status, json, text };
+      } catch (e) {
+        return { ok: res.ok, status: res.status, json: null, text };
+      }
     } catch (e) {
-      return { ok: res.ok, status: res.status, json: null, text };
+      return { ok: res.ok, status: res.status, json: null, text: null, error: String(e) };
     }
   };
 
