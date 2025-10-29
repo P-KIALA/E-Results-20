@@ -128,6 +128,19 @@ const App = () => (
                   </Layout>
                 }
               />
+              <Route
+                path="/queue"
+                element={
+                  <Layout>
+                    <ProtectedRoute>
+                      <React.Suspense fallback={<div className="p-6">Chargement...</div>}>
+                        {/* Queue page lazy loaded */}
+                        <QueuePageLazy />
+                      </React.Suspense>
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route
                 path="*"
