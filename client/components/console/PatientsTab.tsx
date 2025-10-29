@@ -184,7 +184,11 @@ export default function PatientsTab() {
     try {
       const tracks = (videoRef.current?.srcObject as MediaStream | null)?.getTracks() || [];
       tracks.forEach((t) => t.stop());
-      if (videoRef.current) videoRef.current.srcObject = null;
+      if (videoRef.current) {
+        try { videoRef.current.pause(); } catch (e) {}
+        videoRef.current.srcObject = null;
+      }
+      detectorRef.current = null;
     } catch (e) {
       // ignore
     }
