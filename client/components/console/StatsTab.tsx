@@ -93,7 +93,7 @@ export default function StatsTab() {
       });
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
+        const errorData = await res.clone().json().catch(() => ({}));
         throw new Error(errorData.error || "Failed to fetch logs");
       }
 
