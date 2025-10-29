@@ -126,8 +126,21 @@ export default function PatientsTab() {
         setMessage({ type: "info", text: "Utilisation du scanner de secours..." });
         // Ensure the video element is rendered
         setShowScanner(true);
-        // Wait for the DOM to update and ref to be attached
+        // Wait for the DOM to update and ref to be attached (poll briefly)
         await new Promise((resolve) => requestAnimationFrame(resolve));
+        let attempts = 0;
+        while (!videoRef.current && attempts < 10) {
+          await new Promise((r) => setTimeout(r, 50));
+          attempts++;
+        }
+
+        // If still no video element, check if device has camera inputs
+        if (!videoRef.current) {
+          const devices = await navigator.mediaDevices.enumerateDevices().catch(() => []);
+          const hasCamera = devices.some((d: any) => d.kind === 'videoinput');
+          if (!hasCamera) throw new Error('Camera not found');
+          throw new Error('Pas d\'élément vidéo disponible');
+        }
 
         const mod = await import('qr-scanner');
         const QrScanner = (mod && (mod as any).default) || mod;
@@ -136,7 +149,11 @@ export default function PatientsTab() {
         } catch (_) {
           try { (QrScanner as any).WORKER_PATH = '/node_modules/qr-scanner/qr-scanner-worker.min.js'; } catch (_) {}
         }
-        if (!videoRef.current) throw new Error('Pas d\'élément vidéo disponible');
+
+        // Check camera availability in library
+        const hasCam = await ((QrScanner as any).hasCamera ? (QrScanner as any).hasCamera() : Promise.resolve(true));
+        if (!hasCam) throw new Error('Camera not found');
+
         const scanner = new (QrScanner as any)(videoRef.current, async (result: string) => {
           await handleQRPayload(result);
         });
