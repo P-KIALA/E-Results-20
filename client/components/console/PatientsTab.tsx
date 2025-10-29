@@ -17,14 +17,25 @@ export default function PatientsTab() {
 
   const getToken = () => localStorage.getItem("auth_token");
 
+  // Helper to safely read a Response body once and parse JSON if possible
+  const readResponse = async (res: Response) => {
+    const text = await res.text();
+    try {
+      const json = text ? JSON.parse(text) : null;
+      return { ok: res.ok, status: res.status, json, text };
+    } catch (e) {
+      return { ok: res.ok, status: res.status, json: null, text };
+    }
+  };
+
   const fetchPatients = async () => {
     setLoading(true);
     try {
       const token = getToken();
       const res = await fetch("/api/patients", { headers: { Authorization: `Bearer ${token}` } });
-      if (!res.ok) throw new Error("Failed to fetch patients");
-      const data = await res.json();
-      setPatients(data.patients || []);
+      const parsed = await readResponse(res);
+      if (!parsed.ok) throw new Error(parsed.json?.error || parsed.text || "Failed to fetch patients");
+      setPatients(parsed.json?.patients || []);
     } catch (err) {
       console.error(err);
       setMessage({ type: "error", text: "Erreur lors du chargement" });
