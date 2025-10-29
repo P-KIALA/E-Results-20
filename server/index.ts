@@ -123,5 +123,27 @@ export function createServer() {
   app.post("/api/queue/:id/complete", requireAuth, completeQueue);
   app.get("/api/collectors", requireAuth, getCollectors);
 
+  // Global error handler to ensure consistent JSON errors and avoid response stream issues
+  // This will catch errors passed to next(err) or thrown in async route handlers
+  // and ensure we send a single JSON response.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    try {
+      console.error('Unhandled server error:', err);
+      if (res.headersSent) {
+        // If headers already sent, delegate to default Express handler
+        return;
+      }
+      const status = err && err.status ? err.status : 500;
+      const message = err && (err.message || err.error) ? (err.message || err.error) : 'internal';
+      res.status(status).json({ error: String(message) });
+    } catch (e) {
+      console.error('Error in global error handler', e);
+      try {
+        if (!res.headersSent) res.status(500).json({ error: 'internal' });
+      } catch (_) {}
+    }
+  });
+
   return app;
 }
