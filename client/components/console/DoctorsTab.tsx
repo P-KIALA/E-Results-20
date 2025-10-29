@@ -132,7 +132,7 @@ export default function DoctorsTab() {
       });
 
       if (!res.ok) {
-        const err = await res.json();
+        const err = await res.clone().json().catch(() => ({}));
         setMessage({
           type: "error",
           text: err.error || "Erreur lors de l'ajout",
