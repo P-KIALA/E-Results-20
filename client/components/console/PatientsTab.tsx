@@ -187,7 +187,6 @@ export default function PatientsTab() {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Gestion des patients</h2>
         <div className="flex gap-2">
-          <Button onClick={() => { setShowScanner(true); startScanner(); }} className="gap-2">Scanner QR</Button>
           <Button onClick={openCreate} className="gap-2"><span>Nouveau patient</span></Button>
         </div>
       </div>
@@ -280,9 +279,25 @@ export default function PatientsTab() {
               </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium">Analyses à effectuer</label>
-              <div className="space-y-2">
+            <div className="mb-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Analyses à effectuer</label>
+                <Button type="button" onClick={() => { if (!showScanner) startScanner(); else stopScanner(); }}>{showScanner ? "Arrêter le scan" : "Scanner QR"}</Button>
+              </div>
+
+              {showScanner && (
+                <div className="mt-2">
+                  <video ref={videoRef} className="w-full rounded bg-black" style={{ height: 240 }} />
+                  <div className="flex gap-2 mt-2">
+                    <Button type="button" onClick={() => { startScanner(); }}>Démarrer</Button>
+                    <Button type="button" variant="outline" onClick={() => { stopScanner(); }}>Arrêter</Button>
+                  </div>
+                  <label className="text-sm font-medium mt-2">Ou coller le contenu du QR (JSON ou clé:valeur)</label>
+                  <textarea placeholder='{"name":"Jean", "phone":"+241...", "analyses":"NFS;Glycémie"}' className="w-full px-3 py-2 rounded border" onBlur={async (e) => { if (e.target.value.trim()) await handleQRPayload(e.target.value.trim()); }} />
+                </div>
+              )}
+
+              <div className="space-y-2 mt-3">
                 {analyses.map((a, i) => (
                   <div key={i} className="flex gap-2 items-center">
                     <input className="px-3 py-2 rounded border flex-1" value={a.name} onChange={(e) => updateAnalysisName(i, e.target.value)} placeholder="Nom de l'analyse" />
@@ -303,25 +318,6 @@ export default function PatientsTab() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showScanner} onOpenChange={(open) => { if (!open) stopScanner(); setShowScanner(open); }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Scanner QR</DialogTitle>
-            <DialogDescription>Utilisez la camera pour scanner un QR contenant les infos patient (JSON ou clé:valeur)</DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-2">
-            <video ref={videoRef} className="w-full rounded bg-black" style={{ height: 320 }} />
-            <div className="flex gap-2">
-              <Button onClick={startScanner}>Démarrer</Button>
-              <Button variant="outline" onClick={() => { stopScanner(); setShowScanner(false); }}>Fermer</Button>
-            </div>
-            <div>
-              <label className="text-sm font-medium">Ou coller le contenu du QR (JSON ou clé:valeur)</label>
-              <textarea placeholder='{"name":"Jean", "phone":"+241...", "analyses":"NFS;Glycémie"}' className="w-full px-3 py-2 rounded border" onBlur={async (e) => { if (e.target.value.trim()) await handleQRPayload(e.target.value.trim()); }} />
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
