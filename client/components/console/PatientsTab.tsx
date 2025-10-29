@@ -177,6 +177,25 @@ export default function PatientsTab() {
     }
   };
 
+  const addToQueue = async (patientId: string) => {
+    try {
+      setMessage(null);
+      const token = getToken();
+      const res = await fetch(`/api/queue`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ patient_id: patientId }),
+      });
+      const parsed = await readResponse(res);
+      if (!parsed.ok) throw new Error(parsed.json?.error || parsed.text || "Erreur ajout file");
+      setMessage({ type: "success", text: "Patient ajouté à la file" });
+      // refresh queue if needed by navigating or calling fetch
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: "error", text: "Impossible d'ajouter à la file" });
+    }
+  };
+
   // QR scanning using BarcodeDetector if available
   const startScanner = async () => {
     setMessage(null);
