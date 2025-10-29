@@ -17,7 +17,10 @@ export const createQueueItem: RequestHandler = async (req, res) => {
       },
     ]);
 
-    if (error) return res.status(500).json({ error: error?.message || error });
+    if (error) {
+      console.error('supabase createQueue error', error);
+      return res.status(500).json({ error: error?.message || error });
+    }
     return res.json({ data: data?.[0] });
   } catch (err) {
     console.error(err);
