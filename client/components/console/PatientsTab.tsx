@@ -64,11 +64,8 @@ export default function PatientsTab() {
       const url = editingId ? `/api/patients/${editingId}` : "/api/patients";
       const method = editingId ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) });
-      if (!res.ok) {
-        const err = await res.clone().json().catch(() => ({}));
-        throw new Error(err.error || "Erreur");
-      }
-      const data = await res.json();
+      const parsed = await readResponse(res);
+      if (!parsed.ok) throw new Error(parsed.json?.error || parsed.text || "Erreur");
       setMessage({ type: "success", text: editingId ? "Patient modifié" : "Patient ajouté" });
       setShowForm(false);
       await fetchPatients();
@@ -90,10 +87,8 @@ export default function PatientsTab() {
     try {
       const token = getToken();
       const res = await fetch(`/api/patients/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
-      if (!res.ok) {
-        const err = await res.clone().json().catch(() => ({}));
-        throw new Error(err.error || "Erreur de suppression");
-      }
+      const parsed = await readResponse(res);
+      if (!parsed.ok) throw new Error(parsed.json?.error || parsed.text || "Erreur de suppression");
       await fetchPatients();
     } catch (err) {
       console.error(err);
@@ -153,11 +148,12 @@ export default function PatientsTab() {
     try {
       const token = getToken();
       const res = await fetch("/api/patients/scan", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ qr: raw }) });
-      if (!res.ok) throw new Error("Erreur lors du parsing du QR");
-      const data = await res.json();
-      const parsed = data.parsed || {};
-      setForm({ name: parsed.name || "", phone: parsed.phone || "", dob: parsed.dob || "", site: "", sex: parsed.sex || "", doctor: parsed.doctor || "", patient_ref: parsed.patient_ref || "" });
-      setAnalyses((parsed.analyses || []).map((a: any) => ({ name: a.name, status: a.status || "pending" })));
+      const parsed = await readResponse(res);
+      if (!parsed.ok) throw new Error(parsed.json?.error || parsed.text || "Erreur lors du parsing du QR");
+      const data = parsed.json || {};
+      const p = data.parsed || {};
+      setForm({ name: p.name || "", phone: p.phone || "", dob: p.dob || "", site: "", sex: p.sex || "", doctor: p.doctor || "", patient_ref: p.patient_ref || "" });
+      setAnalyses((p.analyses || []).map((a: any) => ({ name: a.name, status: a.status || "pending" })));
       setShowForm(true);
       setMessage(null);
     } catch (err) {
@@ -184,7 +180,8 @@ export default function PatientsTab() {
     try {
       const token = getToken();
       const res = await fetch(`/api/patients/${patientId}/analyses/${index}`, { method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ status: "validated" }) });
-      if (!res.ok) throw new Error("Erreur lors de la validation");
+      const parsed = await readResponse(res);
+      if (!parsed.ok) throw new Error(parsed.json?.error || parsed.text || "Erreur lors de la validation");
       await fetchPatients();
       setMessage({ type: "success", text: "Analyse validée" });
     } catch (err) {
