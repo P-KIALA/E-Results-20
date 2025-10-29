@@ -317,6 +317,7 @@ export const updateUser: RequestHandler = async (req, res) => {
     if (permissions !== undefined) updateData.permissions = permissions;
     if (primary_site_id !== undefined)
       updateData.primary_site_id = primary_site_id;
+    if (is_collector !== undefined) updateData.is_collector = is_collector;
 
     const { data: user, error } = await supabase
       .from("users")
