@@ -246,12 +246,14 @@ export default function PatientsTab() {
               type: "error",
               text: "Pas de caméra trouvée sur cet appareil. Collez le contenu du QR.",
             });
+            try { fileInputRef.current?.click(); } catch (e) {}
             return;
           }
           setMessage({
             type: "error",
             text: "Impossible d'initialiser l'élément vidéo. Collez le contenu du QR.",
           });
+          try { fileInputRef.current?.click(); } catch (e) {}
           return;
         }
 
