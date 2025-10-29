@@ -294,7 +294,7 @@ export const updateUser: RequestHandler = async (req, res) => {
   try {
     const adminId = (req as any).userId;
     const { id: targetUserId } = req.params;
-    const { role, permissions, primary_site_id, accessible_site_ids } =
+    const { role, permissions, primary_site_id, accessible_site_ids, is_collector } =
       req.body;
 
     if (!adminId) {
