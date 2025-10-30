@@ -7,6 +7,17 @@ export async function sendViaInfobip(
   const baseUrl = process.env.INFOBIP_BASE_URL;
   const sender = process.env.INFOBIP_SENDER;
 
+  // Debug presence of env vars (do not log secrets)
+  try {
+    console.log("Infobip config presence:", {
+      hasApiKey: !!apiKey,
+      hasBaseUrl: !!baseUrl,
+      hasSender: !!sender,
+    });
+  } catch (e) {
+    // ignore
+  }
+
   if (!apiKey || !baseUrl || !sender) throw new Error("Infobip not configured");
 
   // Infobip WhatsApp endpoints vary by account; this implementation uses a common pattern.
