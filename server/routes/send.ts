@@ -17,7 +17,28 @@ async function sendViaWhatsApp(
   message: string,
   mediaUrls: string[],
 ): Promise<string> {
+  const useInfobip = !!process.env.INFOBIP_API_KEY && process.env.USE_INFOBIP !== "false";
   const useNotifyer = !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
+
+  if (useInfobip) {
+    try {
+      const id = await sendViaInfobip(to, message, mediaUrls);
+      console.log(`Infobip sent message to ${to}: ${id}`);
+      return id;
+    } catch (error) {
+      try {
+        console.error(`Infobip send error for ${to}:`, {
+          message: (error as any)?.message,
+          stack: (error as any)?.stack,
+          details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+        });
+      } catch (e) {
+        console.error(`Infobip send error for ${to}:`, error);
+      }
+      // fallthrough to other providers
+      console.warn("Falling back from Infobip to other provider");
+    }
+  }
 
   if (useNotifyer) {
     try {
