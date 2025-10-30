@@ -13,6 +13,7 @@ import { sendResults, getSendLogs, webhookInfobip } from "./routes/send";
 import { debugInfo, sendTest } from "./routes/debug";
 import { proxyHandler } from "./routes/proxy";
 import { twilioTestHandler } from "./routes/twilio";
+import { twilioSendHandler } from "./routes/twilio_send";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import {
   login,
