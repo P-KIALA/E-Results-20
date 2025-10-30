@@ -205,14 +205,9 @@ export default function HistoryTab({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold">Historique des envois</h3>
-        <p className="text-sm text-muted-foreground">
-          Suivi en temps réel de tous les envois
-        </p>
-      </div>
+      <div />
 
-      <div className="space-y-4">
+      <div className="space-y-4 mt-6">
         <div className="grid gap-4 sm:grid-cols-7 items-center">
           {!userOnly && (
             <select
