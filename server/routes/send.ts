@@ -166,6 +166,13 @@ async function sendViaWhatsApp(
         stack: error?.stack,
         details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
       });
+
+      // Common Twilio authentication failure
+      if (typeof error?.message === "string" && error.message.includes("Authenticate")) {
+        console.error(
+          "Twilio authentication failed. Please verify TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN (or TWILIO_API_KEY/TWILIO_API_SECRET) in your environment.",
+        );
+      }
     } catch (e) {
       console.error(`Error sending WhatsApp message to ${to}:`, error);
     }
