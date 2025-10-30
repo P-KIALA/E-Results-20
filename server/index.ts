@@ -114,6 +114,8 @@ export function createServer() {
 
   // Debug endpoints (public in dev only)
   app.get("/api/debug", debugInfo);
+  // Debug: simulate sending a result without external provider (useful for testing)
+  app.post("/api/debug/send-test", sendTest);
 
   // Global error handler to ensure consistent JSON errors and avoid response stream issues
   // This will catch errors passed to next(err) or thrown in async route handlers
