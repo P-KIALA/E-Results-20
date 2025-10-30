@@ -12,13 +12,11 @@ export async function twilioSendHandler(req: Request, res: Response) {
       return res.status(500).json({ ok: false, error: "TWILIO_ACCOUNT_SID/TWILIO_AUTH_TOKEN/TWILIO_PHONE_NUMBER must be configured" });
     }
 
-    // Accept 'to' in query or body
-    const toRaw = (req.query.to as string) || (req.body && (req.body.to as string));
-    if (!toRaw) {
-      return res.status(400).json({ ok: false, error: "Missing 'to' parameter" });
-    }
+    // Accept 'to' in query or body. If not provided, default to the testing recipient as requested.
+    // The default recipient is written explicitly as whatsapp:+243821338291
+    const toRaw = (req.query.to as string) || (req.body && (req.body.to as string)) || "whatsapp:+243821338291";
 
-    // Normalize to Twilio WhatsApp format
+    // Normalize to Twilio WhatsApp format (ensure we don't double-prefix)
     const to = toRaw.startsWith("whatsapp:") ? toRaw : `whatsapp:${toRaw}`;
     const fromWhats = from.startsWith("whatsapp:") ? from : `whatsapp:${from}`;
 
