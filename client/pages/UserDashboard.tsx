@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, Send, Plus, Trash2 } from "lucide-react";
+import { authFetch } from "@/lib/api";
 
 export default function UserDashboard() {
   const { user } = useAuth();
