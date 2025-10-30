@@ -22,7 +22,6 @@ import ConsolePage from "./pages/Console";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import SitesManagement from "./pages/SitesManagement";
-const QueuePageLazy = lazy(() => import("./pages/Queue"));
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
@@ -125,21 +124,6 @@ const App = () => (
                   <Layout>
                     <ProtectedRoute requiredRole="user">
                       <UserDashboard />
-                    </ProtectedRoute>
-                  </Layout>
-                }
-              />
-              <Route
-                path="/queue"
-                element={
-                  <Layout>
-                    <ProtectedRoute>
-                      <Suspense
-                        fallback={<div className="p-6">Chargement...</div>}
-                      >
-                        {/* Queue page lazy loaded */}
-                        <QueuePageLazy />
-                      </Suspense>
                     </ProtectedRoute>
                   </Layout>
                 }

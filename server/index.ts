@@ -27,24 +27,7 @@ import {
   deleteSite,
 } from "./routes/sites";
 import { createInitialAdmin } from "./routes/seed";
-import {
-  getPatients,
-  addPatient,
-  updatePatient,
-  deletePatient,
-  scanPatientFromQR,
-  validateAnalysis,
-} from "./routes/patients";
 import { authMiddleware, requireAuth } from "./lib/middleware";
-import {
-  createQueueItem,
-  listQueue,
-  assignQueue,
-  claimQueue,
-  releaseQueue,
-  completeQueue,
-  getCollectors,
-} from "./routes/queue";
 
 export function createServer() {
   const app = express();
@@ -105,14 +88,6 @@ export function createServer() {
   app.delete("/api/doctors/:id", requireAuth, deleteDoctor);
   app.post("/api/doctors/:id/verify", requireAuth, verifyDoctor);
 
-  // Patients management (protected)
-  app.get("/api/patients", requireAuth, getPatients);
-  app.post("/api/patients", requireAuth, addPatient);
-  app.put("/api/patients/:id", requireAuth, updatePatient);
-  app.delete("/api/patients/:id", requireAuth, deletePatient);
-  // QR scan and per-analysis validation
-  app.post("/api/patients/scan", requireAuth, scanPatientFromQR);
-  app.patch("/api/patients/:id/analyses/:index", requireAuth, validateAnalysis);
 
   // File upload (protected)
   app.post("/api/upload-files", requireAuth, uploadFiles);
@@ -125,14 +100,6 @@ export function createServer() {
   // Twilio webhook (public)
   app.post("/api/webhook/twilio", webhookTwilio);
 
-  // Queue management
-  app.post("/api/queue", requireAuth, createQueueItem);
-  app.get("/api/queue", requireAuth, listQueue);
-  app.post("/api/queue/:id/assign", requireAuth, assignQueue); // admin assigns
-  app.post("/api/queue/:id/claim", requireAuth, claimQueue); // collector claims
-  app.post("/api/queue/:id/release", requireAuth, releaseQueue);
-  app.post("/api/queue/:id/complete", requireAuth, completeQueue);
-  app.get("/api/collectors", requireAuth, getCollectors);
 
   // Global error handler to ensure consistent JSON errors and avoid response stream issues
   // This will catch errors passed to next(err) or thrown in async route handlers

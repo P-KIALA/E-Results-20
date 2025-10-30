@@ -5,7 +5,6 @@ import DoctorsTab from "@/components/console/DoctorsTab";
 import ResultsTab from "@/components/console/ResultsTab";
 import HistoryTab from "@/components/console/HistoryTab";
 import StatsTab from "@/components/console/StatsTab";
-import PatientsTab from "@/components/console/PatientsTab";
 
 export default function ConsolePage() {
   const [searchParams] = useSearchParams();
@@ -36,9 +35,6 @@ export default function ConsolePage() {
             <DoctorsTab />
           </TabsContent>
 
-          <TabsContent value="patients" className="space-y-6">
-            <PatientsTab />
-          </TabsContent>
 
           <TabsContent value="results" className="space-y-6">
             <ResultsTab />
