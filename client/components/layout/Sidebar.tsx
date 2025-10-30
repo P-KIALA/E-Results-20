@@ -119,6 +119,15 @@ export default function Sidebar() {
             <MapPin size={20} className="flex-shrink-0" />
             {!isMinimized && <span className="font-medium">Sites</span>}
           </Link>
+
+          <Link
+            to="/report"
+            className={navItemClass(isActive("/report"))}
+            title="Rapport"
+          >
+            <BarChart3 size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Rapport</span>}
+          </Link>
         </>
       ) : (
         <>
@@ -129,6 +138,33 @@ export default function Sidebar() {
           >
             <LayoutDashboard size={20} className="flex-shrink-0" />
             {!isMinimized && <span className="font-medium">Envois</span>}
+          </Link>
+
+          <Link
+            to="/history"
+            className={navItemClass(isActive("/history"))}
+            title="Historique"
+          >
+            <Clock size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Historique</span>}
+          </Link>
+
+          <Link
+            to="/stats"
+            className={navItemClass(isActive("/stats"))}
+            title="Statistiques"
+          >
+            <BarChart3 size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Statistiques</span>}
+          </Link>
+
+          <Link
+            to="/report"
+            className={navItemClass(isActive("/report"))}
+            title="Rapport"
+          >
+            <BarChart3 size={20} className="flex-shrink-0" />
+            {!isMinimized && <span className="font-medium">Rapport</span>}
           </Link>
         </>
       )}
