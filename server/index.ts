@@ -82,6 +82,10 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Reports export
+  app.post("/api/reports/export", requireAuth, exportReport);
+  app.get("/api/reports/export", requireAuth, exportReport);
+
   // Doctors management (protected)
   app.get("/api/doctors", requireAuth, getDoctors);
   app.post("/api/doctors", requireAuth, addDoctor);
