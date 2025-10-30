@@ -121,6 +121,7 @@ export function createServer() {
 
   // Debug endpoints (public in dev only)
   app.get("/api/debug/twilio-test", twilioTest);
+  app.post("/api/debug/fix-pending-twilio-auth", fixPendingDueToTwilioAuth);
 
   // Global error handler to ensure consistent JSON errors and avoid response stream issues
   // This will catch errors passed to next(err) or thrown in async route handlers
