@@ -284,6 +284,7 @@ export const sendResults: RequestHandler = async (req, res) => {
 
         // Create send log entry
         let sendLog: any = null;
+        let sendLogId: string | null = null;
         const { data: inserted, error: logError } = await supabase
           .from("send_logs")
           .insert({
@@ -314,6 +315,7 @@ export const sendResults: RequestHandler = async (req, res) => {
         }
 
         sendLog = inserted;
+        sendLogId = inserted?.id || null;
 
         // Get media files if any
         let mediaUrls: string[] = [];
