@@ -26,6 +26,7 @@ import {
   getUserAccessibleSites,
   deleteSite,
 } from "./routes/sites";
+import { exportReport } from "./routes/reports";
 import { createInitialAdmin } from "./routes/seed";
 import { authMiddleware, requireAuth } from "./lib/middleware";
 
