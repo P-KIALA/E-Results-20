@@ -146,12 +146,7 @@ export default function SitesManagement() {
         return;
       }
 
-      const res = await fetch(`/api/sites/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch(`/api/sites/${id}`, { method: "DELETE" });
 
       if (!res.ok) {
         const data = await res
