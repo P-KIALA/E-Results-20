@@ -32,6 +32,9 @@ export async function twilioTestHandler(req: Request, res: Response) {
     });
 
     const text = await resp.text();
+    try {
+      console.log("twilioTestHandler: upstream status", resp.status, "bodyPreview", text && text.toString ? text.toString().slice(0, 500) : text);
+    } catch (_) {}
     let body: any = null;
     try {
       body = JSON.parse(text);
