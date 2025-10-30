@@ -86,16 +86,14 @@ export default function HistoryTab({ active = false, userOnly = false }: History
       params.append("limit", String(pageSize));
       params.append("offset", String((page - 1) * pageSize));
 
-      const token = getToken();
-      if (!token) {
-        throw new Error("No auth token");
+      // If userOnly, limit to current user's sends
+      if (userOnly && user?.id) {
+        params.append("sender_id", user.id);
+      } else if (filterSender) {
+        params.append("sender_id", filterSender);
       }
 
-      const res = await fetch(`/api/send-logs?${params}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch(`/api/send-logs?${params}`);
 
       if (!res.ok) {
         let errMsg = `Failed to fetch logs: ${res.status}`;
