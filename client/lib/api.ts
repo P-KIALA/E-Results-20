@@ -30,6 +30,7 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   if (asStr && asStr.startsWith("/api")) {
     // Try relative path first
     try {
+      try { console.debug("authFetch: attempting relative", { url: asStr, hasAuth: !!baseHeaders.Authorization }); } catch(_) {}
       return await fetch(asStr, defaultOpts);
     } catch (e) {
       lastErr = e;
@@ -38,6 +39,7 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
           url: asStr,
           err: String(e),
           online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
+          hasAuth: !!baseHeaders.Authorization,
         });
       } catch (_) {}
     }
