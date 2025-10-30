@@ -114,6 +114,9 @@ export function createServer() {
   // Infobip webhook (public)
   app.post("/api/webhook/infobip", webhookInfobip);
 
+  // Debug endpoints (public in dev only)
+  app.get("/api/debug/twilio-test", twilioTest);
+
   // Global error handler to ensure consistent JSON errors and avoid response stream issues
   // This will catch errors passed to next(err) or thrown in async route handlers
   // and ensure we send a single JSON response.
