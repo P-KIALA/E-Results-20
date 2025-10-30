@@ -12,6 +12,17 @@ export async function twilioTestHandler(req: Request, res: Response) {
 
     const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}.json`;
 
+    // Log presence of Twilio env vars (do not log values)
+    try {
+      console.log("twilioTestHandler: env presence", {
+        hasSid: !!sid,
+        sidLength: sid ? sid.length : 0,
+        hasToken: !!token,
+        tokenLength: token ? token.length : 0,
+        hasPhone: !!process.env.TWILIO_PHONE_NUMBER,
+      });
+    } catch (_) {}
+
     const resp = await fetch(url, {
       method: "GET",
       headers: {
