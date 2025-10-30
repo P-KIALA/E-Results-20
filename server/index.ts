@@ -37,6 +37,21 @@ import { authMiddleware, requireAuth } from "./lib/middleware";
 export function createServer() {
   const app = express();
 
+  // Instrument route registration to log each registered path (helps detect malformed routes)
+  const methodsToWrap = ["get", "post", "put", "delete", "all", "patch"];
+  methodsToWrap.forEach((m) => {
+    // @ts-ignore
+    const orig = app[m];
+    // @ts-ignore
+    app[m] = function (path: any, ...args: any[]) {
+      try {
+        console.log(`[ROUTE REGISTER] ${m.toUpperCase()} ${String(path)}`);
+      } catch (e) {}
+      // @ts-ignore
+      return orig.call(this, path, ...args);
+    } as any;
+  });
+
   // Middleware
   // Configure CORS to explicitly allow requests from the app base URL and common embed/origin hosts
   // For development/embed environments (Builder.io), accept builder origins as well.
