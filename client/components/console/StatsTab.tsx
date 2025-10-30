@@ -96,11 +96,7 @@ export default function StatsTab({ userOnly = false }: { userOnly?: boolean }) {
       const logs = data.logs || [];
 
       // Fetch all sites
-      const sitesRes = await fetch("/api/sites", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const sitesRes = await authFetch("/api/sites");
 
       if (!sitesRes.ok) {
         const errorData = await sitesRes
