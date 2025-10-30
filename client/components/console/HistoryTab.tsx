@@ -56,11 +56,7 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
   const fetchDoctors = useCallback(async () => {
     try {
       const token = getToken();
-      const res = await fetch("/api/doctors", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch("/api/doctors");
       if (!res.ok) throw new Error("Failed to fetch doctors");
       const data = await res.json();
       setDoctors(data.doctors || []);
