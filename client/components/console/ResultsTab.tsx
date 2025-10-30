@@ -42,12 +42,7 @@ export default function ResultsTab() {
 
   const fetchDoctors = async () => {
     try {
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/doctors", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch("/api/doctors");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setDoctors(
