@@ -156,6 +156,9 @@ export function createServer() {
   // Debug: simulate sending a result without external provider (useful for testing)
   app.post("/api/debug/send-test", sendTest);
 
+  // Twilio connectivity test (protected)
+  app.get("/api/debug/twilio-test", requireAuth, twilioTestHandler);
+
   // Server-side proxy to forward requests from embedded clients (iframes) to the app base URL.
   // Example: client calls /api/proxy/send-logs -> server forwards to APP_BASE_URL/api/send-logs
   app.all("/api/proxy/*", requireAuth, proxyHandler);
