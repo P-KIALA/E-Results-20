@@ -24,6 +24,7 @@ import {
   RefreshCw,
   Pencil,
 } from "lucide-react";
+import { authFetch } from "@/lib/api";
 
 export default function DoctorsTab() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
