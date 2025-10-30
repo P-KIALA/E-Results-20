@@ -65,13 +65,8 @@ export default function UserDashboard() {
 
     setAddingDoctor(true);
     try {
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/doctors", {
+      const res = await authFetch("/api/doctors", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({
           name: newDoctor.name,
           phone: newDoctor.phone,
