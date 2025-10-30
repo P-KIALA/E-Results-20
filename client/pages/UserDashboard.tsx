@@ -37,6 +37,13 @@ export default function UserDashboard() {
     phone: "",
     specialization: "",
   });
+  // Extra arbitrary recipient numbers (comma/newline separated)
+  const [extraRecipients, setExtraRecipients] = useState("");
+  const parseExtraRecipients = () =>
+    extraRecipients
+      .split(/[\n,;]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
 
   useEffect(() => {
     fetchDoctors();
@@ -175,8 +182,10 @@ export default function UserDashboard() {
   };
 
   const handleSend = async () => {
-    if (selectedDoctors.length === 0) {
-      setMessage({ type: "error", text: "Sélectionnez au moins un médecin" });
+    const parsedExtras = parseExtraRecipients();
+
+    if (selectedDoctors.length === 0 && parsedExtras.length === 0) {
+      setMessage({ type: "error", text: "Sélectionnez au moins un médecin ou ajoutez un numéro" });
       return;
     }
 
@@ -210,6 +219,7 @@ export default function UserDashboard() {
           file_ids: uploadedFileIds,
           patient_name: patientName || undefined,
           patient_site: patientSite || undefined,
+          extra_numbers: parseExtraRecipients(),
         }),
       });
 
@@ -230,6 +240,7 @@ export default function UserDashboard() {
         "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
       );
       setUploadedFileIds([]);
+      setExtraRecipients("");
     } catch (error) {
       setMessage({ type: "error", text: `Erreur: ${String(error)}` });
     } finally {
@@ -255,6 +266,21 @@ export default function UserDashboard() {
           {message.text}
         </div>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Destinataires supplémentaires</CardTitle>
+          <CardDescription>Ajoutez des numéros (un par ligne ou séparés par des virgules)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="+243821234567\n+33712345678"
+            value={extraRecipients}
+            onChange={(e) => setExtraRecipients(e.target.value)}
+            className="w-full"
+          />
+        </CardContent>
+      </Card>
 
       {user?.permissions?.includes("manage_doctors") && (
         <Card className="border-primary/20 bg-primary/5">
