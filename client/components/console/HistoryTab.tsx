@@ -59,16 +59,14 @@ export default function HistoryTab({
           headers["Content-Type"] = "application/json";
         }
         if (token) headers["Authorization"] = `Bearer ${token}`;
-        const absolute = `${window.location.origin}${path}`;
+
+        // Try relative path first (works in iframe), then absolute
         try {
-          return await fetch(absolute, { ...init, headers } as RequestInit);
+          return await fetch(path, { ...init, headers } as RequestInit);
         } catch (e) {
           try {
-            const topOrigin = window.top && window.top.location && window.top.location.origin ? window.top.location.origin : null;
-            if (topOrigin && topOrigin !== window.location.origin) {
-              const topAbsolute = `${topOrigin}${path}`;
-              return await fetch(topAbsolute, { ...init, headers } as RequestInit);
-            }
+            const absolute = `${window.location.origin}${path}`;
+            return await fetch(absolute, { ...init, headers } as RequestInit);
           } catch (_) {}
           throw e;
         }

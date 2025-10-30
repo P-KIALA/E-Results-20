@@ -28,27 +28,17 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   const asStr = typeof input === "string" ? input : (input as Request).url;
 
   if (asStr && asStr.startsWith("/api")) {
-    // Try relative path first
+    // Try relative path first (works best in iframe and direct access)
     try {
-      try { console.debug("authFetch: attempting relative", { url: asStr, hasAuth: !!baseHeaders.Authorization }); } catch(_) {}
       return await fetch(asStr, defaultOpts);
     } catch (e) {
       lastErr = e;
-      try {
-        console.warn("authFetch: relative fetch failed", {
-          url: asStr,
-          err: String(e),
-          online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
-          hasAuth: !!baseHeaders.Authorization,
-        });
-      } catch (_) {}
     }
 
     // Try absolute using current origin
     try {
       const origin = window.location && window.location.origin ? window.location.origin : "";
       const absolute = `${origin}${asStr}`;
-      try { console.debug("authFetch: attempting absolute", { url: absolute, hasAuth: !!baseHeaders.Authorization }); } catch(_) {}
       return await fetch(absolute, defaultOpts);
     } catch (e) {
       lastErr = e;
@@ -57,37 +47,13 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
           url: asStr,
           err: String(e),
           online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
-          hasAuth: !!baseHeaders.Authorization,
         });
-      } catch (_) {}
-    }
-
-    // If inside an iframe, try parent/top origin (useful for embedded preview environments)
-    try {
-      const topOrigin = window.top && window.top.location && window.top.location.origin ? window.top.location.origin : null;
-      if (topOrigin && topOrigin !== (window.location && window.location.origin)) {
-        try {
-          const topAbsolute = `${topOrigin}${asStr}`;
-          try { console.debug("authFetch: attempting topOrigin", { url: topAbsolute, topOrigin, hasAuth: !!baseHeaders.Authorization }); } catch(_) {}
-          return await fetch(topAbsolute, defaultOpts);
-        } catch (e2) {
-          lastErr = e2;
-          try {
-            console.warn("authFetch: top origin fetch failed", { url: asStr, topOrigin, err: String(e2), hasAuth: !!baseHeaders.Authorization });
-          } catch (_) {}
-        }
-      }
-    } catch (e) {
-      // Accessing window.top may throw in cross-origin iframes - ignore
-      try {
-        console.warn("authFetch: could not access window.top", { err: String(e) });
       } catch (_) {}
     }
 
     // Netlify functions fallback
     try {
       const fallback = `/.netlify/functions/api${asStr.replace(/^\/api/, "")}`;
-      try { console.debug("authFetch: attempting netlify fallback", { url: fallback, hasAuth: !!baseHeaders.Authorization }); } catch(_) {}
       return await fetch(fallback, defaultOpts);
     } catch (e) {
       lastErr = e;
@@ -97,7 +63,6 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
           fallback,
           err: String(e),
           online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
-          hasAuth: !!baseHeaders.Authorization,
         });
       } catch (_) {}
     }
