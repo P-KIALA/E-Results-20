@@ -183,7 +183,15 @@ export function createServer() {
 
   // Server-side proxy to forward requests from embedded clients (iframes) to the app base URL.
   // Example: client calls /api/proxy/send-logs -> server forwards to APP_BASE_URL/api/send-logs
-  app.all("/api/proxy/*", requireAuth, proxyHandler);
+  // Use app.use for proxy to avoid path-to-regexp complications with wildcards
+  app.use(
+    "/api/proxy",
+    requireAuth,
+    (req: any, res: any, next: any) => {
+      // proxyHandler returns a Promise; ensure errors are forwarded to next
+      Promise.resolve(proxyHandler(req, res)).catch(next);
+    },
+  );
 
   // Global error handler to ensure consistent JSON errors and avoid response stream issues
   // This will catch errors passed to next(err) or thrown in async route handlers
