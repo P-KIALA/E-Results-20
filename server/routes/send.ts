@@ -331,6 +331,17 @@ export const sendResults: RequestHandler = async (req, res) => {
         } catch (e) {
           console.error(`Error sending to doctor ${doctor_id}:`, error);
         }
+        // Mark send_log as failed with error message
+        try {
+          if (sendLog && sendLog.id) {
+            await supabase
+              .from("send_logs")
+              .update({ status: "failed", error_message: String(error) })
+              .eq("id", sendLog.id);
+          }
+        } catch (updateErr) {
+          console.error("Failed to update send_log status to failed:", updateErr);
+        }
         results.push({
           doctor_id,
           success: false,
