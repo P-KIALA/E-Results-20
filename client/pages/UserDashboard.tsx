@@ -48,12 +48,7 @@ export default function UserDashboard() {
 
   const fetchDoctors = async () => {
     try {
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/doctors", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch("/api/doctors");
       const data = await res.json();
       setDoctors(data.doctors?.filter((d: any) => d.whatsapp_verified) || []);
     } catch (error) {
