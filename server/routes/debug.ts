@@ -35,3 +35,24 @@ export const twilioTest: RequestHandler = async (_req, res) => {
     res.status(500).json({ error: error?.message || String(error) });
   }
 };
+
+export const fixPendingDueToTwilioAuth: RequestHandler = async (_req, res) => {
+  try {
+    // Update pending send_logs with no provider id to failed with a clear message
+    const { error, data } = await (await import("../lib/supabase")).supabase
+      .from("send_logs")
+      .update({ status: "failed", error_message: "Twilio authentication failed. Please verify credentials." })
+      .is("twilio_message_sid", null)
+      .eq("status", "pending");
+
+    if (error) {
+      console.error("fixPendingDueToTwilioAuth - update error:", error);
+      return res.status(500).json({ success: false, error: error.message || String(error) });
+    }
+
+    return res.json({ success: true, updated: (data || []).length });
+  } catch (error: any) {
+    console.error("fixPendingDueToTwilioAuth error:", error);
+    res.status(500).json({ success: false, error: error?.message || String(error) });
+  }
+};
