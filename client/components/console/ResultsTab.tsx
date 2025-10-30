@@ -92,13 +92,8 @@ export default function ResultsTab() {
         }),
       );
 
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/upload-files", {
+      const res = await authFetch("/api/upload-files", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ files: fileDataList }),
       });
 
