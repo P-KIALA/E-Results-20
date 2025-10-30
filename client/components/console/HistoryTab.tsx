@@ -15,9 +15,10 @@ import { authFetch } from "@/lib/api";
 
 interface HistoryTabProps {
   active?: boolean;
+  userOnly?: boolean; // if true, only show current user's history and limit filters
 }
 
-export default function HistoryTab({ active = false }: HistoryTabProps) {
+export default function HistoryTab({ active = false, userOnly = false }: HistoryTabProps) {
   const { user } = useAuth();
   const [logs, setLogs] = useState<(SendLogEntry & { doctors?: any })[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -39,12 +40,7 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
 
   const fetchSites = useCallback(async () => {
     try {
-      const token = getToken();
-      const res = await fetch("/api/sites", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch("/api/sites");
       if (!res.ok) throw new Error("Failed to fetch sites");
       const data = await res.json();
       setSites(data.sites || []);
@@ -55,7 +51,6 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
 
   const fetchDoctors = useCallback(async () => {
     try {
-      const token = getToken();
       const res = await authFetch("/api/doctors");
       if (!res.ok) throw new Error("Failed to fetch doctors");
       const data = await res.json();
@@ -67,10 +62,7 @@ export default function HistoryTab({ active = false }: HistoryTabProps) {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const token = getToken();
-      const res = await fetch("/api/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await authFetch("/api/users");
       if (!res.ok) throw new Error("Failed to fetch users");
       const data = await res.json();
       setUsers(data.users || []);
