@@ -58,6 +58,27 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       } catch (_) {}
     }
 
+    // If inside an iframe, try parent/top origin (useful for embedded preview environments)
+    try {
+      const topOrigin = window.top && window.top.location && window.top.location.origin ? window.top.location.origin : null;
+      if (topOrigin && topOrigin !== (window.location && window.location.origin)) {
+        try {
+          const topAbsolute = `${topOrigin}${asStr}`;
+          return await fetch(topAbsolute, defaultOpts);
+        } catch (e2) {
+          lastErr = e2;
+          try {
+            console.warn("authFetch: top origin fetch failed", { url: asStr, topOrigin, err: String(e2) });
+          } catch (_) {}
+        }
+      }
+    } catch (e) {
+      // Accessing window.top may throw in cross-origin iframes - ignore
+      try {
+        console.warn("authFetch: could not access window.top", { err: String(e) });
+      } catch (_) {}
+    }
+
     // Netlify functions fallback
     try {
       const fallback = `/.netlify/functions/api${asStr.replace(/^\/api/, "")}`;
