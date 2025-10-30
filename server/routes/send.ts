@@ -12,6 +12,13 @@ const twilioClient = twilio(
   process.env.TWILIO_AUTH_TOKEN,
 );
 
+function buildTwilioParams(to: string): any {
+  if (process.env.TWILIO_MESSAGING_SERVICE_SID) {
+    return { messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID, to: `whatsapp:${to}` };
+  }
+  return { from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`, to: `whatsapp:${to}` };
+}
+
 async function sendViaWhatsApp(
   to: string,
   message: string,
@@ -78,11 +85,10 @@ async function sendViaWhatsApp(
 
     if (!mediaUrls || mediaUrls.length === 0) {
       const msgParams: any = {
-        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-        to: `whatsapp:${to}`,
-        body: message,
-      };
-      if (statusCallbackUrl) msgParams.statusCallback = statusCallbackUrl;
+      ...buildTwilioParams(to),
+      body: message,
+      ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
+    };
 
       const result = await twilioClient.messages.create(msgParams);
 
@@ -92,12 +98,11 @@ async function sendViaWhatsApp(
 
     // Send first message with body + first media
     const firstParams: any = {
-      from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-      to: `whatsapp:${to}`,
-      body: message,
-      mediaUrl: [mediaUrls[0]],
-    };
-    if (statusCallbackUrl) firstParams.statusCallback = statusCallbackUrl;
+    ...buildTwilioParams(to),
+    body: message,
+    mediaUrl: [mediaUrls[0]],
+    ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
+  };
 
     const firstResult = await twilioClient.messages.create(firstParams);
     console.log(`Message with first media sent to ${to}: ${firstResult.sid}`);
@@ -106,11 +111,10 @@ async function sendViaWhatsApp(
     for (let i = 1; i < mediaUrls.length; i++) {
       try {
         const msgParams: any = {
-          from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-          to: `whatsapp:${to}`,
+          ...buildTwilioParams(to),
           mediaUrl: [mediaUrls[i]],
+          ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
         };
-        if (statusCallbackUrl) msgParams.statusCallback = statusCallbackUrl;
 
         const res = await twilioClient.messages.create(msgParams);
         console.log(`Additional media ${i + 1} sent to ${to}: ${res.sid}`);
