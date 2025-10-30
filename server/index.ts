@@ -110,6 +110,8 @@ export function createServer() {
 
   // Twilio webhook (public)
   app.post("/api/webhook/twilio", webhookTwilio);
+  // Infobip webhook (public)
+  app.post("/api/webhook/infobip", webhookInfobip);
 
   // Global error handler to ensure consistent JSON errors and avoid response stream issues
   // This will catch errors passed to next(err) or thrown in async route handlers
