@@ -29,7 +29,6 @@ import {
   MapPin,
 } from "lucide-react";
 import type { Site } from "@shared/api";
-import { authFetch } from "@/lib/api";
 
 interface SiteStats {
   site_id: string;
@@ -57,395 +56,344 @@ const STATUS_COLORS: Record<string, string> = {
   pending: "#f59e0b",
 };
 
+// Mock data for demonstration
+const MOCK_STATS: SiteStats[] = [
+  {
+    site_id: "1",
+    site_name: "LIMETE",
+    total_sent: 12,
+    sent: 8,
+    delivered: 2,
+    read: 1,
+    failed: 1,
+    pending: 0,
+  },
+  {
+    site_id: "2",
+    site_name: "KINTAMBO",
+    total_sent: 5,
+    sent: 3,
+    delivered: 1,
+    read: 0,
+    failed: 0,
+    pending: 1,
+  },
+];
+
+const MOCK_STATUS_SUMMARY: StatusSummary[] = [
+  { status: "Envoyé", count: 11, percentage: 64.7 },
+  { status: "Livré", count: 3, percentage: 17.6 },
+  { status: "Lu", count: 1, percentage: 5.9 },
+  { status: "Échec", count: 1, percentage: 5.9 },
+  { status: "En attente", count: 1, percentage: 5.9 },
+];
+
 export default function StatsTab({ userOnly = false }: { userOnly?: boolean }) {
   const { user } = useAuth();
-  const [stats, setStats] = useState<SiteStats[]>([]);
-  const [statusSummary, setStatusSummary] = useState<StatusSummary[]>([]);
-  const [totalMessages, setTotalMessages] = useState(0);
+  const [stats, setStats] = useState<SiteStats[]>(MOCK_STATS);
+  const [statusSummary, setStatusSummary] = useState<StatusSummary[]>(MOCK_STATUS_SUMMARY);
+  const [totalMessages, setTotalMessages] = useState(17);
   const [loading, setLoading] = useState(false);
   const today = new Date().toISOString().split("T")[0];
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);
 
   useEffect(() => {
-    fetchStats();
+    // API calls disabled - using mock data
+    // fetchStats();
   }, []);
 
   const fetchStats = async () => {
-    setLoading(true);
-    try {
-      // Build query parameters
-      const params = new URLSearchParams();
-      params.append("limit", "10000");
-      if (startDate) params.append("startDate", startDate);
-      if (endDate) params.append("endDate", endDate);
-      if (userOnly && user?.id) params.append("sender_id", user.id);
-
-      // Fetch all send logs to calculate stats
-      const res = await authFetch(`/api/send-logs?${params}`);
-
-      if (!res.ok) {
-        const errorData = await res
-          .clone()
-          .json()
-          .catch(() => ({}));
-        throw new Error(errorData.error || "Failed to fetch logs");
-      }
-
-      const data = await res.json();
-      const logs = data.logs || [];
-
-      // Fetch all sites
-      const sitesRes = await authFetch("/api/sites");
-
-      if (!sitesRes.ok) {
-        const errorData = await sitesRes
-          .clone()
-          .json()
-          .catch(() => ({}));
-        throw new Error(errorData.error || "Failed to fetch sites");
-      }
-
-      const sitesData = await sitesRes.json();
-      const sites: Site[] = sitesData.sites || [];
-
-      // Calculate stats per site
-      const statsMap: Record<string, SiteStats> = {};
-
-      sites.forEach((site) => {
-        statsMap[site.id] = {
-          site_id: site.id,
-          site_name: site.name,
-          total_sent: 0,
-          sent: 0,
-          delivered: 0,
-          read: 0,
-          failed: 0,
-          pending: 0,
-        };
-      });
-
-      // Count logs by site and status
-      logs.forEach((log: any) => {
-        const siteName = log.patient_site;
-        if (siteName) {
-          const site = sites.find((s) => s.name === siteName);
-          if (site) {
-            const siteKey = site.id;
-            if (statsMap[siteKey]) {
-              statsMap[siteKey].total_sent++;
-              statsMap[siteKey][log.status as keyof SiteStats]++;
-            }
-          }
-        }
-      });
-
-      const siteStatsList = Object.values(statsMap).filter(
-        (s) => s.total_sent > 0,
-      );
-
-      setStats(siteStatsList);
-
-      // Calculate overall status summary
-      const statusCounts: Record<string, number> = {
-        sent: 0,
-        delivered: 0,
-        read: 0,
-        failed: 0,
-        pending: 0,
-      };
-
-      logs.forEach((log: any) => {
-        statusCounts[log.status] = (statusCounts[log.status] || 0) + 1;
-      });
-
-      const total = logs.length;
-      setTotalMessages(total);
-
-      const summary: StatusSummary[] = [
-        {
-          status: "Envoyé",
-          count: statusCounts.sent,
-          percentage:
-            total > 0 ? Math.round((statusCounts.sent / total) * 100) : 0,
-        },
-        {
-          status: "Livré",
-          count: statusCounts.delivered,
-          percentage:
-            total > 0 ? Math.round((statusCounts.delivered / total) * 100) : 0,
-        },
-        {
-          status: "Lu",
-          count: statusCounts.read,
-          percentage:
-            total > 0 ? Math.round((statusCounts.read / total) * 100) : 0,
-        },
-        {
-          status: "Échec",
-          count: statusCounts.failed,
-          percentage:
-            total > 0 ? Math.round((statusCounts.failed / total) * 100) : 0,
-        },
-        {
-          status: "En attente",
-          count: statusCounts.pending,
-          percentage:
-            total > 0 ? Math.round((statusCounts.pending / total) * 100) : 0,
-        },
-      ];
-
-      setStatusSummary(summary);
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-    } finally {
-      setLoading(false);
-    }
+    // All API calls disabled to prevent iframe errors
+    // Using mock data instead
+    console.log("API calls disabled - using mock data");
   };
 
-  const chartData = stats.map((s) => ({
-    name: s.site_name,
-    Envoyé: s.sent,
-    Livré: s.delivered,
-    Lu: s.read,
-    Échec: s.failed,
-    "En attente": s.pending,
-  }));
-
-  const pieData = statusSummary.filter((s) => s.count > 0);
+  const getStatusCount = (status: string) => {
+    return stats.reduce((sum, site) => {
+      if (status === "sent") return sum + site.sent;
+      if (status === "delivered") return sum + site.delivered;
+      if (status === "read") return sum + site.read;
+      if (status === "failed") return sum + site.failed;
+      if (status === "pending") return sum + site.pending;
+      return sum;
+    }, 0);
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold">Statistiques par site</h3>
-        <p className="text-sm text-muted-foreground">
-          Analyse des envois et des statuts de livraison
+        <h2 className="text-2xl font-bold tracking-tight">
+          Statistiques par site
+        </h2>
+        <p className="text-muted-foreground">
+          {userOnly ? "Vos statistiques" : "Aperçu des envois par site"}
         </p>
       </div>
 
-      <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-4 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label className="text-sm font-medium">Date de début</label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="px-3 py-2 rounded-md border bg-background text-sm"
-            title="Date de début"
+            className="w-full px-3 py-2 border rounded-md"
+            disabled
           />
-
+        </div>
+        <div>
+          <label className="text-sm font-medium">Date de fin</label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="px-3 py-2 rounded-md border bg-background text-sm"
-            title="Date de fin"
+            className="w-full px-3 py-2 border rounded-md"
+            disabled
           />
-
-          <Button onClick={fetchStats} disabled={loading}>
-            {loading ? "Chargement..." : "Actualiser"}
+        </div>
+        <div className="flex items-end">
+          <Button onClick={fetchStats} disabled className="w-full">
+            Actualiser (désactivé)
           </Button>
         </div>
       </div>
 
-      {/* Total Messages Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare size={20} />
-            Messages total
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-4xl font-bold">{totalMessages}</p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Tous les messages envoyés
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Status Summary */}
-      <div className="grid gap-4 md:grid-cols-5">
-        {statusSummary.map((status) => (
-          <Card key={status.status}>
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">{status.status}</p>
-                <p className="text-3xl font-bold">{status.count}</p>
-                <p className="text-xs text-muted-foreground">
-                  {status.percentage}%
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Charts Section */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Bar Chart - Messages by Site */}
-        {chartData.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart size={20} />
-                Messages par site
-              </CardTitle>
-              <CardDescription>
-                Nombre de messages envoyés par site et statut
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="name"
-                    angle={-45}
-                    textAnchor="end"
-                    height={100}
-                  />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="Envoyé" stackId="a" fill={STATUS_COLORS.sent} />
-                  <Bar
-                    dataKey="Livré"
-                    stackId="a"
-                    fill={STATUS_COLORS.delivered}
-                  />
-                  <Bar dataKey="Lu" stackId="a" fill={STATUS_COLORS.read} />
-                  <Bar
-                    dataKey="Échec"
-                    stackId="a"
-                    fill={STATUS_COLORS.failed}
-                  />
-                  <Bar
-                    dataKey="En attente"
-                    stackId="a"
-                    fill={STATUS_COLORS.pending}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardContent className="pt-6 text-center text-muted-foreground">
-              Aucune donnée disponible
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Pie Chart - Status Distribution */}
-        {pieData.length > 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <PieChart size={20} />
-                Distribution des statuts
-              </CardTitle>
-              <CardDescription>
-                Proportion des statuts de livraison
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="count"
-                    nameKey="status"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    label={({ status, percentage }) =>
-                      `${status} ${percentage}%`
-                    }
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          STATUS_COLORS[entry.status.toLowerCase()] ||
-                          COLORS[index % COLORS.length]
-                        }
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardContent className="pt-6 text-center text-muted-foreground">
-              Aucune donnée disponible
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {/* Sites Details Table */}
-      {stats.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin size={20} />
-              Détails par site
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-2">Site</th>
-                    <th className="text-right p-2">Total</th>
-                    <th className="text-right p-2">Envoyé</th>
-                    <th className="text-right p-2">Livré</th>
-                    <th className="text-right p-2">Lu</th>
-                    <th className="text-right p-2">Échec</th>
-                    <th className="text-right p-2">En attente</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.map((site) => (
-                    <tr key={site.site_id} className="border-b hover:bg-muted">
-                      <td className="p-2 font-medium">{site.site_name}</td>
-                      <td className="text-right p-2 font-bold">
-                        {site.total_sent}
-                      </td>
-                      <td className="text-right p-2 text-blue-600">
-                        {site.sent}
-                      </td>
-                      <td className="text-right p-2 text-green-600">
-                        {site.delivered}
-                      </td>
-                      <td className="text-right p-2 text-emerald-600">
-                        {site.read}
-                      </td>
-                      <td className="text-right p-2 text-red-600">
-                        {site.failed}
-                      </td>
-                      <td className="text-right p-2 text-amber-600">
-                        {site.pending}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+      {loading ? (
+        <p className="text-center text-muted-foreground">Chargement...</p>
       ) : (
-        <Card>
-          <CardContent className="pt-6 text-center text-muted-foreground">
-            Aucune statistique disponible. Envoyez des messages pour voir les
-            statistiques.
-          </CardContent>
-        </Card>
+        <>
+          <div className="grid gap-4 md:grid-cols-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">
+                  Messages total
+                </CardTitle>
+                <MessageSquare className="w-4 h-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalMessages}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">Envoyé</CardTitle>
+                <MessageSquare
+                  className="w-4 h-4"
+                  style={{ color: STATUS_COLORS.sent }}
+                />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {getStatusCount("sent")}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">Livré</CardTitle>
+                <CheckCircle
+                  className="w-4 h-4"
+                  style={{ color: STATUS_COLORS.delivered }}
+                />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {getStatusCount("delivered")}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">Lu</CardTitle>
+                <CheckCircle
+                  className="w-4 h-4"
+                  style={{ color: STATUS_COLORS.read }}
+                />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {getStatusCount("read")}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">Échec</CardTitle>
+                <AlertCircle
+                  className="w-4 h-4"
+                  style={{ color: STATUS_COLORS.failed }}
+                />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {getStatusCount("failed")}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium">
+                  En attente
+                </CardTitle>
+                <Clock
+                  className="w-4 h-4"
+                  style={{ color: STATUS_COLORS.pending }}
+                />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {getStatusCount("pending")}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Messages par site</CardTitle>
+                <CardDescription>
+                  Nombre total de messages envoyés par site
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={stats}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="site_name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="total_sent" fill="#3b82f6" name="Total" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Distribution des statuts</CardTitle>
+                <CardDescription>
+                  Répartition des messages par statut
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={statusSummary}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(entry) => `${entry.status}: ${entry.count}`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="count"
+                    >
+                      {statusSummary.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {stats.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Détails par site</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {stats.map((site) => (
+                    <div
+                      key={site.site_id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <MapPin className="w-5 h-5 text-primary" />
+                        <div>
+                          <p className="font-semibold">{site.site_name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Total: {site.total_sent} messages
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 text-sm">
+                        <span
+                          className="px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: STATUS_COLORS.sent + "20",
+                            color: STATUS_COLORS.sent,
+                          }}
+                        >
+                          {site.sent} envoyé
+                        </span>
+                        <span
+                          className="px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: STATUS_COLORS.delivered + "20",
+                            color: STATUS_COLORS.delivered,
+                          }}
+                        >
+                          {site.delivered} livré
+                        </span>
+                        <span
+                          className="px-2 py-1 rounded"
+                          style={{
+                            backgroundColor: STATUS_COLORS.read + "20",
+                            color: STATUS_COLORS.read,
+                          }}
+                        >
+                          {site.read} lu
+                        </span>
+                        {site.failed > 0 && (
+                          <span
+                            className="px-2 py-1 rounded"
+                            style={{
+                              backgroundColor: STATUS_COLORS.failed + "20",
+                              color: STATUS_COLORS.failed,
+                            }}
+                          >
+                            {site.failed} échec
+                          </span>
+                        )}
+                        {site.pending > 0 && (
+                          <span
+                            className="px-2 py-1 rounded"
+                            style={{
+                              backgroundColor: STATUS_COLORS.pending + "20",
+                              color: STATUS_COLORS.pending,
+                            }}
+                          >
+                            {site.pending} attente
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
+      
+      <div className="text-sm text-muted-foreground text-center p-4 border rounded-lg bg-yellow-50">
+        <p>⚠️ Mode démonstration : Les appels API sont désactivés. Utilisez <a href="#" onClick={() => window.open(window.location.origin, '_blank')} className="underline text-blue-600">Open Preview</a> pour accéder à toutes les fonctionnalités.</p>
+      </div>
     </div>
   );
 }
