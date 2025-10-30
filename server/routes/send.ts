@@ -65,6 +65,13 @@ async function sendViaWhatsApp(
     // If multiple media are provided, send the first media with the message body,
     // then send each remaining media as a separate message (without body).
 
+    const allowFallbackToTwilio = process.env.FALLBACK_TO_TWILIO !== "false";
+
+    if (!allowFallbackToTwilio) {
+      // If fallback is disabled and we reach here, it means other providers failed.
+      throw new Error("All providers failed and fallback to Twilio is disabled");
+    }
+
     const statusCallbackUrl = process.env.APP_BASE_URL
       ? `${process.env.APP_BASE_URL.replace(/\/$/, "")}/api/webhook/twilio`
       : process.env.TWILIO_STATUS_CALLBACK_URL || undefined;
