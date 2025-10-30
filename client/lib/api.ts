@@ -10,35 +10,42 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
 
   const opts = { ...init, headers };
 
-  // Try primary fetch, then fallbacks for Netlify functions or absolute origin
+  // Try absolute origin first for relative API paths, then try relative, then Netlify function fallback.
   let lastErr: any = null;
-  try {
-    return await fetch(input, opts as RequestInit);
-  } catch (err) {
-    lastErr = err;
-  }
+  const asStr = typeof input === "string" ? input : (input as Request).url;
 
   try {
-    const asStr = typeof input === "string" ? input : (input as Request).url;
     if (asStr && asStr.startsWith("/api")) {
+      const origin = window.location.origin;
+      const absolute = `${origin}${asStr}`;
+      try {
+        return await fetch(absolute, opts as RequestInit);
+      } catch (e) {
+        lastErr = e;
+        console.warn("authFetch: absolute fetch failed", { url: absolute, err: e });
+      }
+
+      try {
+        return await fetch(asStr, opts as RequestInit);
+      } catch (e) {
+        lastErr = e;
+        console.warn("authFetch: relative fetch failed", { url: asStr, err: e });
+      }
+
       const fallback = `/.netlify/functions/api${asStr.replace(/^\/api/, "")}`;
       try {
         return await fetch(fallback, opts as RequestInit);
       } catch (e) {
         lastErr = e;
+        console.warn("authFetch: netlify fallback failed", { url: fallback, err: e });
       }
-
-      try {
-        const origin = window.location.origin;
-        const absolute = `${origin}${asStr}`;
-        return await fetch(absolute, opts as RequestInit);
-      } catch (e) {
-        lastErr = e;
-      }
+    } else {
+      return await fetch(input, opts as RequestInit);
     }
-  } catch (e) {
-    lastErr = e;
+  } catch (err) {
+    lastErr = err;
   }
 
+  console.error("authFetch: all fetch attempts failed", { input: asStr, opts, lastErr });
   throw lastErr || new Error("Network request failed");
 }
