@@ -158,6 +158,9 @@ export function createServer() {
 
   // Twilio connectivity test (protected)
   app.get("/api/debug/twilio-test", requireAuth, twilioTestHandler);
+  // Public (dev) twilio connectivity test - useful for quick checks when embedding/testing
+  // WARNING: This endpoint is intentionally public for development convenience; remove or protect in production.
+  app.get("/api/debug/twilio-test-public", twilioTestHandler);
 
   // Server-side proxy to forward requests from embedded clients (iframes) to the app base URL.
   // Example: client calls /api/proxy/send-logs -> server forwards to APP_BASE_URL/api/send-logs
