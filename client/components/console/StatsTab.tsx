@@ -56,7 +56,7 @@ const STATUS_COLORS: Record<string, string> = {
   pending: "#f59e0b",
 };
 
-export default function StatsTab() {
+export default function StatsTab({ userOnly = false }: { userOnly?: boolean }) {
   const { user } = useAuth();
   const [stats, setStats] = useState<SiteStats[]>([]);
   const [statusSummary, setStatusSummary] = useState<StatusSummary[]>([]);
@@ -73,24 +73,15 @@ export default function StatsTab() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        console.error("No auth token found");
-        return;
-      }
-
       // Build query parameters
       const params = new URLSearchParams();
       params.append("limit", "10000");
       if (startDate) params.append("startDate", startDate);
       if (endDate) params.append("endDate", endDate);
+      if (userOnly && user?.id) params.append("sender_id", user.id);
 
       // Fetch all send logs to calculate stats
-      const res = await fetch(`/api/send-logs?${params}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch(`/api/send-logs?${params}`);
 
       if (!res.ok) {
         const errorData = await res
