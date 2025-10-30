@@ -93,11 +93,7 @@ export default function DoctorsTab() {
         });
         return;
       }
-      const res = await fetch("/api/doctors", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch("/api/doctors");
       const parsed = await readResponse(res);
       if (!parsed.ok) {
         throw new Error(parsed.json?.error || parsed.text || "Failed to fetch doctors");
