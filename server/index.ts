@@ -15,7 +15,7 @@ import {
   webhookTwilio,
   webhookInfobip,
 } from "./routes/send";
-import { twilioTest } from "./routes/debug";
+import { twilioTest, fixPendingDueToTwilioAuth } from "./routes/debug";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import {
   login,
