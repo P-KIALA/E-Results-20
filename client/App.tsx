@@ -131,6 +131,39 @@ const App = () => (
                   </Layout>
                 }
               />
+
+              <Route
+                path="/history"
+                element={
+                  <Layout>
+                    <ProtectedRoute>
+                      <HistoryPage />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
+
+              <Route
+                path="/stats"
+                element={
+                  <Layout>
+                    <ProtectedRoute>
+                      <StatsPage />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
+
+              <Route
+                path="/report"
+                element={
+                  <Layout>
+                    <ProtectedRoute>
+                      <ReportPage />
+                    </ProtectedRoute>
+                  </Layout>
+                }
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route
                 path="*"
