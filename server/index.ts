@@ -51,7 +51,10 @@ export function createServer() {
   app.use((req, _res, next) => {
     try {
       const auth = Boolean(req.headers.authorization);
-      console.log(`[HTTP] ${req.method} ${req.path} auth=${auth}`);
+      const origin = req.headers.origin || req.headers.referer || "<no-origin>";
+      const authHeader = req.headers.authorization ? "present" : "missing";
+      // log method, path, origin and whether auth header is present (do not log token value)
+      console.log(`[HTTP] ${req.method} ${req.path} auth=${authHeader} origin=${origin}`);
     } catch (e) {
       // ignore logging errors
     }
