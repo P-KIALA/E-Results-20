@@ -62,13 +62,29 @@ async function sendViaWhatsApp(
         const res = await twilioClient.messages.create(msgParams);
         console.log(`Additional media ${i + 1} sent to ${to}: ${res.sid}`);
       } catch (err) {
-        console.error(`Failed to send media #${i + 1} to ${to}:`, err);
+        try {
+          console.error(`Failed to send media #${i + 1} to ${to}:`, {
+            message: err?.message,
+            stack: err?.stack,
+            details: JSON.stringify(err, Object.getOwnPropertyNames(err)),
+          });
+        } catch (e) {
+          console.error(`Failed to send media #${i + 1} to ${to}:`, err);
+        }
       }
     }
 
     return firstResult.sid;
   } catch (error) {
-    console.error(`Error sending WhatsApp message to ${to}:`, error);
+    try {
+      console.error(`Error sending WhatsApp message to ${to}:`, {
+        message: error?.message,
+        stack: error?.stack,
+        details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+      });
+    } catch (e) {
+      console.error(`Error sending WhatsApp message to ${to}:`, error);
+    }
     throw error;
   }
 }
@@ -143,7 +159,15 @@ export const sendResults: RequestHandler = async (req, res) => {
           .single();
 
         if (logError) {
-          console.warn("send_logs insert encountered error:", logError);
+          try {
+            console.warn("send_logs insert encountered error:", {
+              message: logError?.message,
+              stack: logError?.stack,
+              details: JSON.stringify(logError, Object.getOwnPropertyNames(logError)),
+            });
+          } catch (e) {
+            console.warn("send_logs insert encountered error:", logError);
+          }
           throw logError;
         }
 
@@ -192,7 +216,15 @@ export const sendResults: RequestHandler = async (req, res) => {
           message_id: messageId,
         });
       } catch (error) {
-        console.error(`Error sending to doctor ${doctor_id}:`, error);
+        try {
+          console.error(`Error sending to doctor ${doctor_id}:`, {
+            message: error?.message,
+            stack: error?.stack,
+            details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+          });
+        } catch (e) {
+          console.error(`Error sending to doctor ${doctor_id}:`, error);
+        }
         results.push({
           doctor_id,
           success: false,
@@ -203,8 +235,16 @@ export const sendResults: RequestHandler = async (req, res) => {
 
     res.json({ results });
   } catch (error) {
-    console.error("Error sending results:", error);
-    res.status(500).json({ error: "Failed to send results" });
+    try {
+      console.error("Error sending results:", {
+        message: error?.message,
+        stack: error?.stack,
+        details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+      });
+    } catch (e) {
+      console.error("Error sending results:", error);
+    }
+    res.status(500).json({ error: error?.message || "Failed to send results" });
   }
 };
 
@@ -392,7 +432,15 @@ export const webhookTwilio: RequestHandler = async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error("Error handling Twilio webhook:", error);
-    res.status(500).json({ error: "Failed to process webhook" });
+    try {
+      console.error("Error handling Twilio webhook:", {
+        message: error?.message,
+        stack: error?.stack,
+        details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+      });
+    } catch (e) {
+      console.error("Error handling Twilio webhook:", error);
+    }
+    res.status(500).json({ error: error?.message || "Failed to process webhook" });
   }
 };
