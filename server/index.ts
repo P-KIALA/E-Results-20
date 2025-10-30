@@ -35,14 +35,44 @@ export function createServer() {
   const app = express();
 
   // Middleware
+  // Configure CORS to explicitly allow requests from the app base URL and common embed/origin hosts
+  // For development/embed environments (Builder.io), accept builder origins as well.
   app.use(
     cors({
-      origin: true,
+      origin: (origin, callback) => {
+        try {
+          // If no origin (server-to-server or curl), allow
+          if (!origin) return callback(null, true);
+
+          const allowed = [
+            process.env.APP_BASE_URL,
+            "https://app.builder.io",
+            "https://builder.io",
+            "https://preview.builder.io",
+          ].filter(Boolean) as string[];
+
+          // If origin matches one of the allowed patterns or is a subdomain of builder.io, allow it
+          const isAllowed = allowed.some((allowedOrigin) => origin === allowedOrigin) || /(^|\.)builder\.io$/.test(new URL(origin).hostname);
+
+          if (isAllowed) return callback(null, true);
+
+          // Otherwise deny CORS with an explanatory message
+          console.warn(`CORS: rejecting origin ${origin}`);
+          return callback(new Error(`Origin not allowed by CORS: ${origin}`));
+        } catch (e) {
+          // Fallback to allow if something goes wrong parsing origin
+          return callback(null, true);
+        }
+      },
       allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       credentials: true,
+      optionsSuccessStatus: 204,
+      preflightContinue: false,
+      exposedHeaders: ["Authorization"],
     }),
   );
+
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ extended: true, limit: "50mb" }));
   app.use(authMiddleware); // Optional auth middleware (token verification)
