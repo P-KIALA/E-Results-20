@@ -139,13 +139,8 @@ export default function ResultsTab() {
 
     setSending(true);
     try {
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/send-results", {
+      const res = await authFetch("/api/send-results", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({
           doctor_ids: selectedDoctors,
           custom_message: customMessage,
