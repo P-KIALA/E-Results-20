@@ -25,7 +25,9 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
         return await fetch(asStr, defaultOpts);
       } catch (e) {
         lastErr = e;
-        console.warn("authFetch: relative fetch failed", { url: asStr, err: e });
+        try {
+          console.warn("authFetch: relative fetch failed", { url: asStr, err: String(e), online: typeof navigator !== 'undefined' ? navigator.onLine : undefined });
+        } catch (_) {}
       }
 
       // 2) Try absolute using current origin
@@ -35,7 +37,9 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
         return await fetch(absolute, defaultOpts);
       } catch (e) {
         lastErr = e;
-        console.warn("authFetch: absolute fetch failed", { url: asStr, err: e });
+        try {
+          console.warn("authFetch: absolute fetch failed", { url: asStr, absolute, err: String(e), online: typeof navigator !== 'undefined' ? navigator.onLine : undefined });
+        } catch (_) {}
       }
 
       // 3) Netlify functions fallback
@@ -44,7 +48,9 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
         return await fetch(fallback, defaultOpts);
       } catch (e) {
         lastErr = e;
-        console.warn("authFetch: netlify fallback failed", { url: asStr, err: e });
+        try {
+          console.warn("authFetch: netlify fallback failed", { url: asStr, fallback, err: String(e), online: typeof navigator !== 'undefined' ? navigator.onLine : undefined });
+        } catch (_) {}
       }
     } else {
       return await fetch(input, defaultOpts);
