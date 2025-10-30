@@ -102,12 +102,8 @@ export default function SitesManagement() {
         return;
       }
 
-      const res = await fetch("/api/sites", {
+      const res = await authFetch("/api/sites", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ name: newSiteName.trim() }),
       });
 
