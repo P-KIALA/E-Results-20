@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MapPin, Trash2, Plus, X, Check } from "lucide-react";
+import { authFetch } from "@/lib/api";
 import type { Site } from "@shared/api";
 
 export default function SitesManagement() {
