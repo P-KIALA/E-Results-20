@@ -29,6 +29,7 @@ import {
   MapPin,
 } from "lucide-react";
 import type { Site } from "@shared/api";
+import { authFetch } from "@/lib/api";
 
 interface SiteStats {
   site_id: string;
