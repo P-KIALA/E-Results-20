@@ -95,13 +95,7 @@ export default function UserDashboard() {
     if (!confirm("Êtes-vous sûr ?")) return;
 
     try {
-      const token = localStorage.getItem("auth_token");
-      const res = await fetch(`/api/doctors/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch(`/api/doctors/${id}`, { method: "DELETE" });
 
       if (!res.ok) throw new Error("Erreur de suppression");
 
