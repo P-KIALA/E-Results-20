@@ -47,11 +47,7 @@ export default function SitesManagement() {
         return;
       }
 
-      const res = await fetch("/api/sites", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch("/api/sites");
 
       if (!res.ok) {
         const errorData = await res
