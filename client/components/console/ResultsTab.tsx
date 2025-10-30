@@ -12,11 +12,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { Doctor } from "@shared/api";
 import { Upload, Send, CheckCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { authFetch } from "@/lib/api";
+
+// Mock data
+const MOCK_DOCTORS: Doctor[] = [
+  {
+    id: "doc1",
+    phone: "+243123456789",
+    name: "PARACLET KIALA",
+    whatsapp_verified: true,
+    whatsapp_verified_at: "2025-01-30T10:00:00Z",
+    created_at: "2025-01-30T10:00:00Z",
+    updated_at: "2025-01-30T10:00:00Z",
+  },
+];
 
 export default function ResultsTab() {
   const { user } = useAuth();
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);
   const [selectedDoctors, setSelectedDoctors] = useState<string[]>([]);
   const [customMessage, setCustomMessage] = useState(
     "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
@@ -33,24 +45,15 @@ export default function ResultsTab() {
   const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchDoctors();
-    // Auto-fill patient site from user's primary site
+    // API calls disabled
+    // fetchDoctors();
     if (user?.primary_site?.name) {
       setPatientSite(user.primary_site.name);
     }
   }, [user?.primary_site?.name]);
 
   const fetchDoctors = async () => {
-    try {
-      const res = await authFetch("/api/doctors");
-      if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.json();
-      setDoctors(
-        data.doctors?.filter((d: Doctor) => d.whatsapp_verified) || [],
-      );
-    } catch (error) {
-      setMessage({ type: "error", text: "Erreur lors du chargement" });
-    }
+    console.log("API calls disabled - using mock data");
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,125 +69,37 @@ export default function ResultsTab() {
   };
 
   const handleUploadFiles = async () => {
-    if (files.length === 0) {
-      setMessage({ type: "error", text: "Sélectionnez au moins un fichier" });
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const fileDataList = await Promise.all(
-        files.map(async (file) => {
-          const data = await new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-              const base64 = (reader.result as string).split(",")[1];
-              resolve(base64);
-            };
-            reader.readAsDataURL(file);
-          });
-
-          return {
-            name: file.name,
-            data,
-            type: file.type,
-          };
-        }),
-      );
-
-      const res = await authFetch("/api/upload-files", {
-        method: "POST",
-        body: JSON.stringify({ files: fileDataList }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || "Upload failed");
-      }
-
-      setUploadedFileIds(result.files.map((f: any) => f.id));
-      setMessage({
-        type: "success",
-        text: `${result.files.length} fichier(s) uploadé(s)`,
-      });
-      setFiles([]);
-    } catch (error) {
-      setMessage({ type: "error", text: `Erreur: ${String(error)}` });
-    } finally {
-      setUploading(false);
-    }
+    setMessage({ type: "error", text: "Fonction désactivée en mode démonstration" });
   };
 
-  const handleSend = async () => {
-    if (selectedDoctors.length === 0) {
-      setMessage({ type: "error", text: "Sélectionnez au moins un médecin" });
-      return;
-    }
+  const handleSendResults = async () => {
+    setMessage({ type: "error", text: "Fonction désactivée en mode démonstration" });
+  };
 
-    if (!customMessage.trim()) {
-      setMessage({ type: "error", text: "Écrivez un message" });
-      return;
-    }
-
-    if (!patientName.trim()) {
-      setMessage({ type: "error", text: "Le nom du malade est requis" });
-      return;
-    }
-
-    if (!patientSite.trim()) {
-      setMessage({ type: "error", text: "Le site du centre est requis" });
-      return;
-    }
-
-    setSending(true);
-    try {
-      const res = await authFetch("/api/send-results", {
-        method: "POST",
-        body: JSON.stringify({
-          doctor_ids: selectedDoctors,
-          custom_message: customMessage,
-          file_ids: uploadedFileIds,
-          patient_name: patientName || undefined,
-          patient_site: patientSite || undefined,
-        }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || "Send failed");
-      }
-
-      const successCount = result.results.filter((r: any) => r.success).length;
-      setMessage({
-        type: "success",
-        text: `${successCount}/${selectedDoctors.length} envoyé(s)`,
-      });
-      setSelectedDoctors([]);
-      setCustomMessage(
-        "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
-      );
-      setUploadedFileIds([]);
-    } catch (error) {
-      setMessage({ type: "error", text: `Erreur: ${String(error)}` });
-    } finally {
-      setSending(false);
-    }
+  const toggleDoctorSelection = (id: string) => {
+    setSelectedDoctors((prev) =>
+      prev.includes(id) ? prev.filter((did) => did !== id) : [...prev, id],
+    );
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold">Envoyer des résultats</h3>
-        <p className="text-sm text-muted-foreground">
-          Uploadez les fichiers et envoyez-les aux médecins
+        <h2 className="text-2xl font-bold tracking-tight">
+          Envoyer des résultats
+        </h2>
+        <p className="text-muted-foreground">
+          Sélectionnez les médecins et uploadez les fichiers
         </p>
       </div>
 
       {message && (
         <div
-          className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+          className={`p-4 rounded-lg ${
+            message.type === "success"
+              ? "bg-green-50 text-green-800"
+              : "bg-red-50 text-red-800"
+          }`}
         >
           {message.text}
         </div>
@@ -192,171 +107,180 @@ export default function ResultsTab() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload size={18} /> Upload des fichiers
-          </CardTitle>
-          <CardDescription>PDF, JPG, PNG (max 16 MB chacun)</CardDescription>
+          <CardTitle>1. Sélectionner les médecins</CardTitle>
+          <CardDescription>
+            Choisissez un ou plusieurs médecins (WhatsApp vérifié uniquement)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {doctors.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Aucun médecin avec WhatsApp vérifié
+            </p>
+          ) : (
+            <div className="grid gap-2">
+              {doctors.map((doctor) => (
+                <div
+                  key={doctor.id}
+                  className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                    selectedDoctors.includes(doctor.id)
+                      ? "border-primary bg-primary/5"
+                      : "hover:bg-muted/50"
+                  }`}
+                  onClick={() => toggleDoctorSelection(doctor.id)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedDoctors.includes(doctor.id)}
+                    onChange={() => toggleDoctorSelection(doctor.id)}
+                    className="rounded"
+                    disabled
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium">{doctor.name || doctor.phone}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {doctor.phone}
+                      {doctor.specialization && ` • ${doctor.specialization}`}
+                    </p>
+                  </div>
+                  {doctor.whatsapp_verified && (
+                    <CheckCircle size={16} className="text-green-600" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>2. Informations du patient</CardTitle>
+          <CardDescription>
+            Renseignez le nom du patient et son site
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="border-2 border-dashed rounded-lg p-6 text-center">
+          <div>
+            <label className="text-sm font-medium">Nom du patient *</label>
+            <Input
+              type="text"
+              placeholder="Nom Prénom"
+              value={patientName}
+              onChange={(e) => setPatientName(e.target.value)}
+              disabled
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Site du centre *</label>
+            <Input
+              type="text"
+              placeholder="LIMETE, KINTAMBO..."
+              value={patientSite}
+              onChange={(e) => setPatientSite(e.target.value)}
+              disabled
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>3. Message personnalisé</CardTitle>
+          <CardDescription>
+            Personnalisez le message envoyé avec les résultats
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            value={customMessage}
+            onChange={(e) => setCustomMessage(e.target.value)}
+            rows={5}
+            placeholder="Votre message..."
+            disabled
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>4. Fichiers de résultats</CardTitle>
+          <CardDescription>
+            Uploadez les fichiers PDF (max 16 MB par fichier)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
             <input
               type="file"
+              accept="application/pdf,image/*"
               multiple
               onChange={handleFileSelect}
               className="hidden"
-              id="file-input"
-              accept=".pdf,.jpg,.jpeg,.png"
+              id="file-upload"
+              disabled
             />
-            <label htmlFor="file-input" className="cursor-pointer">
-              <p className="font-medium">Cliquez pour sélectionner</p>
-              <p className="text-sm text-muted-foreground">
-                ou glissez des fichiers ici
-              </p>
+            <label htmlFor="file-upload">
+              <Button variant="outline" className="gap-2" disabled asChild>
+                <span>
+                  <Upload size={16} /> Sélectionner des fichiers
+                </span>
+              </Button>
             </label>
           </div>
 
           {files.length > 0 && (
             <div className="space-y-2">
-              {files.map((f, i) => (
+              {files.map((file, idx) => (
                 <div
-                  key={i}
-                  className="flex justify-between items-center p-2 bg-muted rounded"
+                  key={idx}
+                  className="flex items-center justify-between p-2 border rounded"
                 >
-                  <span className="text-sm">{f.name}</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() =>
-                      setFiles(files.filter((_, idx) => idx !== i))
-                    }
-                  >
-                    ✕
-                  </Button>
+                  <span className="text-sm">{file.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                  </span>
                 </div>
               ))}
+              <Button
+                onClick={handleUploadFiles}
+                disabled={uploading || uploadedFileIds.length > 0}
+                className="w-full"
+              >
+                {uploading ? "Upload..." : "Upload les fichiers"}
+              </Button>
             </div>
           )}
-
-          <Button
-            onClick={handleUploadFiles}
-            disabled={uploading || files.length === 0}
-            className="w-full"
-          >
-            {uploading
-              ? "Upload en cours..."
-              : `Upload ${files.length} fichier(s)`}
-          </Button>
 
           {uploadedFileIds.length > 0 && (
-            <div className="p-3 bg-green-50 rounded flex items-center gap-2 text-green-800">
-              <CheckCircle size={16} />
-              {uploadedFileIds.length} fichier(s) prêt(s)
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+              ✓ {uploadedFileIds.length} fichier(s) uploadé(s)
             </div>
           )}
-
-          {/* Patient name and site - always visible and required */}
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div>
-              <label className="text-sm font-medium">Nom du malade</label>
-              <Input
-                placeholder="Nom du malade"
-                value={patientName}
-                onChange={(e) => setPatientName(e.target.value)}
-                aria-required={true}
-              />
-              {!patientName.trim() && (
-                <p className="text-xs text-red-600 mt-1">
-                  Le nom du malade est requis.
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">
-                Site du centre {user?.primary_site?.name && "(auto-complété)"}
-              </label>
-              <Input
-                placeholder="Site du centre"
-                value={patientSite}
-                onChange={(e) => setPatientSite(e.target.value)}
-                aria-required={true}
-              />
-              {!patientSite.trim() && (
-                <p className="text-xs text-red-600 mt-1">
-                  Le site du centre est requis.
-                </p>
-              )}
-            </div>
-          </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Sélectionner les médecins destinataires</CardTitle>
-          <CardDescription>
-            Seuls les médecins avec WhatsApp vérifié sont listés
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {doctors.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Aucun médecin disponible
-            </p>
-          ) : (
-            doctors.map((doctor) => (
-              <label
-                key={doctor.id}
-                className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedDoctors.includes(doctor.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedDoctors([...selectedDoctors, doctor.id]);
-                    } else {
-                      setSelectedDoctors(
-                        selectedDoctors.filter((id) => id !== doctor.id),
-                      );
-                    }
-                  }}
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{doctor.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {doctor.phone}
-                  </p>
-                </div>
-              </label>
-            ))
-          )}
-        </CardContent>
-      </Card>
+      <div className="flex justify-end">
+        <Button
+          size="lg"
+          onClick={handleSendResults}
+          disabled={
+            sending ||
+            selectedDoctors.length === 0 ||
+            uploadedFileIds.length === 0 ||
+            !patientName ||
+            !patientSite
+          }
+          className="gap-2"
+        >
+          <Send size={16} />
+          {sending ? "Envoi en cours..." : "Envoyer les résultats"}
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Message personnalisé</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Textarea
-            value={customMessage}
-            onChange={(e) => setCustomMessage(e.target.value)}
-            rows={6}
-            placeholder="Écrivez votre message..."
-          />
-          <Button
-            onClick={handleSend}
-            disabled={
-              sending || selectedDoctors.length === 0 || !patientName.trim()
-            }
-            className="w-full gap-2"
-          >
-            <Send size={16} />
-            {sending ? "Envoi en cours..." : "Envoyer"}
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="text-sm text-muted-foreground text-center p-4 border rounded-lg bg-yellow-50">
+        <p>⚠️ Mode démonstration : Les appels API sont désactivés. Utilisez <a href="#" onClick={() => window.open(window.location.origin, '_blank')} className="underline text-blue-600">Open Preview</a> pour accéder à toutes les fonctionnalités.</p>
+      </div>
     </div>
   );
 }
