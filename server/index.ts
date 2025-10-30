@@ -10,6 +10,7 @@ import {
   verifyDoctor,
 } from "./routes/doctors";
 import { sendResults, getSendLogs, webhookTwilio, webhookInfobip } from "./routes/send";
+import { twilioTest } from "./routes/debug";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import {
   login,
