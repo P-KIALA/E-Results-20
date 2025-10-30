@@ -232,7 +232,7 @@ export const sendResults: RequestHandler = async (req, res) => {
 
           if (filesError) throw filesError;
 
-          // Generate public URLs for Twilio to download files
+          // Generate public URLs for providers to download files
           mediaUrls = (files || []).map((f) => {
             const publicUrl = supabase.storage
               .from("results")
