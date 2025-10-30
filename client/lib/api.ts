@@ -11,8 +11,8 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
 
   if (token) baseHeaders["Authorization"] = `Bearer ${token}`;
 
-  // Ensure CORS mode is used for cross-origin requests
-  const defaultOpts: RequestInit = { mode: "cors", ...init, headers: baseHeaders };
+  // Ensure CORS mode is used for cross-origin requests and include same-origin credentials
+  const defaultOpts: RequestInit = { mode: "cors", credentials: "same-origin", ...init, headers: baseHeaders };
 
   // Try relative path first (works with dev proxy and same-origin setups), then absolute, then Netlify fallback
   let lastErr: any = null;
