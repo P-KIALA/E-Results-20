@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 import { SendResultsRequest } from "@shared/api";
 import { validateAndFormatPhone, checkWhatsAppAvailability } from "../lib/phone";
 import { sendViaNotifyer } from "../lib/notifyer";
-import { validateAndFormatPhone, checkWhatsAppAvailability } from "../lib/phone";
+import { sendViaInfobip } from "../lib/infobip";
 
 // Initialize Twilio client
 const twilioClient = twilio(
