@@ -41,6 +41,8 @@ export interface SendResultsRequest {
   file_ids: string[];
   patient_name?: string;
   patient_site?: string;
+  // Optional additional recipient phone numbers in E.164 or common formats
+  extra_numbers?: string[];
 }
 
 export interface UploadFileResponse {
