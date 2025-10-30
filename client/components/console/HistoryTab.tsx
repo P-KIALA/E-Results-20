@@ -41,9 +41,33 @@ export default function HistoryTab({
 
   const getToken = () => localStorage.getItem("auth_token");
 
+  // Helper to robustly call the API; falls back to absolute fetch if authFetch fails
+  const safeFetch = async (path: string, init: RequestInit = {}) => {
+    try {
+      return await authFetch(path, init);
+    } catch (err) {
+      try {
+        console.warn("safeFetch: authFetch failed, trying absolute fetch", { path, err });
+        const token = localStorage.getItem("auth_token");
+        const headers: Record<string, string> = {
+          ...(init.headers as Record<string, string> || {}),
+        };
+        if (!headers["Content-Type"] && !(init.body instanceof FormData)) {
+          headers["Content-Type"] = "application/json";
+        }
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+        const absolute = `${window.location.origin}${path}`;
+        return await fetch(absolute, { ...init, headers } as RequestInit);
+      } catch (err2) {
+        console.error("safeFetch: all fetch attempts failed", { path, err, err2 });
+        throw err2 || err;
+      }
+    }
+  };
+
   const fetchSites = useCallback(async () => {
     try {
-      const res = await authFetch("/api/sites");
+      const res = await safeFetch("/api/sites");
       if (!res.ok) throw new Error("Failed to fetch sites");
       const data = await res.json();
       setSites(data.sites || []);
