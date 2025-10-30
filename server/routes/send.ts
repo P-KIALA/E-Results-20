@@ -253,16 +253,15 @@ export const sendResults: RequestHandler = async (req, res) => {
           .from("send_logs")
           .update({
             status: "sent",
-            twilio_message_sid: messageId,
             sent_at: new Date().toISOString(),
           })
-          .eq("id", sendLog.id);
+          .eq("id", sendLogId);
 
         if (updateError) throw updateError;
 
         results.push({
           doctor_id,
-          send_log_id: sendLog.id,
+          send_log_id: sendLogId,
           success: true,
           message_id: messageId,
         });
