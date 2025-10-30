@@ -255,7 +255,8 @@ export const sendResults: RequestHandler = async (req, res) => {
         }
 
         // Create send log entry
-        const { data: sendLog, error: logError } = await supabase
+        let sendLog: any = null;
+        const { data: inserted, error: logError } = await supabase
           .from("send_logs")
           .insert({
             doctor_id,
@@ -280,6 +281,8 @@ export const sendResults: RequestHandler = async (req, res) => {
           }
           throw logError;
         }
+
+        sendLog = inserted;
 
         // Get media files if any
         let mediaUrls: string[] = [];
@@ -335,21 +338,26 @@ export const sendResults: RequestHandler = async (req, res) => {
         } catch (e) {
           console.error(`Error sending to doctor ${doctor_id}:`, error);
         }
-        // Mark send_log as failed with error message
+
+        // Determine friendly error message
+        const errorMessage = error && (error.message || error.error) ? String(error.message || error.error) : String(error);
+
+        // Mark send_log as failed with error message if we have a sendLog
         try {
           if (sendLog && sendLog.id) {
             await supabase
               .from("send_logs")
-              .update({ status: "failed", error_message: String(error) })
+              .update({ status: "failed", error_message: errorMessage })
               .eq("id", sendLog.id);
           }
         } catch (updateErr) {
           console.error("Failed to update send_log status to failed:", updateErr);
         }
+
         results.push({
           doctor_id,
           success: false,
-          error: String(error),
+          error: errorMessage,
         });
       }
     }
