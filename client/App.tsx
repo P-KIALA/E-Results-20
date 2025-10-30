@@ -25,6 +25,9 @@ import SitesManagement from "./pages/SitesManagement";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
+import HistoryPage from "./pages/HistoryPage";
+import StatsPage from "./pages/StatsPage";
+import ReportPage from "./pages/ReportPage";
 
 const queryClient = new QueryClient();
 
