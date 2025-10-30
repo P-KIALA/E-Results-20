@@ -10,7 +10,7 @@ import {
   verifyDoctor,
 } from "./routes/doctors";
 import { sendResults, getSendLogs, webhookInfobip } from "./routes/send";
-import { debugInfo } from "./routes/debug";
+import { debugInfo, sendTest } from "./routes/debug";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import {
   login,
