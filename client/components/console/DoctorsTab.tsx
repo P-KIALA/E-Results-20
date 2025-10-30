@@ -295,12 +295,8 @@ export default function DoctorsTab() {
         return;
       }
 
-      const res = await fetch(`/api/doctors/${id}`, {
+      const res = await authFetch(`/api/doctors/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify(editFormData),
       });
 
