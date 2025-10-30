@@ -16,10 +16,8 @@ async function sendViaWhatsApp(
   message: string,
   mediaUrls: string[],
 ): Promise<string> {
-  const useInfobip =
-    !!process.env.INFOBIP_API_KEY && process.env.USE_INFOBIP !== "false";
-  const useNotifyer =
-    !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
+  const useInfobip = !!process.env.INFOBIP_API_KEY && process.env.USE_INFOBIP !== "false";
+  const useNotifyer = !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
 
   if (useInfobip) {
     try {
@@ -56,97 +54,14 @@ async function sendViaWhatsApp(
       } catch (e) {
         console.error(`Notifyer send error for ${to}:`, error);
       }
-      // Fallback to Twilio if notifyer fails
-      console.warn("Falling back to Twilio for message delivery");
+      console.warn("Both Infobip and Notifyer failed to deliver the message.");
     }
   }
 
-  try {
-    // WhatsApp via Twilio supports one media per message reliably.
-    // If multiple media are provided, send the first media with the message body,
-    // then send each remaining media as a separate message (without body).
-
-    const allowFallbackToTwilio = process.env.FALLBACK_TO_TWILIO !== "false";
-
-    if (!allowFallbackToTwilio) {
-      // If fallback is disabled and we reach here, it means other providers failed.
-      throw new Error(
-        "All providers failed and fallback to Twilio is disabled",
-      );
-    }
-
-    const statusCallbackUrl = process.env.APP_BASE_URL
-      ? `${process.env.APP_BASE_URL.replace(/\/$/, "")}/api/webhook/twilio`
-      : process.env.TWILIO_STATUS_CALLBACK_URL || undefined;
-
-    if (!mediaUrls || mediaUrls.length === 0) {
-      const msgParams: any = {
-        ...buildTwilioParams(to),
-        body: message,
-        ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
-      };
-
-      const result = await twilioClient.messages.create(msgParams);
-
-      console.log(`Message sent successfully to ${to}: ${result.sid}`);
-      return result.sid;
-    }
-
-    // Send first message with body + first media
-    const firstParams: any = {
-      ...buildTwilioParams(to),
-      body: message,
-      mediaUrl: [mediaUrls[0]],
-      ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
-    };
-
-    const firstResult = await twilioClient.messages.create(firstParams);
-    console.log(`Message with first media sent to ${to}: ${firstResult.sid}`);
-
-    // Send remaining media as separate messages
-    for (let i = 1; i < mediaUrls.length; i++) {
-      try {
-        const msgParams: any = {
-          ...buildTwilioParams(to),
-          mediaUrl: [mediaUrls[i]],
-          ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
-        };
-
-        const res = await twilioClient.messages.create(msgParams);
-        console.log(`Additional media ${i + 1} sent to ${to}: ${res.sid}`);
-      } catch (err) {
-        try {
-          console.error(`Failed to send media #${i + 1} to ${to}:`, {
-            message: err?.message,
-            stack: err?.stack,
-            details: JSON.stringify(err, Object.getOwnPropertyNames(err)),
-          });
-        } catch (e) {
-          console.error(`Failed to send media #${i + 1} to ${to}:`, err);
-        }
-      }
-    }
-
-    return firstResult.sid;
-  } catch (error) {
-    try {
-      console.error(`Error sending WhatsApp message to ${to}:`, {
-        message: error?.message,
-        stack: error?.stack,
-        details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
-      });
-
-      // Common Twilio authentication failure
-      if (typeof error?.message === "string" && error.message.includes("Authenticate")) {
-        console.error(
-          "Twilio authentication failed. Please verify TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN (or TWILIO_API_KEY/TWILIO_API_SECRET) in your environment.",
-        );
-      }
-    } catch (e) {
-      console.error(`Error sending WhatsApp message to ${to}:`, error);
-    }
-    throw error;
-  }
+  // If no provider succeeded, fail with clear message (Twilio removed)
+  throw new Error(
+    "No messaging provider configured or all providers failed. Twilio integration has been removed from the codebase.",
+  );
 }
 
 export const sendResults: RequestHandler = async (req, res) => {
