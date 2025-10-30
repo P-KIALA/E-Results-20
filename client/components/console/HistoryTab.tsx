@@ -139,9 +139,14 @@ export default function HistoryTab({ active = false, userOnly = false }: History
       (async () => {
         setLoading(true);
         try {
-          await fetchSites();
+          if (!userOnly) {
+            await fetchSites();
+            await fetchUsers();
+          }
           await fetchDoctors();
-          await fetchUsers();
+          if (userOnly && user?.id) {
+            setFilterSender(user.id);
+          }
           await fetchLogs();
         } finally {
           setLoading(false);
