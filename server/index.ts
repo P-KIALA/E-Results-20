@@ -9,7 +9,7 @@ import {
   deleteDoctor,
   verifyDoctor,
 } from "./routes/doctors";
-import { sendResults, getSendLogs, webhookTwilio } from "./routes/send";
+import { sendResults, getSendLogs, webhookTwilio, webhookInfobip } from "./routes/send";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import {
   login,
