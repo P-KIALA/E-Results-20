@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import twilio from "twilio";
 import { supabase } from "../lib/supabase";
 import { SendResultsRequest } from "@shared/api";
+import { validateAndFormatPhone, checkWhatsAppAvailability } from "../lib/phone";
 
 // Initialize Twilio client
 const twilioClient = twilio(
@@ -91,8 +92,11 @@ async function sendViaWhatsApp(
 
 export const sendResults: RequestHandler = async (req, res) => {
   try {
-    const { doctor_ids, custom_message, file_ids } =
+    const { doctor_ids: incomingDoctorIds, custom_message, file_ids, extra_numbers } =
       req.body as SendResultsRequest;
+
+    // Normalize doctor_ids to a mutable array
+    const doctor_ids = Array.isArray(incomingDoctorIds) ? [...incomingDoctorIds] : [];
 
     // Note: patient_name field may not be present in DB schema yet in some environments.
     // To avoid blocking message sending while migrations propagate, do not enforce it server-side.
@@ -105,6 +109,56 @@ export const sendResults: RequestHandler = async (req, res) => {
     }
 
     const results: any[] = [];
+
+    // If extra_numbers provided, try to resolve them to doctor IDs (find existing doctor by phone or create one)
+    if (extra_numbers && Array.isArray(extra_numbers) && extra_numbers.length > 0) {
+      for (const rawPhone of extra_numbers) {
+        try {
+          const validation = validateAndFormatPhone(String(rawPhone));
+          if (!validation.is_valid) {
+            console.warn(`Skipping invalid phone: ${rawPhone}`);
+            continue;
+          }
+          const formatted = validation.formatted_phone;
+
+          // Try to find existing doctor
+          const { data: existing, error: findErr } = await supabase
+            .from("doctors")
+            .select("id")
+            .eq("phone", formatted)
+            .single();
+
+          if (findErr) {
+            console.warn(`Error looking up doctor for ${formatted}:`, findErr);
+          }
+
+          if (existing && existing.id) {
+            doctor_ids.push(existing.id);
+          } else {
+            // Create a lightweight doctor record for this number
+            const is_whatsapp = await checkWhatsAppAvailability(formatted);
+            const { data: newDoc, error: insertErr } = await supabase
+              .from("doctors")
+              .insert({
+                phone: formatted,
+                name: formatted,
+                whatsapp_verified: is_whatsapp,
+                whatsapp_verified_at: is_whatsapp ? new Date().toISOString() : null,
+              })
+              .select()
+              .single();
+
+            if (insertErr) {
+              console.warn(`Failed to create doctor for ${formatted}:`, insertErr);
+            } else if (newDoc && newDoc.id) {
+              doctor_ids.push(newDoc.id);
+            }
+          }
+        } catch (e) {
+          console.error(`Error resolving extra number ${rawPhone}:`, e);
+        }
+      }
+    }
 
     for (const doctor_id of doctor_ids) {
       // Get doctor
