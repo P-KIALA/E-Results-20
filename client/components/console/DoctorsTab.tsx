@@ -187,11 +187,8 @@ export default function DoctorsTab() {
         return;
       }
 
-      const res = await fetch(`/api/doctors/${deletingDoctorId}`, {
+      const res = await authFetch(`/api/doctors/${deletingDoctorId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       if (res.ok) {
         setMessage({ type: "success", text: "Médecin supprimé avec succès" });
