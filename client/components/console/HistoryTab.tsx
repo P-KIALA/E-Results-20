@@ -120,7 +120,7 @@ export default function HistoryTab({
         params.append("sender_id", filterSender);
       }
 
-      const res = await authFetch(`/api/send-logs?${params}`);
+      const res = await safeFetch(`/api/send-logs?${params}`);
 
       if (!res.ok) {
         let errMsg = `Failed to fetch logs: ${res.status}`;
