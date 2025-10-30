@@ -16,8 +16,10 @@ async function sendViaWhatsApp(
   message: string,
   mediaUrls: string[],
 ): Promise<string> {
-  const useInfobip = !!process.env.INFOBIP_API_KEY && process.env.USE_INFOBIP !== "false";
-  const useNotifyer = !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
+  const useInfobip =
+    !!process.env.INFOBIP_API_KEY && process.env.USE_INFOBIP !== "false";
+  const useNotifyer =
+    !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
 
   if (useInfobip) {
     try {
@@ -454,7 +456,6 @@ export const getSendLogs: RequestHandler = async (req, res) => {
       .json({ error: error?.message || "Failed to fetch send logs" });
   }
 };
-
 
 export const webhookInfobip: RequestHandler = async (req, res) => {
   try {

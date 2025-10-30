@@ -5,14 +5,23 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   };
 
   // Only set JSON content-type when body is present and not FormData
-  if (init.body && !((init as any).body instanceof FormData) && !baseHeaders["Content-Type"]) {
+  if (
+    init.body &&
+    !((init as any).body instanceof FormData) &&
+    !baseHeaders["Content-Type"]
+  ) {
     baseHeaders["Content-Type"] = "application/json";
   }
 
   if (token) baseHeaders["Authorization"] = `Bearer ${token}`;
 
   // Ensure CORS mode is used for cross-origin requests and include same-origin credentials
-  const defaultOpts: RequestInit = { mode: "cors", credentials: "same-origin", ...init, headers: baseHeaders };
+  const defaultOpts: RequestInit = {
+    mode: "cors",
+    credentials: "same-origin",
+    ...init,
+    headers: baseHeaders,
+  };
 
   // Try relative path first (works with dev proxy and same-origin setups), then absolute, then Netlify fallback
   let lastErr: any = null;
@@ -26,7 +35,12 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       } catch (e) {
         lastErr = e;
         try {
-          console.warn("authFetch: relative fetch failed", { url: asStr, err: String(e), online: typeof navigator !== 'undefined' ? navigator.onLine : undefined });
+          console.warn("authFetch: relative fetch failed", {
+            url: asStr,
+            err: String(e),
+            online:
+              typeof navigator !== "undefined" ? navigator.onLine : undefined,
+          });
         } catch (_) {}
       }
 
@@ -38,7 +52,13 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       } catch (e) {
         lastErr = e;
         try {
-          console.warn("authFetch: absolute fetch failed", { url: asStr, absolute, err: String(e), online: typeof navigator !== 'undefined' ? navigator.onLine : undefined });
+          console.warn("authFetch: absolute fetch failed", {
+            url: asStr,
+            absolute,
+            err: String(e),
+            online:
+              typeof navigator !== "undefined" ? navigator.onLine : undefined,
+          });
         } catch (_) {}
       }
 
@@ -49,7 +69,13 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       } catch (e) {
         lastErr = e;
         try {
-          console.warn("authFetch: netlify fallback failed", { url: asStr, fallback, err: String(e), online: typeof navigator !== 'undefined' ? navigator.onLine : undefined });
+          console.warn("authFetch: netlify fallback failed", {
+            url: asStr,
+            fallback,
+            err: String(e),
+            online:
+              typeof navigator !== "undefined" ? navigator.onLine : undefined,
+          });
         } catch (_) {}
       }
     } else {
@@ -59,6 +85,10 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     lastErr = err;
   }
 
-  console.error("authFetch: all fetch attempts failed", { input: asStr, opts: defaultOpts, lastErr });
+  console.error("authFetch: all fetch attempts failed", {
+    input: asStr,
+    opts: defaultOpts,
+    lastErr,
+  });
   throw lastErr || new Error("Network request failed");
 }
