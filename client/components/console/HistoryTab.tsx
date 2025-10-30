@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SendLogEntry, Doctor, Site } from "@shared/api";
 import { Clock, CheckCircle, AlertCircle, Loader, MapPin } from "lucide-react";
+import { authFetch } from "@/lib/api";
 
 interface HistoryTabProps {
   active?: boolean;
