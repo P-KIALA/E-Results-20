@@ -145,12 +145,8 @@ export default function DoctorsTab() {
         return;
       }
 
-      const res = await fetch("/api/doctors", {
+      const res = await authFetch("/api/doctors", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify(formData),
       });
 
