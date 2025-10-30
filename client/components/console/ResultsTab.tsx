@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Doctor } from "@shared/api";
 import { Upload, Send, CheckCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { authFetch } from "@/lib/api";
 
 export default function ResultsTab() {
   const { user } = useAuth();
