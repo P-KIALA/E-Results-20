@@ -249,9 +249,21 @@ export const getSendLogs: RequestHandler = async (req, res) => {
       }
     }
 
+    // Debug incoming query params to help diagnose issues
+    try {
+      console.log('getSendLogs - query params:', JSON.stringify(req.query));
+    } catch (_) {}
+
     // Filter by sender (user who sent the message)
-    if (req.query.sender_id) {
-      query = query.eq("sender_id", req.query.sender_id as string);
+    const senderParam = req.query.sender_id;
+    if (senderParam) {
+      if (Array.isArray(senderParam)) {
+        // If multiple sender_id provided, filter by any of them
+        const senderIds = senderParam.map((s) => String(s));
+        query = query.in("sender_id", senderIds);
+      } else {
+        query = query.eq("sender_id", String(senderParam));
+      }
     }
 
     // Filter by date range
