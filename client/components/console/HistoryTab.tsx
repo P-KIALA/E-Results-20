@@ -18,7 +18,10 @@ interface HistoryTabProps {
   userOnly?: boolean; // if true, only show current user's history and limit filters
 }
 
-export default function HistoryTab({ active = false, userOnly = false }: HistoryTabProps) {
+export default function HistoryTab({
+  active = false,
+  userOnly = false,
+}: HistoryTabProps) {
   const { user } = useAuth();
   const [logs, setLogs] = useState<(SendLogEntry & { doctors?: any })[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);

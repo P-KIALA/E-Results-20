@@ -251,7 +251,7 @@ export const getSendLogs: RequestHandler = async (req, res) => {
 
     // Debug incoming query params to help diagnose issues
     try {
-      console.log('getSendLogs - query params:', JSON.stringify(req.query));
+      console.log("getSendLogs - query params:", JSON.stringify(req.query));
     } catch (_) {}
 
     // Filter by sender (user who sent the message)
@@ -337,7 +337,9 @@ export const getSendLogs: RequestHandler = async (req, res) => {
     } catch (e) {
       console.error("Error fetching send logs (failed to stringify):", error);
     }
-    res.status(500).json({ error: error?.message || "Failed to fetch send logs" });
+    res
+      .status(500)
+      .json({ error: error?.message || "Failed to fetch send logs" });
   }
 };
 
@@ -350,7 +352,9 @@ export const webhookTwilio: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "MessageSid is required" });
     }
 
-    console.log(`Twilio webhook: MessageSid=${MessageSid}, Status=${MessageStatus}, ErrorCode=${ErrorCode}, ErrorMessage=${ErrorMessage}`);
+    console.log(
+      `Twilio webhook: MessageSid=${MessageSid}, Status=${MessageStatus}, ErrorCode=${ErrorCode}, ErrorMessage=${ErrorMessage}`,
+    );
 
     // Map Twilio status to our status
     const statusMap: Record<string, string> = {

@@ -64,7 +64,12 @@ export default function DoctorsTab() {
             const json = cloneText ? JSON.parse(cloneText) : null;
             return { ok: res.ok, status: res.status, json, text: cloneText };
           } catch (e) {
-            return { ok: res.ok, status: res.status, json: null, text: cloneText };
+            return {
+              ok: res.ok,
+              status: res.status,
+              json: null,
+              text: cloneText,
+            };
           }
         } catch (e) {
           return { ok: res.ok, status: res.status, json: null, text: null };
@@ -96,7 +101,9 @@ export default function DoctorsTab() {
       const res = await authFetch("/api/doctors");
       const parsed = await readResponse(res);
       if (!parsed.ok) {
-        throw new Error(parsed.json?.error || parsed.text || "Failed to fetch doctors");
+        throw new Error(
+          parsed.json?.error || parsed.text || "Failed to fetch doctors",
+        );
       }
       setDoctors(parsed.json?.doctors || []);
     } catch (error) {

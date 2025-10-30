@@ -139,7 +139,10 @@ export const exportReport: RequestHandler = async (req, res) => {
     ];
 
     const tableTop = doc.y;
-    const colWidth = Math.floor((doc.page.width - doc.page.margins.left - doc.page.margins.right) / cols.length);
+    const colWidth = Math.floor(
+      (doc.page.width - doc.page.margins.left - doc.page.margins.right) /
+        cols.length,
+    );
 
     // header
     doc.fontSize(10);
@@ -168,7 +171,13 @@ export const exportReport: RequestHandler = async (req, res) => {
     doc.end();
     return;
   } catch (error: any) {
-    console.error("Error exporting report:", error?.message || error, error?.stack || "no-stack");
-    res.status(500).json({ error: error?.message || "Failed to export report" });
+    console.error(
+      "Error exporting report:",
+      error?.message || error,
+      error?.stack || "no-stack",
+    );
+    res
+      .status(500)
+      .json({ error: error?.message || "Failed to export report" });
   }
 };

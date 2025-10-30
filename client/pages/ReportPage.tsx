@@ -13,7 +13,9 @@ export default function ReportPage() {
       // Post current filters via body if needed; for now rely on default (today)
       const res = await fetch(`/api/reports/export?format=${format}`, {
         method: "GET",
-        headers: { "Authorization": `Bearer ${localStorage.getItem("auth_token")}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -40,13 +42,25 @@ export default function ReportPage() {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Rapport</h1>
         <div className="flex gap-2">
-          <button className="btn" onClick={() => handleExport("csv")} disabled={exporting}>
+          <button
+            className="btn"
+            onClick={() => handleExport("csv")}
+            disabled={exporting}
+          >
             Export CSV
           </button>
-          <button className="btn" onClick={() => handleExport("xlsx")} disabled={exporting}>
+          <button
+            className="btn"
+            onClick={() => handleExport("xlsx")}
+            disabled={exporting}
+          >
             Export Excel
           </button>
-          <button className="btn" onClick={() => handleExport("pdf")} disabled={exporting}>
+          <button
+            className="btn"
+            onClick={() => handleExport("pdf")}
+            disabled={exporting}
+          >
             Export PDF
           </button>
         </div>

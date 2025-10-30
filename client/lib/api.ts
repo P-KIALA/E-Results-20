@@ -1,7 +1,7 @@
 export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   const token = localStorage.getItem("auth_token");
   const headers: Record<string, string> = {
-    ...(init.headers as Record<string, string> || {}),
+    ...((init.headers as Record<string, string>) || {}),
   };
   if (!headers["Content-Type"] && !(init.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
