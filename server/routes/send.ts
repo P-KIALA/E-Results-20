@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-import twilio from "twilio";
 import { supabase } from "../lib/supabase";
 import { SendResultsRequest } from "@shared/api";
 import {
@@ -9,38 +8,8 @@ import {
 import { sendViaNotifyer } from "../lib/notifyer";
 import { sendViaInfobip } from "../lib/infobip";
 
-// Initialize Twilio client. Prefer API Key+Secret if provided (more secure), otherwise use Account SID + Auth Token.
-const twilioClient = (() => {
-  if (process.env.TWILIO_API_KEY && process.env.TWILIO_API_SECRET && process.env.TWILIO_ACCOUNT_SID) {
-    console.log("Initializing Twilio client with API Key/Secret");
-    return twilio(
-      process.env.TWILIO_API_KEY,
-      process.env.TWILIO_API_SECRET,
-      { accountSid: process.env.TWILIO_ACCOUNT_SID },
-    );
-  }
-
-  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-    console.log("Initializing Twilio client with Account SID/Auth Token");
-    return twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-  }
-
-  console.warn("Twilio credentials not found in environment");
-  return twilio("", "");
-})();
-
-function buildTwilioParams(to: string): any {
-  if (process.env.TWILIO_MESSAGING_SERVICE_SID) {
-    return {
-      messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID,
-      to: `whatsapp:${to}`,
-    };
-  }
-  return {
-    from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
-    to: `whatsapp:${to}`,
-  };
-}
+// Note: Twilio removed from the codebase — messaging will use configured providers (Infobip / Notifyer) only.
+// If no provider is configured, sending will fail with a clear error.
 
 async function sendViaWhatsApp(
   to: string,
