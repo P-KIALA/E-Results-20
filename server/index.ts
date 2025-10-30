@@ -163,6 +163,9 @@ export function createServer() {
   // WARNING: This endpoint is intentionally public for development convenience; remove or protect in production.
   app.get("/api/debug/twilio-test-public", twilioTestHandler);
 
+  // Public dev endpoint to send a WhatsApp test message (use 'to' query param). Remove or protect in production.
+  app.post("/api/debug/twilio-send-public", twilioSendHandler);
+
   // Server-side proxy to forward requests from embedded clients (iframes) to the app base URL.
   // Example: client calls /api/proxy/send-logs -> server forwards to APP_BASE_URL/api/send-logs
   app.all("/api/proxy/*", requireAuth, proxyHandler);
