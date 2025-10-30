@@ -211,57 +211,65 @@ export default function HistoryTab({ active = false, userOnly = false }: History
 
       <div className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-7 items-center">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 rounded-md border bg-background text-sm"
-          >
-            <option value="">Tous les statuts</option>
-            <option value="pending">En attente</option>
-            <option value="sent">Envoyé</option>
-            <option value="delivered">Livré</option>
-            <option value="read">Lu</option>
-            <option value="failed">Échec</option>
-          </select>
+          {!userOnly && (
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 rounded-md border bg-background text-sm"
+            >
+              <option value="">Tous les statuts</option>
+              <option value="pending">En attente</option>
+              <option value="sent">Envoyé</option>
+              <option value="delivered">Livré</option>
+              <option value="read">Lu</option>
+              <option value="failed">Échec</option>
+            </select>
+          )}
 
-          <select
-            value={filterDoctor}
-            onChange={(e) => setFilterDoctor(e.target.value)}
-            className="px-3 py-2 rounded-md border bg-background text-sm"
-          >
-            <option value="">Tous les médecins</option>
-            {doctors.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
-            ))}
-          </select>
+          {!userOnly && (
+            <select
+              value={filterDoctor}
+              onChange={(e) => setFilterDoctor(e.target.value)}
+              className="px-3 py-2 rounded-md border bg-background text-sm"
+            >
+              <option value="">Tous les médecins</option>
+              {doctors.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          )}
 
-          <select
-            value={filterSite}
-            onChange={(e) => setFilterSite(e.target.value)}
-            className="px-3 py-2 rounded-md border bg-background text-sm"
-          >
-            <option value="">Tous les sites</option>
-            {sites.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          {!userOnly && (
+            <select
+              value={filterSite}
+              onChange={(e) => setFilterSite(e.target.value)}
+              className="px-3 py-2 rounded-md border bg-background text-sm"
+            >
+              <option value="">Tous les sites</option>
+              {sites.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          )}
 
-          <select
-            value={filterSender}
-            onChange={(e) => setFilterSender(e.target.value)}
-            className="px-3 py-2 rounded-md border bg-background text-sm"
-          >
-            <option value="">Tous les expéditeurs</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.email}
-              </option>
-            ))}
-          </select>
+          {!userOnly && (
+            <select
+              value={filterSender}
+              onChange={(e) => setFilterSender(e.target.value)}
+              className="px-3 py-2 rounded-md border bg-background text-sm"
+            >
+              <option value="">Tous les expéditeurs</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.email}
+                </option>
+              ))}
+            </select>
+          )}
 
           <input
             type="date"
