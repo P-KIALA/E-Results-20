@@ -60,7 +60,18 @@ export default function HistoryTab({
         }
         if (token) headers["Authorization"] = `Bearer ${token}`;
         const absolute = `${window.location.origin}${path}`;
-        return await fetch(absolute, { ...init, headers } as RequestInit);
+        try {
+          return await fetch(absolute, { ...init, headers } as RequestInit);
+        } catch (e) {
+          try {
+            const topOrigin = window.top && window.top.location && window.top.location.origin ? window.top.location.origin : null;
+            if (topOrigin && topOrigin !== window.location.origin) {
+              const topAbsolute = `${topOrigin}${path}`;
+              return await fetch(topAbsolute, { ...init, headers } as RequestInit);
+            }
+          } catch (_) {}
+          throw e;
+        }
       } catch (err2) {
         console.error("safeFetch: all fetch attempts failed", {
           path,
