@@ -89,7 +89,7 @@ export default function HistoryTab({
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await authFetch("/api/users");
+      const res = await safeFetch("/api/users");
       if (!res.ok) throw new Error("Failed to fetch users");
       const data = await res.json();
       setUsers(data.users || []);
