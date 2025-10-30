@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { User, Trash2, Plus, Users, Edit2, X, MapPin } from "lucide-react";
 import type { Site } from "@shared/api";
+import { authFetch } from "@/lib/api";
 
 interface UserItem {
   id: string;
@@ -73,14 +74,10 @@ export default function AdminDashboard() {
   const fetchSites = async () => {
     try {
       const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/sites", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (!token) return;
 
+      const res = await authFetch("/api/sites");
       if (!res.ok) throw new Error("Failed to fetch sites");
-
       const data = await res.json();
       setSites(data.sites || []);
     } catch (error) {
@@ -92,13 +89,16 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const token = localStorage.getItem("auth_token");
-      const res = await fetch("/api/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      if (!token) {
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        return;
+      }
 
-      if (!res.ok) throw new Error("Failed to fetch users");
+      const res = await authFetch("/api/users");
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch users");
+      }
 
       const data = await res.json();
       setUsers(data.users || []);
@@ -126,12 +126,8 @@ export default function AdminDashboard() {
 
       if (editingId) {
         // Update user
-        const res = await fetch(`/api/users/${editingId}`, {
+        const res = await authFetch(`/api/users/${editingId}`, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({
             role: formData.role,
             permissions: formData.permissions,
@@ -149,12 +145,8 @@ export default function AdminDashboard() {
         setMessage({ type: "success", text: "Utilisateur modifié" });
       } else {
         // Create new user
-        const res = await fetch("/api/auth/register", {
+        const res = await authFetch("/api/auth/register", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: JSON.stringify({
             email: formData.email,
             password: formData.password,
@@ -207,11 +199,13 @@ export default function AdminDashboard() {
 
     try {
       const token = localStorage.getItem("auth_token");
-      const res = await fetch(`/api/users/${id}`, {
+      if (!token) {
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        return;
+      }
+
+      const res = await authFetch(`/api/users/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!res.ok) throw new Error("Erreur de suppression");
@@ -495,7 +489,7 @@ export default function AdminDashboard() {
                       <div className="flex-1">
                         <p className="font-semibold">{u.email}</p>
                         <p className="text-sm text-muted-foreground">
-                          Rôle:{" "}
+                          Rôle: {" "}
                           {u.role === "admin"
                             ? "Administrateur"
                             : u.role === "prelevement"
@@ -520,7 +514,7 @@ export default function AdminDashboard() {
                           </div>
                         )}
                         <p className="text-xs text-muted-foreground mt-2">
-                          Créé:{" "}
+                          Créé: {" "}
                           {new Date(u.created_at).toLocaleDateString("fr-FR")}
                         </p>
                       </div>
