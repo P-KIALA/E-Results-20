@@ -154,6 +154,11 @@ export function createServer() {
   // Debug: simulate sending a result without external provider (useful for testing)
   app.post("/api/debug/send-test", sendTest);
 
+  // Server-side proxy to forward requests from embedded clients (iframes) to the app base URL.
+  // Example: client calls /api/proxy/send-logs -> server forwards to APP_BASE_URL/api/send-logs
+  import { proxyHandler } from "./routes/proxy"; // imported inline to keep grouping
+  app.all("/api/proxy/*", requireAuth, proxyHandler);
+
   // Global error handler to ensure consistent JSON errors and avoid response stream issues
   // This will catch errors passed to next(err) or thrown in async route handlers
   // and ensure we send a single JSON response.
