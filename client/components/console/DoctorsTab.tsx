@@ -228,11 +228,8 @@ export default function DoctorsTab() {
         return;
       }
 
-      const res = await fetch(`/api/doctors/${id}/verify`, {
+      const res = await authFetch(`/api/doctors/${id}/verify`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       if (res.ok) {
         setMessage({ type: "success", text: "Vérification en cours..." });
