@@ -378,13 +378,13 @@ export const sendResults: RequestHandler = async (req, res) => {
             ? String(error.message || error.error)
             : String(error);
 
-        // Mark send_log as failed with error message if we have a sendLog
+        // Mark send_log as failed with error message if we have a sendLogId
         try {
-          if (sendLog && sendLog.id) {
+          if (sendLogId) {
             await supabase
               .from("send_logs")
               .update({ status: "failed", error_message: errorMessage })
-              .eq("id", sendLog.id);
+              .eq("id", sendLogId);
           }
         } catch (updateErr) {
           console.error(
