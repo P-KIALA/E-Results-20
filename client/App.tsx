@@ -184,6 +184,17 @@ const App = () => (
 const rootEl = document.getElementById("root");
 if (!rootEl) throw new Error("Root element not found");
 
+// Expose a runtime APP base URL that authFetch can use as an explicit absolute fallback.
+// Prefer Vite injected VITE_APP_BASE_URL, then process.env.APP_BASE_URL (Node), otherwise window.location.origin.
+try {
+  const anyWindow = window as any;
+  const viteBase = (typeof import.meta !== "undefined" && (import.meta as any).env && (import.meta as any).env.VITE_APP_BASE_URL) || null;
+  const nodeBase = (typeof process !== "undefined" && process.env && process.env.APP_BASE_URL) || null;
+  anyWindow.__APP_BASE_URL__ = viteBase || nodeBase || window.location.origin;
+} catch (e) {
+  // ignore
+}
+
 // Reuse existing root across HMR to avoid calling createRoot multiple times
 const anyWindow = window as any;
 if (!anyWindow.__app_root) {
