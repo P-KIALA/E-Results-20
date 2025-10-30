@@ -22,14 +22,20 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
         return await fetch(absolute, opts as RequestInit);
       } catch (e) {
         lastErr = e;
-        console.warn("authFetch: absolute fetch failed", { url: absolute, err: e });
+        console.warn("authFetch: absolute fetch failed", {
+          url: absolute,
+          err: e,
+        });
       }
 
       try {
         return await fetch(asStr, opts as RequestInit);
       } catch (e) {
         lastErr = e;
-        console.warn("authFetch: relative fetch failed", { url: asStr, err: e });
+        console.warn("authFetch: relative fetch failed", {
+          url: asStr,
+          err: e,
+        });
       }
 
       const fallback = `/.netlify/functions/api${asStr.replace(/^\/api/, "")}`;
@@ -37,7 +43,10 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
         return await fetch(fallback, opts as RequestInit);
       } catch (e) {
         lastErr = e;
-        console.warn("authFetch: netlify fallback failed", { url: fallback, err: e });
+        console.warn("authFetch: netlify fallback failed", {
+          url: fallback,
+          err: e,
+        });
       }
     } else {
       return await fetch(input, opts as RequestInit);
@@ -46,6 +55,10 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     lastErr = err;
   }
 
-  console.error("authFetch: all fetch attempts failed", { input: asStr, opts, lastErr });
+  console.error("authFetch: all fetch attempts failed", {
+    input: asStr,
+    opts,
+    lastErr,
+  });
   throw lastErr || new Error("Network request failed");
 }

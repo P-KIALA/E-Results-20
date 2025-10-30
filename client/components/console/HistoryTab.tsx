@@ -47,10 +47,13 @@ export default function HistoryTab({
       return await authFetch(path, init);
     } catch (err) {
       try {
-        console.warn("safeFetch: authFetch failed, trying absolute fetch", { path, err });
+        console.warn("safeFetch: authFetch failed, trying absolute fetch", {
+          path,
+          err,
+        });
         const token = localStorage.getItem("auth_token");
         const headers: Record<string, string> = {
-          ...(init.headers as Record<string, string> || {}),
+          ...((init.headers as Record<string, string>) || {}),
         };
         if (!headers["Content-Type"] && !(init.body instanceof FormData)) {
           headers["Content-Type"] = "application/json";
@@ -59,7 +62,11 @@ export default function HistoryTab({
         const absolute = `${window.location.origin}${path}`;
         return await fetch(absolute, { ...init, headers } as RequestInit);
       } catch (err2) {
-        console.error("safeFetch: all fetch attempts failed", { path, err, err2 });
+        console.error("safeFetch: all fetch attempts failed", {
+          path,
+          err,
+          err2,
+        });
         throw err2 || err;
       }
     }

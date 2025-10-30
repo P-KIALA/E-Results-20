@@ -2,7 +2,10 @@ import { RequestHandler } from "express";
 import twilio from "twilio";
 import { supabase } from "../lib/supabase";
 import { SendResultsRequest } from "@shared/api";
-import { validateAndFormatPhone, checkWhatsAppAvailability } from "../lib/phone";
+import {
+  validateAndFormatPhone,
+  checkWhatsAppAvailability,
+} from "../lib/phone";
 import { sendViaNotifyer } from "../lib/notifyer";
 import { sendViaInfobip } from "../lib/infobip";
 
@@ -14,9 +17,15 @@ const twilioClient = twilio(
 
 function buildTwilioParams(to: string): any {
   if (process.env.TWILIO_MESSAGING_SERVICE_SID) {
-    return { messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID, to: `whatsapp:${to}` };
+    return {
+      messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID,
+      to: `whatsapp:${to}`,
+    };
   }
-  return { from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`, to: `whatsapp:${to}` };
+  return {
+    from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+    to: `whatsapp:${to}`,
+  };
 }
 
 async function sendViaWhatsApp(
@@ -24,8 +33,10 @@ async function sendViaWhatsApp(
   message: string,
   mediaUrls: string[],
 ): Promise<string> {
-  const useInfobip = !!process.env.INFOBIP_API_KEY && process.env.USE_INFOBIP !== "false";
-  const useNotifyer = !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
+  const useInfobip =
+    !!process.env.INFOBIP_API_KEY && process.env.USE_INFOBIP !== "false";
+  const useNotifyer =
+    !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
 
   if (useInfobip) {
     try {
@@ -76,7 +87,9 @@ async function sendViaWhatsApp(
 
     if (!allowFallbackToTwilio) {
       // If fallback is disabled and we reach here, it means other providers failed.
-      throw new Error("All providers failed and fallback to Twilio is disabled");
+      throw new Error(
+        "All providers failed and fallback to Twilio is disabled",
+      );
     }
 
     const statusCallbackUrl = process.env.APP_BASE_URL
@@ -85,10 +98,10 @@ async function sendViaWhatsApp(
 
     if (!mediaUrls || mediaUrls.length === 0) {
       const msgParams: any = {
-      ...buildTwilioParams(to),
-      body: message,
-      ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
-    };
+        ...buildTwilioParams(to),
+        body: message,
+        ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
+      };
 
       const result = await twilioClient.messages.create(msgParams);
 
@@ -98,11 +111,11 @@ async function sendViaWhatsApp(
 
     // Send first message with body + first media
     const firstParams: any = {
-    ...buildTwilioParams(to),
-    body: message,
-    mediaUrl: [mediaUrls[0]],
-    ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
-  };
+      ...buildTwilioParams(to),
+      body: message,
+      mediaUrl: [mediaUrls[0]],
+      ...(statusCallbackUrl ? { statusCallback: statusCallbackUrl } : {}),
+    };
 
     const firstResult = await twilioClient.messages.create(firstParams);
     console.log(`Message with first media sent to ${to}: ${firstResult.sid}`);
@@ -148,11 +161,17 @@ async function sendViaWhatsApp(
 
 export const sendResults: RequestHandler = async (req, res) => {
   try {
-    const { doctor_ids: incomingDoctorIds, custom_message, file_ids, extra_numbers } =
-      req.body as SendResultsRequest;
+    const {
+      doctor_ids: incomingDoctorIds,
+      custom_message,
+      file_ids,
+      extra_numbers,
+    } = req.body as SendResultsRequest;
 
     // Normalize doctor_ids to a mutable array
-    const doctor_ids = Array.isArray(incomingDoctorIds) ? [...incomingDoctorIds] : [];
+    const doctor_ids = Array.isArray(incomingDoctorIds)
+      ? [...incomingDoctorIds]
+      : [];
 
     // Note: patient_name field may not be present in DB schema yet in some environments.
     // To avoid blocking message sending while migrations propagate, do not enforce it server-side.
@@ -167,7 +186,11 @@ export const sendResults: RequestHandler = async (req, res) => {
     const results: any[] = [];
 
     // If extra_numbers provided, try to resolve them to doctor IDs (find existing doctor by phone or create one)
-    if (extra_numbers && Array.isArray(extra_numbers) && extra_numbers.length > 0) {
+    if (
+      extra_numbers &&
+      Array.isArray(extra_numbers) &&
+      extra_numbers.length > 0
+    ) {
       for (const rawPhone of extra_numbers) {
         try {
           const validation = validateAndFormatPhone(String(rawPhone));
@@ -199,13 +222,18 @@ export const sendResults: RequestHandler = async (req, res) => {
                 phone: formatted,
                 name: formatted,
                 whatsapp_verified: is_whatsapp,
-                whatsapp_verified_at: is_whatsapp ? new Date().toISOString() : null,
+                whatsapp_verified_at: is_whatsapp
+                  ? new Date().toISOString()
+                  : null,
               })
               .select()
               .single();
 
             if (insertErr) {
-              console.warn(`Failed to create doctor for ${formatted}:`, insertErr);
+              console.warn(
+                `Failed to create doctor for ${formatted}:`,
+                insertErr,
+              );
             } else if (newDoc && newDoc.id) {
               doctor_ids.push(newDoc.id);
             }
@@ -274,7 +302,10 @@ export const sendResults: RequestHandler = async (req, res) => {
             console.warn("send_logs insert encountered error:", {
               message: logError?.message,
               stack: logError?.stack,
-              details: JSON.stringify(logError, Object.getOwnPropertyNames(logError)),
+              details: JSON.stringify(
+                logError,
+                Object.getOwnPropertyNames(logError),
+              ),
             });
           } catch (e) {
             console.warn("send_logs insert encountered error:", logError);
@@ -340,7 +371,10 @@ export const sendResults: RequestHandler = async (req, res) => {
         }
 
         // Determine friendly error message
-        const errorMessage = error && (error.message || error.error) ? String(error.message || error.error) : String(error);
+        const errorMessage =
+          error && (error.message || error.error)
+            ? String(error.message || error.error)
+            : String(error);
 
         // Mark send_log as failed with error message if we have a sendLog
         try {
@@ -351,7 +385,10 @@ export const sendResults: RequestHandler = async (req, res) => {
               .eq("id", sendLog.id);
           }
         } catch (updateErr) {
-          console.error("Failed to update send_log status to failed:", updateErr);
+          console.error(
+            "Failed to update send_log status to failed:",
+            updateErr,
+          );
         }
 
         results.push({
@@ -570,7 +607,9 @@ export const webhookTwilio: RequestHandler = async (req, res) => {
     } catch (e) {
       console.error("Error handling Twilio webhook:", error);
     }
-    res.status(500).json({ error: error?.message || "Failed to process webhook" });
+    res
+      .status(500)
+      .json({ error: error?.message || "Failed to process webhook" });
   }
 };
 
@@ -586,11 +625,21 @@ export const webhookInfobip: RequestHandler = async (req, res) => {
 
     if (body.messageId) {
       messageId = body.messageId;
-    } else if (body.messages && Array.isArray(body.messages) && body.messages[0]) {
-      messageId = body.messages[0].messageId || body.messages[0].id || body.messages[0].messageId;
+    } else if (
+      body.messages &&
+      Array.isArray(body.messages) &&
+      body.messages[0]
+    ) {
+      messageId =
+        body.messages[0].messageId ||
+        body.messages[0].id ||
+        body.messages[0].messageId;
       status = body.messages[0].status?.name || body.messages[0].status;
     } else if (body.results && Array.isArray(body.results) && body.results[0]) {
-      messageId = body.results[0].messageId || body.results[0].bulkId || body.results[0].id;
+      messageId =
+        body.results[0].messageId ||
+        body.results[0].bulkId ||
+        body.results[0].id;
       status = body.results[0].status || body.results[0].statusName;
     }
 
@@ -614,7 +663,8 @@ export const webhookInfobip: RequestHandler = async (req, res) => {
 
     const updateData: any = { status: mapped };
     if (mapped === "sent") updateData.sent_at = new Date().toISOString();
-    if (mapped === "delivered") updateData.delivered_at = new Date().toISOString();
+    if (mapped === "delivered")
+      updateData.delivered_at = new Date().toISOString();
     if (mapped === "read") updateData.read_at = new Date().toISOString();
 
     // Update send_logs where twilio_message_sid equals messageId (we store provider ids there)
