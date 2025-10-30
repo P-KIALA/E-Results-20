@@ -3,6 +3,8 @@ import twilio from "twilio";
 import { supabase } from "../lib/supabase";
 import { SendResultsRequest } from "@shared/api";
 import { validateAndFormatPhone, checkWhatsAppAvailability } from "../lib/phone";
+import { sendViaNotifyer } from "../lib/notifyer";
+import { validateAndFormatPhone, checkWhatsAppAvailability } from "../lib/phone";
 
 // Initialize Twilio client
 const twilioClient = twilio(
@@ -15,6 +17,28 @@ async function sendViaWhatsApp(
   message: string,
   mediaUrls: string[],
 ): Promise<string> {
+  const useNotifyer = !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
+
+  if (useNotifyer) {
+    try {
+      const id = await sendViaNotifyer(to, message, mediaUrls);
+      console.log(`Notifyer sent message to ${to}: ${id}`);
+      return id;
+    } catch (error) {
+      try {
+        console.error(`Notifyer send error for ${to}:`, {
+          message: (error as any)?.message,
+          stack: (error as any)?.stack,
+          details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+        });
+      } catch (e) {
+        console.error(`Notifyer send error for ${to}:`, error);
+      }
+      // Fallback to Twilio if notifyer fails
+      console.warn("Falling back to Twilio for message delivery");
+    }
+  }
+
   try {
     // WhatsApp via Twilio supports one media per message reliably.
     // If multiple media are provided, send the first media with the message body,
