@@ -113,14 +113,11 @@ export function createServer() {
   app.post("/api/send-results", requireAuth, sendResults);
   app.get("/api/send-logs", requireAuth, getSendLogs);
 
-  // Twilio webhook (public)
-  app.post("/api/webhook/twilio", webhookTwilio);
   // Infobip webhook (public)
   app.post("/api/webhook/infobip", webhookInfobip);
 
   // Debug endpoints (public in dev only)
-  app.get("/api/debug/twilio-test", twilioTest);
-  app.post("/api/debug/fix-pending-twilio-auth", fixPendingDueToTwilioAuth);
+  app.get("/api/debug", debugInfo);
 
   // Global error handler to ensure consistent JSON errors and avoid response stream issues
   // This will catch errors passed to next(err) or thrown in async route handlers
