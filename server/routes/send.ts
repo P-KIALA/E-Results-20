@@ -543,3 +543,61 @@ export const webhookTwilio: RequestHandler = async (req, res) => {
     res.status(500).json({ error: error?.message || "Failed to process webhook" });
   }
 };
+
+export const webhookInfobip: RequestHandler = async (req, res) => {
+  try {
+    // Infobip delivery callbacks structure can vary. We'll try to extract common fields.
+    const body = req.body;
+    console.log("Infobip webhook payload:", JSON.stringify(body));
+
+    // Common fields: messageId, status, or results array
+    let messageId: string | undefined;
+    let status: string | undefined;
+
+    if (body.messageId) {
+      messageId = body.messageId;
+    } else if (body.messages && Array.isArray(body.messages) && body.messages[0]) {
+      messageId = body.messages[0].messageId || body.messages[0].id || body.messages[0].messageId;
+      status = body.messages[0].status?.name || body.messages[0].status;
+    } else if (body.results && Array.isArray(body.results) && body.results[0]) {
+      messageId = body.results[0].messageId || body.results[0].bulkId || body.results[0].id;
+      status = body.results[0].status || body.results[0].statusName;
+    }
+
+    if (!messageId) {
+      console.warn("Infobip webhook: could not find message id in payload");
+      return res.json({ success: true });
+    }
+
+    // Map Infobip status to our status
+    const map: Record<string, string> = {
+      PENDING: "pending",
+      SCHEDULED: "pending",
+      SENT: "sent",
+      DELIVERED: "delivered",
+      READ: "read",
+      UNDELIVERABLE: "failed",
+      FAILED: "failed",
+    };
+
+    const mapped = status ? map[status.toUpperCase()] || status : "sent";
+
+    const updateData: any = { status: mapped };
+    if (mapped === "sent") updateData.sent_at = new Date().toISOString();
+    if (mapped === "delivered") updateData.delivered_at = new Date().toISOString();
+    if (mapped === "read") updateData.read_at = new Date().toISOString();
+
+    // Update send_logs where twilio_message_sid equals messageId (we store provider ids there)
+    const { error } = await supabase
+      .from("send_logs")
+      .update(updateData)
+      .eq("twilio_message_sid", messageId);
+
+    if (error) throw error;
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error handling Infobip webhook:", error);
+    res.status(500).json({ error: "Failed to process infobip webhook" });
+  }
+};
