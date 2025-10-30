@@ -510,7 +510,7 @@ export const webhookInfobip: RequestHandler = async (req, res) => {
       updateData.delivered_at = new Date().toISOString();
     if (mapped === "read") updateData.read_at = new Date().toISOString();
 
-    // Update send_logs where twilio_message_sid equals messageId (we store provider ids there)
+    // Update send_logs where provider message id equals messageId (stored in twilio_message_sid column)
     const { error } = await supabase
       .from("send_logs")
       .update(updateData)
