@@ -24,34 +24,10 @@ import {
   RefreshCw,
   Pencil,
 } from "lucide-react";
-
-// Mock data
-const MOCK_DOCTORS: Doctor[] = [
-  {
-    id: "doc1",
-    phone: "+243123456789",
-    name: "PARACLET KIALA",
-    specialization: "Généraliste",
-    cnom: "12345",
-    whatsapp_verified: true,
-    whatsapp_verified_at: "2025-01-30T10:00:00Z",
-    created_at: "2025-01-30T10:00:00Z",
-    updated_at: "2025-01-30T10:00:00Z",
-  },
-  {
-    id: "doc2",
-    phone: "+243987654321",
-    name: "Dr. MARIE KABILA",
-    specialization: "Pédiatrie",
-    cnom: "67890",
-    whatsapp_verified: false,
-    created_at: "2025-01-30T11:00:00Z",
-    updated_at: "2025-01-30T11:00:00Z",
-  },
-];
+import { authFetch } from "@/lib/api";
 
 export default function DoctorsTab() {
-  const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -76,208 +52,622 @@ export default function DoctorsTab() {
   const [deletingDoctorName, setDeletingDoctorName] = useState("");
 
   useEffect(() => {
-    // API calls disabled
-    // fetchDoctors();
+    fetchDoctors();
   }, []);
 
+  const readResponse = async (res: Response) => {
+    try {
+      if ((res as any).bodyUsed) {
+        try {
+          const cloneText = await (res.clone() as Response).text();
+          try {
+            const json = cloneText ? JSON.parse(cloneText) : null;
+            return { ok: res.ok, status: res.status, json, text: cloneText };
+          } catch (e) {
+            return {
+              ok: res.ok,
+              status: res.status,
+              json: null,
+              text: cloneText,
+            };
+          }
+        } catch (e) {
+          return { ok: res.ok, status: res.status, json: null, text: null };
+        }
+      }
+      const text = await res.text();
+      try {
+        const json = text ? JSON.parse(text) : null;
+        return { ok: res.ok, status: res.status, json, text };
+      } catch (e) {
+        return { ok: res.ok, status: res.status, json: null, text };
+      }
+    } catch (e) {
+      return { ok: res.ok, status: res.status, json: null, text: null };
+    }
+  };
+
   const fetchDoctors = async () => {
-    console.log("API calls disabled - using mock data");
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
+        return;
+      }
+      const res = await authFetch("/api/doctors");
+      const parsed = await readResponse(res);
+      if (!parsed.ok) {
+        throw new Error(
+          parsed.json?.error || parsed.text || "Failed to fetch doctors",
+        );
+      }
+      setDoctors(parsed.json?.doctors || []);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+      setMessage({
+        type: "error",
+        text:
+          error instanceof Error ? error.message : "Erreur lors du chargement",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCreateDoctor = async (e: React.FormEvent) => {
+  const handleAddDoctor = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage({ type: "error", text: "Fonction désactivée en mode démonstration" });
+    setSubmitting(true);
+    setMessage(null);
+
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
+        return;
+      }
+
+      // Check for duplicates locally
+      if (doctors.some((d) => d.phone === formData.phone)) {
+        setMessage({
+          type: "error",
+          text: "Ce numéro de téléphone existe déjà",
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      if (formData.cnom && doctors.some((d) => d.cnom === formData.cnom)) {
+        setMessage({
+          type: "error",
+          text: "Ce numéro CNOM existe déjà",
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      const res = await authFetch("/api/doctors", {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+
+      const parsed = await readResponse(res);
+      if (!parsed.ok) {
+        setMessage({
+          type: "error",
+          text: parsed.json?.error || parsed.text || "Erreur lors de l'ajout",
+        });
+        return;
+      }
+
+      setMessage({ type: "success", text: "Médecin ajouté avec succès" });
+      setFormData({ phone: "", name: "", specialization: "", cnom: "" });
+      setShowAddForm(false);
+      await fetchDoctors();
+    } catch (error) {
+      console.error("Error adding doctor:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur lors de l'ajout",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleEditDoctor = (doctor: Doctor) => {
-    setMessage({ type: "error", text: "Fonction désactivée en mode démonstration" });
+  const confirmDeleteDoctor = async () => {
+    if (!deletingDoctorId) return;
+
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
+        return;
+      }
+
+      const res = await authFetch(`/api/doctors/${deletingDoctorId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setMessage({ type: "success", text: "Médecin supprimé avec succès" });
+        await fetchDoctors();
+      } else {
+        const parsed = await readResponse(res);
+        setMessage({
+          type: "error",
+          text: parsed.json?.error || parsed.text || "Erreur de suppression",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting doctor:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur de suppression",
+      });
+    } finally {
+      setDeletingDoctorId(null);
+      setDeletingDoctorName("");
+    }
   };
 
-  const handleUpdateDoctor = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage({ type: "error", text: "Fonction désactivée en mode démonstration" });
+  const handleDeleteDoctor = (id: string, name: string) => {
+    setDeletingDoctorId(id);
+    setDeletingDoctorName(name);
   };
 
-  const handleDeleteDoctor = async (id: string) => {
-    setMessage({ type: "error", text: "Fonction désactivée en mode démonstration" });
+  const handleVerify = async (id: string) => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
+        return;
+      }
+
+      const res = await authFetch(`/api/doctors/${id}/verify`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        setMessage({ type: "success", text: "Vérification en cours..." });
+        await fetchDoctors();
+      } else {
+        const parsed = await readResponse(res);
+        setMessage({
+          type: "error",
+          text: parsed.json?.error || parsed.text || "Erreur de vérification",
+        });
+      }
+    } catch (error) {
+      console.error("Error verifying doctor:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Erreur de vérification",
+      });
+    }
   };
 
-  const confirmDelete = async () => {
-    setMessage({ type: "error", text: "Fonction désactivée en mode démonstration" });
-  };
+  const handleEditDoctor = async (id: string) => {
+    if (!editFormData.name.trim()) {
+      setMessage({
+        type: "error",
+        text: "Le nom ne peut pas être vide",
+      });
+      return;
+    }
 
-  const handleVerifyDoctor = async (id: string) => {
-    setMessage({ type: "error", text: "Fonction désactivée en mode démonstration" });
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
+        return;
+      }
+
+      // Check for duplicates (excluding current doctor)
+      const currentDoctor = doctors.find((d) => d.id === id);
+      if (
+        editFormData.phone &&
+        editFormData.phone !== currentDoctor?.phone &&
+        doctors.some((d) => d.id !== id && d.phone === editFormData.phone)
+      ) {
+        setMessage({
+          type: "error",
+          text: "Ce numéro de téléphone existe déjà",
+        });
+        return;
+      }
+
+      if (
+        editFormData.cnom &&
+        editFormData.cnom !== currentDoctor?.cnom &&
+        doctors.some((d) => d.id !== id && d.cnom === editFormData.cnom)
+      ) {
+        setMessage({
+          type: "error",
+          text: "Ce numéro CNOM existe déjà",
+        });
+        return;
+      }
+
+      const res = await authFetch(`/api/doctors/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(editFormData),
+      });
+
+      if (!res.ok) {
+        const err = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
+        setMessage({
+          type: "error",
+          text: err.error || "Erreur lors de la modification",
+        });
+        return;
+      }
+
+      setMessage({ type: "success", text: "Médecin modifié avec succès" });
+      setEditingDoctorId(null);
+      setEditFormData({ name: "", phone: "", specialization: "", cnom: "" });
+      await fetchDoctors();
+    } catch (error) {
+      console.error("Error editing doctor:", error);
+      setMessage({
+        type: "error",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Erreur lors de la modification",
+      });
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">
-            Gestion des médecins
-          </h2>
-          <p className="text-muted-foreground">
-            {doctors.length} médecin(s) enregistré(s)
+          <h3 className="text-lg font-semibold">Gestion des médecins</h3>
+          <p className="text-sm text-muted-foreground">
+            Ajoutez et gérez les médecins destinataires
           </p>
         </div>
-        <Button onClick={() => setShowAddForm(true)} className="gap-2" disabled>
-          <Plus size={16} /> Ajouter un médecin
+        <Button onClick={() => setShowAddForm(true)} className="gap-2">
+          <Plus size={16} /> Ajouter médecin
         </Button>
       </div>
 
-      {message && (
+      {message && !showAddForm && editingDoctorId === null && (
         <div
-          className={`p-4 rounded-lg ${
-            message.type === "success"
-              ? "bg-green-50 text-green-800"
-              : "bg-red-50 text-red-800"
-          }`}
+          className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
         >
           {message.text}
         </div>
       )}
 
-      {loading ? (
-        <p className="text-center text-muted-foreground">Chargement...</p>
-      ) : doctors.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6 text-center text-muted-foreground">
-            Aucun médecin enregistré
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {doctors.map((doctor) => (
+      <Dialog
+        open={showAddForm}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowAddForm(false);
+            setMessage(null);
+          } else {
+            setShowAddForm(true);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ajouter un médecin</DialogTitle>
+            <DialogDescription>
+              Ajoutez un nouveau médecin au système
+            </DialogDescription>
+          </DialogHeader>
+          {message && showAddForm && (
+            <div
+              className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+            >
+              {message.text}
+            </div>
+          )}
+          <form onSubmit={handleAddDoctor} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Téléphone *</label>
+              <Input
+                type="tel"
+                placeholder="+243 (format international)"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Nom *</label>
+              <Input
+                placeholder="Dr. Martin Dupont"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Spécialité</label>
+              <Input
+                placeholder="Cardiologue"
+                value={formData.specialization}
+                onChange={(e) =>
+                  setFormData({ ...formData, specialization: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">CNOM</label>
+              <Input
+                placeholder="Numéro d'ordre au CNOM"
+                value={formData.cnom}
+                onChange={(e) =>
+                  setFormData({ ...formData, cnom: e.target.value })
+                }
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowAddForm(false)}
+              >
+                Annuler
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Ajout..." : "Ajouter"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={deletingDoctorId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeletingDoctorId(null);
+            setDeletingDoctorName("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmer la suppression</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer le médecin{" "}
+              <strong>{deletingDoctorName}</strong> ? Cette action est
+              irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeletingDoctorId(null);
+                setDeletingDoctorName("");
+              }}
+            >
+              Annuler
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteDoctor}>
+              Supprimer
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={editingDoctorId !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingDoctorId(null);
+            setEditFormData({
+              name: "",
+              phone: "",
+              specialization: "",
+              cnom: "",
+            });
+            setMessage(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier le médecin</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations du médecin
+            </DialogDescription>
+          </DialogHeader>
+          {message && editingDoctorId !== null && (
+            <div
+              className={`p-3 rounded-lg ${message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+            >
+              {message.text}
+            </div>
+          )}
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Nom *</label>
+              <Input
+                type="text"
+                value={editFormData.name}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, name: e.target.value })
+                }
+                placeholder="Nom du médecin"
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Téléphone</label>
+              <Input
+                type="tel"
+                value={editFormData.phone}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, phone: e.target.value })
+                }
+                placeholder="+243 (format international)"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Spécialité</label>
+              <Input
+                type="text"
+                value={editFormData.specialization}
+                onChange={(e) =>
+                  setEditFormData({
+                    ...editFormData,
+                    specialization: e.target.value,
+                  })
+                }
+                placeholder="Cardiologue"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">CNOM</label>
+              <Input
+                type="text"
+                value={editFormData.cnom}
+                onChange={(e) =>
+                  setEditFormData({ ...editFormData, cnom: e.target.value })
+                }
+                placeholder="Numéro d'ordre au CNOM"
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditingDoctorId(null);
+                  setEditFormData({
+                    name: "",
+                    phone: "",
+                    specialization: "",
+                    cnom: "",
+                  });
+                }}
+              >
+                Annuler
+              </Button>
+              <Button
+                onClick={() =>
+                  editingDoctorId && handleEditDoctor(editingDoctorId)
+                }
+              >
+                Enregistrer
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="grid gap-4">
+        {loading ? (
+          <p className="text-center text-muted-foreground">Chargement...</p>
+        ) : doctors.length === 0 ? (
+          <Card>
+            <CardContent className="pt-6 text-center text-muted-foreground">
+              Aucun médecin. Commencez par en ajouter un.
+            </CardContent>
+          </Card>
+        ) : (
+          doctors.map((doctor) => (
             <Card key={doctor.id}>
-              <CardHeader>
+              <CardContent className="pt-6">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="flex items-center gap-2">
-                      {doctor.name || doctor.phone}
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className="font-semibold">{doctor.name}</h4>
                       {doctor.whatsapp_verified ? (
                         <CheckCircle
                           size={16}
                           className="text-green-600"
-                          title="WhatsApp vérifié"
+                          title="Vérifié WhatsApp"
                         />
                       ) : (
                         <AlertCircle
                           size={16}
-                          className="text-yellow-600"
-                          title="WhatsApp non vérifié"
+                          className="text-amber-600"
+                          title="Non vérifié WhatsApp"
                         />
                       )}
-                    </CardTitle>
-                    <CardDescription>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
                       {doctor.phone}
-                      {doctor.specialization && ` • ${doctor.specialization}`}
-                      {doctor.cnom && ` • CNOM: ${doctor.cnom}`}
-                    </CardDescription>
+                    </p>
+                    {doctor.specialization && (
+                      <p className="text-sm text-muted-foreground">
+                        Spécialité: {doctor.specialization}
+                      </p>
+                    )}
+                    {doctor.cnom && (
+                      <p className="text-sm text-muted-foreground">
+                        CNOM: {doctor.cnom}
+                      </p>
+                    )}
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditingDoctorId(doctor.id);
+                        setEditFormData({
+                          name: doctor.name,
+                          phone: doctor.phone,
+                          specialization: doctor.specialization || "",
+                          cnom: doctor.cnom || "",
+                        });
+                      }}
+                      className="gap-2"
+                    >
+                      <Pencil size={14} /> Modifier
+                    </Button>
                     {!doctor.whatsapp_verified && (
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleVerifyDoctor(doctor.id)}
-                        disabled
-                        title="Vérifier WhatsApp"
+                        onClick={() => handleVerify(doctor.id)}
+                        className="gap-2"
                       >
-                        <RefreshCw size={14} />
+                        <RefreshCw size={14} /> Vérifier
                       </Button>
                     )}
                     <Button
                       size="sm"
-                      variant="outline"
-                      onClick={() => handleEditDoctor(doctor)}
-                      disabled
-                    >
-                      <Pencil size={14} />
-                    </Button>
-                    <Button
-                      size="sm"
                       variant="destructive"
-                      onClick={() => handleDeleteDoctor(doctor.id)}
-                      disabled
+                      onClick={() => handleDeleteDoctor(doctor.id, doctor.name)}
+                      className="gap-2"
                     >
                       <Trash2 size={14} />
                     </Button>
                   </div>
                 </div>
-              </CardHeader>
+              </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
-
-      <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Ajouter un médecin</DialogTitle>
-            <DialogDescription>
-              Remplissez les informations du médecin (désactivé)
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleCreateDoctor} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Téléphone *</label>
-              <Input
-                type="tel"
-                placeholder="+243..."
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-                disabled
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Nom</label>
-              <Input
-                type="text"
-                placeholder="Dr. Nom Prénom"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                disabled
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Spécialisation</label>
-              <Input
-                type="text"
-                placeholder="Généraliste, Pédiatre..."
-                value={formData.specialization}
-                onChange={(e) =>
-                  setFormData({ ...formData, specialization: e.target.value })
-                }
-                disabled
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Numéro CNOM</label>
-              <Input
-                type="text"
-                placeholder="12345"
-                value={formData.cnom}
-                onChange={(e) =>
-                  setFormData({ ...formData, cnom: e.target.value })
-                }
-                disabled
-              />
-            </div>
-            <Button type="submit" disabled={submitting}>
-              {submitting ? "Ajout..." : "Ajouter"}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <div className="text-sm text-muted-foreground text-center p-4 border rounded-lg bg-yellow-50">
-        <p>⚠️ Mode démonstration : Les appels API sont désactivés. Utilisez <a href="#" onClick={() => window.open(window.location.origin, '_blank')} className="underline text-blue-600">Open Preview</a> pour accéder à toutes les fonctionnalités.</p>
+          ))
+        )}
       </div>
     </div>
   );
