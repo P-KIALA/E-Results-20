@@ -188,8 +188,16 @@ if (!rootEl) throw new Error("Root element not found");
 // Prefer Vite injected VITE_APP_BASE_URL, then process.env.APP_BASE_URL (Node), otherwise window.location.origin.
 try {
   const anyWindow = window as any;
-  const viteBase = (typeof import.meta !== "undefined" && (import.meta as any).env && (import.meta as any).env.VITE_APP_BASE_URL) || null;
-  const nodeBase = (typeof process !== "undefined" && process.env && process.env.APP_BASE_URL) || null;
+  const viteBase =
+    (typeof import.meta !== "undefined" &&
+      (import.meta as any).env &&
+      (import.meta as any).env.VITE_APP_BASE_URL) ||
+    null;
+  const nodeBase =
+    (typeof process !== "undefined" &&
+      process.env &&
+      process.env.APP_BASE_URL) ||
+    null;
   anyWindow.__APP_BASE_URL__ = viteBase || nodeBase || window.location.origin;
 } catch (e) {
   // ignore

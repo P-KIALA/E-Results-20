@@ -1,5 +1,6 @@
 export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
-  const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
 
   const baseHeaders: Record<string, string> = {
     ...((init.headers as Record<string, string>) || {}),
@@ -39,9 +40,22 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     // 2) Try explicit base URL provided at build-time (Vite) or runtime via window.__APP_BASE_URL__
     try {
       // Prefer Vite injected env var VITE_APP_BASE_URL, then runtime global, then window.location.origin
-      const viteBase = (typeof import.meta !== "undefined" && (import.meta as any).env && (import.meta as any).env.VITE_APP_BASE_URL) || null;
-      const runtimeBase = (typeof window !== "undefined" ? (window as any).__APP_BASE_URL__ : null) || null;
-      const origin = viteBase || runtimeBase || (typeof window !== "undefined" && window.location && window.location.origin) || "";
+      const viteBase =
+        (typeof import.meta !== "undefined" &&
+          (import.meta as any).env &&
+          (import.meta as any).env.VITE_APP_BASE_URL) ||
+        null;
+      const runtimeBase =
+        (typeof window !== "undefined"
+          ? (window as any).__APP_BASE_URL__
+          : null) || null;
+      const origin =
+        viteBase ||
+        runtimeBase ||
+        (typeof window !== "undefined" &&
+          window.location &&
+          window.location.origin) ||
+        "";
       const absolute = `${origin}${asStr}`;
       return await fetch(absolute, defaultOpts);
     } catch (e) {
@@ -50,7 +64,8 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
         console.warn("authFetch: absolute fetch failed", {
           url: asStr,
           err: String(e),
-          online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
+          online:
+            typeof navigator !== "undefined" ? navigator.onLine : undefined,
         });
       } catch (_) {}
     }
@@ -66,7 +81,8 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
           url: asStr,
           fallback,
           err: String(e),
-          online: typeof navigator !== "undefined" ? navigator.onLine : undefined,
+          online:
+            typeof navigator !== "undefined" ? navigator.onLine : undefined,
         });
       } catch (_) {}
     }

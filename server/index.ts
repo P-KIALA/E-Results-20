@@ -52,7 +52,9 @@ export function createServer() {
           ].filter(Boolean) as string[];
 
           // If origin matches one of the allowed patterns or is a subdomain of builder.io, allow it
-          const isAllowed = allowed.some((allowedOrigin) => origin === allowedOrigin) || /(^|\.)builder\.io$/.test(new URL(origin).hostname);
+          const isAllowed =
+            allowed.some((allowedOrigin) => origin === allowedOrigin) ||
+            /(^|\.)builder\.io$/.test(new URL(origin).hostname);
 
           if (isAllowed) return callback(null, true);
 
@@ -84,7 +86,9 @@ export function createServer() {
       const origin = req.headers.origin || req.headers.referer || "<no-origin>";
       const authHeader = req.headers.authorization ? "present" : "missing";
       // log method, path, origin and whether auth header is present (do not log token value)
-      console.log(`[HTTP] ${req.method} ${req.path} auth=${authHeader} origin=${origin}`);
+      console.log(
+        `[HTTP] ${req.method} ${req.path} auth=${authHeader} origin=${origin}`,
+      );
     } catch (e) {
       // ignore logging errors
     }
