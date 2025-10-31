@@ -61,7 +61,21 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
       try {
-        return await fetch(url, { ...opts, signal: controller.signal });
+        const resp = await fetch(url, { ...opts, signal: controller.signal });
+        // If server returned HTML (e.g., dev server error page or client index.html), treat as failure to allow fallbacks
+        try {
+          const ct = (resp.headers.get("content-type") || "").toLowerCase();
+          if (ct.includes("text/html") || ct.includes("application/xhtml+xml")) {
+            const text = await resp.text();
+            const err: any = new Error("Non-JSON response from server");
+            err.status = resp.status;
+            err.responseText = text.slice(0, 2000);
+            throw err;
+          }
+        } catch (e) {
+          // If reading headers or text failed, fall through to return the response
+        }
+        return resp;
       } finally {
         clearTimeout(id);
       }
