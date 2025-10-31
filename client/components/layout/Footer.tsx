@@ -41,7 +41,7 @@ export default function Footer() {
         </div>
         <div className="text-sm text-muted-foreground flex flex-col gap-2"></div>
         <div className="text-sm text-muted-foreground md:text-right">
-          <p>
+          <p className="mt-[52px]">
             © {new Date().getFullYear()} Le PARACLET. Tous droits réservés.
           </p>
         </div>
