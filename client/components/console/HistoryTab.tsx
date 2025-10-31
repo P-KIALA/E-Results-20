@@ -95,6 +95,74 @@ export default function HistoryTab({
     }
   };
 
+  // Open files modal for a specific send log
+  const openFilesForLog = async (log: any) => {
+    setSelectedLog(log);
+    setFilesModalOpen(true);
+    setFilesLoading(true);
+    setLogFiles([]);
+    try {
+      const res = await safeFetch(`/api/send-logs/${log.id}/files`);
+      if (!res.ok) throw new Error("Failed to fetch files");
+      const data = await res.json();
+      setLogFiles(data.files || []);
+    } catch (e) {
+      console.error("Failed to load files for log", e);
+      setLogFiles([]);
+      setMessage({ type: "error", text: "Impossible de charger les fichiers" });
+    } finally {
+      setFilesLoading(false);
+    }
+  };
+
+  const openFileUrl = async (storagePath: string) => {
+    try {
+      const res = await safeFetch(`/api/file-url?storage_path=${encodeURIComponent(storagePath)}`);
+      if (!res.ok) throw new Error("Failed to get file URL");
+      const data = await res.json();
+      if (data && data.url) {
+        window.open(data.url, "_blank");
+      }
+    } catch (e) {
+      console.error("Failed to get file URL", e);
+      setMessage({ type: "error", text: "Impossible d'ouvrir le fichier" });
+    }
+  };
+
+  const resendFilesToDoctor = async () => {
+    if (!selectedLog) return;
+    if (logFiles.length === 0) {
+      setMessage({ type: "error", text: "Aucun fichier à renvoyer" });
+      return;
+    }
+    setResendLoading(true);
+    try {
+      const payload = {
+        doctor_ids: [selectedLog.doctor_id],
+        custom_message: (selectedLog as any).custom_message || "",
+        file_ids: logFiles.map((f) => f.id),
+      };
+      const res = await safeFetch(`/api/send-results`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to resend files");
+      }
+      setMessage({ type: "success", text: "Fichiers renvoyés avec succès" });
+      setFilesModalOpen(false);
+      // refresh logs
+      await fetchLogs();
+    } catch (e: any) {
+      console.error("Failed to resend files:", e);
+      setMessage({ type: "error", text: e?.message || "Erreur lors du renvoi" });
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const fetchSites = useCallback(async () => {
     try {
       const res = await safeFetch("/api/sites");
