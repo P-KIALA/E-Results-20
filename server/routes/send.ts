@@ -13,10 +13,10 @@ async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[],
   const toWhats = to.startsWith("whatsapp:") ? to : `whatsapp:${validation.formatted_phone}`;
 
   // Credentials
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
-  const messagingService = process.env.TWILIO_MESSAGING_SERVICE_SID;
-  const fromEnv = process.env.TWILIO_PHONE_NUMBER;
+  const sid = creds?.sid || process.env.TWILIO_ACCOUNT_SID;
+  const token = creds?.token || process.env.TWILIO_AUTH_TOKEN;
+  const messagingService = creds?.messagingService || process.env.TWILIO_MESSAGING_SERVICE_SID;
+  const fromEnv = creds?.from || process.env.TWILIO_PHONE_NUMBER;
 
   if (!sid || !token) throw new Error("Twilio credentials not configured");
 
