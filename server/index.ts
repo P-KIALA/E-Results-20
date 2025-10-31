@@ -69,10 +69,27 @@ export function createServer() {
             "https://preview.builder.io",
           ].filter(Boolean) as string[];
 
-          // If origin matches one of the allowed patterns or is a subdomain of builder.io, allow it
+          // If origin matches one of the allowed patterns, is a subdomain of the app base or builder.io, allow it
+          const hostname = (() => {
+            try {
+              return new URL(origin).hostname;
+            } catch (_) {
+              return null;
+            }
+          })();
+
+          const appBaseHost = (() => {
+            try {
+              return process.env.APP_BASE_URL ? new URL(process.env.APP_BASE_URL).hostname : null;
+            } catch (_) {
+              return null;
+            }
+          })();
+
           const isAllowed =
             allowed.some((allowedOrigin) => origin === allowedOrigin) ||
-            /(^|\.)builder\.io$/.test(new URL(origin).hostname);
+            (hostname && appBaseHost && (hostname === appBaseHost || hostname.endsWith('.' + appBaseHost))) ||
+            /(^|\.)builder\.io$/.test(hostname || "");
 
           if (isAllowed) return callback(null, true);
 
