@@ -726,6 +726,7 @@ export const getSendLogFiles: RequestHandler = async (req, res) => {
       }
     }
 
+    console.log(`[getSendLogFiles] returning ${((files||[]).length)} files for send_log ${String(sendLogId)}`);
     res.json({ files: files || [] });
   } catch (error: any) {
     console.error("Error fetching send log files:", error);
