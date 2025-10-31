@@ -60,22 +60,24 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Use pure black background in dark mode */
+    --background: 0 0% 0%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    /* Cards should be very dark but slightly lighter than background to create separation */
+    --card: 0 0% 6%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 0 0% 6%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 146 62% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 210 12% 6%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 210 12% 6%;
     --muted-foreground: 215 20.2% 65.1%;
 
     --accent: 146 30% 20%;
@@ -84,16 +86,17 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    /* darker borders/inputs */
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
     --ring: 146 62% 45%;
-    --sidebar-background: 240 5.9% 10%;
+    --sidebar-background: 0 0% 3%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 146 62% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent: 0 0% 6%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-border: 0 0% 10%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
