@@ -271,22 +271,101 @@ function MobileDrawer() {
         </div>
 
         <div className="p-3 flex flex-col gap-1">
-          {location && (
-            <>
-              {/** replicate main menu items here **/}
-              {/** Admin vs User sections **/}
-            </>
-          )}
-
-          {/* Links - replicate from desktop aside */}
-          {/* we keep the same order and classes but simplified */}
-          <div className="mt-2">
-            {/* The menu items are copied to avoid duplication issues with render order */}
-            {/* Admin items */}
-            {/* We can't access user role easily here without refetch - but top-level component had it; reuse hook */}
-          </div>
+          {/* reuse auth info */}
+          <MobileMenuItems setOpenMobile={setOpenMobile} />
         </div>
       </aside>
     </div>
+  );
+}
+
+function MobileMenuItems({ setOpenMobile }: { setOpenMobile: (v: boolean) => void }) {
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const { user, logout } = useAuth();
+  const isConsoleActive = location.pathname === "/console";
+  const currentTab = searchParams.get("tab") || "doctors";
+
+  const navItemClass = (active: boolean) =>
+    cn(
+      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 w-full",
+      "no-underline text-decoration-none whitespace-nowrap",
+      active
+        ? "bg-primary text-primary-foreground font-semibold"
+        : "text-foreground hover:bg-muted/60 hover:text-primary",
+    );
+
+  return (
+    <>
+      {user?.role === "admin" ? (
+        <>
+          <Link onClick={() => setOpenMobile(false)} to="/console?tab=doctors" className={navItemClass(isConsoleActive && currentTab === "doctors")}>
+            <Stethoscope size={18} />
+            <span>Médecins</span>
+          </Link>
+
+          <Link onClick={() => setOpenMobile(false)} to="/console?tab=results" className={navItemClass(isConsoleActive && currentTab === "results")}>
+            <Send size={18} />
+            <span>Envoi résultat</span>
+          </Link>
+
+          <Link onClick={() => setOpenMobile(false)} to="/console?tab=history" className={navItemClass(isConsoleActive && currentTab === "history")}>
+            <Clock size={18} />
+            <span>Historique</span>
+          </Link>
+
+          <Link onClick={() => setOpenMobile(false)} to="/console?tab=stats" className={navItemClass(isConsoleActive && currentTab === "stats")}>
+            <BarChart3 size={18} />
+            <span>Statistiques</span>
+          </Link>
+
+          <div className="my-2 border-t border-border" />
+
+          <Link onClick={() => setOpenMobile(false)} to="/admin" className={navItemClass(location.pathname === "/admin")}>
+            <Users size={18} />
+            <span>Utilisateurs</span>
+          </Link>
+
+          <Link onClick={() => setOpenMobile(false)} to="/sites" className={navItemClass(location.pathname === "/sites")}>
+            <MapPin size={18} />
+            <span>Sites</span>
+          </Link>
+
+          <Link onClick={() => setOpenMobile(false)} to="/report" className={navItemClass(location.pathname === "/report")}>
+            <BarChart3 size={18} />
+            <span>Rapport</span>
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link onClick={() => setOpenMobile(false)} to="/dashboard" className={navItemClass(location.pathname === "/dashboard")}>
+            <LayoutDashboard size={18} />
+            <span>Envois</span>
+          </Link>
+
+          <Link onClick={() => setOpenMobile(false)} to="/history" className={navItemClass(location.pathname === "/history")}>
+            <Clock size={18} />
+            <span>Historique</span>
+          </Link>
+
+          <Link onClick={() => setOpenMobile(false)} to="/stats" className={navItemClass(location.pathname === "/stats")}>
+            <BarChart3 size={18} />
+            <span>Statistiques</span>
+          </Link>
+
+          <Link onClick={() => setOpenMobile(false)} to="/report" className={navItemClass(location.pathname === "/report")}>
+            <BarChart3 size={18} />
+            <span>Rapport</span>
+          </Link>
+        </>
+      )}
+
+      <div className="flex-1" />
+
+      <button onClick={() => { logout(); setOpenMobile(false); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 w-full">
+        <LogOut size={18} />
+        <span>Déconnexion</span>
+      </button>
+    </>
   );
 }
