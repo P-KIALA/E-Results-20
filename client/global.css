@@ -128,6 +128,15 @@
     color: rgba(255,255,255,0.7) !important;
   }
 
+  /* Ensure slider uses the dark background color in dark mode */
+  .dark .slider-track {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .dark .slider-range {
+    background-color: hsl(var(--background)) !important;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
