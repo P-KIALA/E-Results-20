@@ -168,6 +168,8 @@ export function createServer() {
   app.get("/api/debug", debugInfo);
   // Debug: simulate sending a result without external provider (useful for testing)
   app.post("/api/debug/send-test", sendTest);
+  // Public upload endpoint for testing (dev only)
+  app.post("/api/debug/upload-public", uploadPublic);
 
   // Twilio debug send endpoint (public, dev only). Sends a simple WhatsApp text message.
   app.post("/api/debug/twilio-send-public", twilioSendHandler);
