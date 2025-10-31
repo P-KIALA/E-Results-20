@@ -501,6 +501,12 @@ export default function HistoryTab({
                           {log.error_message}
                         </p>
                       )}
+
+                      <div className="mt-2 flex justify-end gap-2">
+                        <Button size="sm" variant="outline" onClick={() => openFilesForLog(log)}>
+                          Fichiers
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
