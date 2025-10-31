@@ -9,8 +9,20 @@ export async function twilioSendHandler(req: Request, res: Response) {
     const from = process.env.TWILIO_PHONE_NUMBER || undefined; // prefer WhatsApp formatted number like whatsapp:+1415...
     const messagingService = process.env.TWILIO_MESSAGING_SERVICE_SID || undefined;
 
-    if (!sid || !token) {
-      return res.status(500).json({ ok: false, error: "TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be configured" });
+    // Allow passing credentials in request body for local/dev testing if env not set
+    let useSid = sid;
+    let useToken = token;
+    if (!useSid || !useToken) {
+      const maybeSid = (req.body && (req.body.sid as string)) || (req.query && (req.query.sid as string));
+      const maybeToken = (req.body && (req.body.token as string)) || (req.query && (req.query.token as string));
+      if (maybeSid && maybeToken) {
+        useSid = maybeSid;
+        useToken = maybeToken;
+      }
+    }
+
+    if (!useSid || !useToken) {
+      return res.status(500).json({ ok: false, error: "TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be configured (or passed in request for dev testing)" });
     }
 
     const toRaw = (req.query.to as string) || (req.body && (req.body.to as string));
@@ -29,8 +41,6 @@ export async function twilioSendHandler(req: Request, res: Response) {
       payload.append("MessagingServiceSid", messagingService);
     } else if (from) {
       payload.append("From", from.startsWith("whatsapp:") ? from : `whatsapp:${from}`);
-    } else {
-      return res.status(500).json({ ok: false, error: "TWILIO_PHONE_NUMBER or TWILIO_MESSAGING_SERVICE_SID must be configured" });
     }
     payload.append("Body", msg);
 
