@@ -185,6 +185,7 @@ export function createServer() {
   // Send results (protected)
   app.post("/api/send-results", requireAuth, sendResults);
   app.get("/api/send-logs", requireAuth, getSendLogs);
+  app.get("/api/send-logs/:id/files", requireAuth, getSendLogFiles);
 
   // Debug endpoints (public in dev only)
   app.get("/api/debug", debugInfo);
