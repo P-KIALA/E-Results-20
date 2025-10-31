@@ -40,10 +40,26 @@ const images = [
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading, isAuthenticated } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const prevThemeRef = useRef<string | undefined>(undefined);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Force light theme on /login while mounted
+  useEffect(() => {
+    // save previous theme
+    prevThemeRef.current = theme;
+    // force light
+    setTheme("light");
+    return () => {
+      // restore previous theme or system
+      setTheme(prevThemeRef.current || "system");
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
