@@ -45,12 +45,12 @@ function Layout({ children }: { children: ReactNode }) {
       <Header />
       <Sidebar />
       <main
-        className={`flex-1 transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}
+        className={`flex-1 transition-all duration-300 ease-in-out ${isMinimized ? "md:ml-20 ml-0" : "md:ml-56 ml-0"}`}
       >
         {children}
       </main>
       <footer
-        className={`transition-all duration-300 ease-in-out ${isMinimized ? "ml-20" : "ml-56"}`}
+        className={`transition-all duration-300 ease-in-out ${isMinimized ? "md:ml-20 ml-0" : "md:ml-56 ml-0"}`}
       >
         <Footer />
       </footer>
