@@ -44,12 +44,12 @@ export async function twilioSendHandler(req: Request, res: Response) {
     }
     payload.append("Body", msg);
 
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${useSid}/Messages.json`;
 
     const resp = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+        Authorization: `Basic ${Buffer.from(`${useSid}:${useToken}`).toString("base64")}`,
         "Content-Type": "application/x-www-form-urlencoded",
         Accept: "application/json",
       },
