@@ -2,12 +2,12 @@ import { RequestHandler } from "express";
 import { supabase } from "../lib/supabase";
 import { validateAndFormatPhone } from "../lib/phone";
 
-// Generic debug endpoint — Twilio-specific debug removed
+// Generic debug endpoint
 export const debugInfo: RequestHandler = async (_req, res) => {
   try {
     res.json({
       success: true,
-      message: "Debug endpoints active. Twilio integration removed.",
+      message: "Debug endpoints active.",
     });
   } catch (error: any) {
     console.error("debugInfo error:", error);
