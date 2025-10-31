@@ -676,3 +676,23 @@ export const getSendLogs: RequestHandler = async (req, res) => {
       .json({ error: error?.message || "Failed to fetch send logs" });
   }
 };
+
+// Get files associated with a send_log
+export const getSendLogFiles: RequestHandler = async (req, res) => {
+  try {
+    const sendLogId = req.params.id || req.query.send_log_id;
+    if (!sendLogId) return res.status(400).json({ error: "send_log_id is required" });
+
+    const { data, error } = await supabase
+      .from("result_files")
+      .select("id, file_name, storage_path")
+      .eq("send_log_id", String(sendLogId));
+
+    if (error) throw error;
+
+    res.json({ files: data || [] });
+  } catch (error: any) {
+    console.error("Error fetching send log files:", error);
+    res.status(500).json({ error: error?.message || "Failed to fetch files" });
+  }
+};
