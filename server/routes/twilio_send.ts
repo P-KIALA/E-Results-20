@@ -6,8 +6,15 @@ export async function twilioSendHandler(req: Request, res: Response) {
   try {
     const sid = process.env.TWILIO_ACCOUNT_SID;
     const token = process.env.TWILIO_AUTH_TOKEN;
-    const from = process.env.TWILIO_PHONE_NUMBER || undefined; // prefer WhatsApp formatted number like whatsapp:+1415...
-    const messagingService = process.env.TWILIO_MESSAGING_SERVICE_SID || undefined;
+    let from = process.env.TWILIO_PHONE_NUMBER || undefined; // prefer WhatsApp formatted number like whatsapp:+1415...
+    let messagingService = process.env.TWILIO_MESSAGING_SERVICE_SID || undefined;
+    // Allow providing messagingService or from in request body/query for dev testing
+    if (!messagingService) {
+      messagingService = (req.body && (req.body.messagingService as string)) || (req.query && (req.query.messagingService as string)) || undefined;
+    }
+    if (!from) {
+      from = (req.body && (req.body.from as string)) || (req.query && (req.query.from as string)) || undefined;
+    }
 
     // Allow passing credentials in request body for local/dev testing if env not set
     let useSid = sid;
