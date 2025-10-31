@@ -35,14 +35,14 @@ export function validateAndFormatPhone(phone: string): PhoneValidationResult {
   };
 }
 
-// Verify WhatsApp availability is disabled (Twilio removed).
-// This function will only perform basic validation and will return false
-// so new doctors are not auto-marked as WhatsApp-verified.
+// Check WhatsApp availability (no external provider check).
+// This implementation performs only basic validation and returns false
+// to avoid auto-marking new doctors as WhatsApp-verified.
 export async function checkWhatsAppAvailability(
   phone: string,
 ): Promise<boolean> {
   const validation = validateAndFormatPhone(phone);
   if (!validation.is_valid) return false;
-  // Twilio Lookup removed — do not assume WhatsApp availability
+  // No external lookup implemented — conservatively report unavailable
   return false;
 }
