@@ -138,20 +138,20 @@ export default function HistoryTab({
       if (!res.ok) {
         let errText = `HTTP ${res.status}`;
         try {
-          const errBody = await res.json().catch(() => null);
+          const errBody = await res.clone().json().catch(() => null);
           if (errBody && errBody.error) errText = errBody.error;
         } catch (_) {}
         throw new Error(errText);
       }
 
-      const contentType = res.headers.get("content-type") || "";
+      const contentType = (res.headers.get("content-type") || "").toLowerCase();
       if (!contentType.includes("application/json")) {
-        const txt = await res.text();
+        const txt = await res.clone().text();
         console.error("getFileUrl: expected JSON but got:", txt);
         throw new Error("Réponse inattendue du serveur");
       }
 
-      const data = await res.json();
+      const data = await res.clone().json();
       if (data && data.url) {
         window.open(data.url, "_blank");
       }
