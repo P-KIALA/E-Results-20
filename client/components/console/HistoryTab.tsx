@@ -104,24 +104,24 @@ export default function HistoryTab({
     try {
       const res = await safeFetch(`/api/send-logs/${log.id}/files`);
       if (!res.ok) {
-        // Try to extract JSON error if present
+        // Try to extract JSON error if present using a clone so we don't consume the original stream
         let errText = `HTTP ${res.status}`;
         try {
-          const errBody = await res.json().catch(() => null);
+          const errBody = await res.clone().json().catch(() => null);
           if (errBody && errBody.error) errText = errBody.error;
         } catch (_) {}
         throw new Error(errText);
       }
 
-      // Ensure response is JSON; if not, read as text for debugging
-      const contentType = res.headers.get("content-type") || "";
+      // Ensure response is JSON; if not, read as text for debugging using clone
+      const contentType = (res.headers.get("content-type") || "").toLowerCase();
       if (!contentType.includes("application/json")) {
-        const txt = await res.text();
+        const txt = await res.clone().text();
         console.error("getSendLogFiles: expected JSON but got:", txt);
         throw new Error("Réponse inattendue du serveur (non JSON)");
       }
 
-      const data = await res.json();
+      const data = await res.clone().json();
       setLogFiles(data.files || []);
     } catch (e: any) {
       console.error("Failed to load files for log", e);
