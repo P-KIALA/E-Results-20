@@ -683,14 +683,49 @@ export const getSendLogFiles: RequestHandler = async (req, res) => {
     const sendLogId = req.params.id || req.query.send_log_id;
     if (!sendLogId) return res.status(400).json({ error: "send_log_id is required" });
 
+    // Primary: files explicitly linked to send_log
     const { data, error } = await supabase
       .from("result_files")
-      .select("id, file_name, storage_path")
+      .select("id, file_name, storage_path, created_at")
       .eq("send_log_id", String(sendLogId));
 
     if (error) throw error;
 
-    res.json({ files: data || [] });
+    let files = data || [];
+
+    // If no files attached, attempt a best-effort fallback: find recent unlinked files
+    // created around the send_log creation time (±5 minutes).
+    if (!files || files.length === 0) {
+      try {
+        const { data: sendLog } = await supabase
+          .from("send_logs")
+          .select("id, created_at")
+          .eq("id", String(sendLogId))
+          .single();
+
+        if (sendLog && sendLog.created_at) {
+          const createdAt = new Date(sendLog.created_at);
+          const from = new Date(createdAt.getTime() - 5 * 60 * 1000).toISOString();
+          const to = new Date(createdAt.getTime() + 5 * 60 * 1000).toISOString();
+
+          const { data: fallbackFiles, error: fbErr } = await supabase
+            .from("result_files")
+            .select("id, file_name, storage_path, created_at")
+            .is("send_log_id", null)
+            .gte("created_at", from)
+            .lte("created_at", to);
+
+          if (!fbErr && fallbackFiles && fallbackFiles.length > 0) {
+            files = fallbackFiles;
+            console.warn(`getSendLogFiles: using fallback ${fallbackFiles.length} files for send_log ${sendLogId}`);
+          }
+        }
+      } catch (e) {
+        console.warn("getSendLogFiles: fallback query failed", e);
+      }
+    }
+
+    res.json({ files: files || [] });
   } catch (error: any) {
     console.error("Error fetching send log files:", error);
     res.status(500).json({ error: error?.message || "Failed to fetch files" });
