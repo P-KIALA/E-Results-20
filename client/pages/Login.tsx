@@ -144,7 +144,7 @@ export default function LoginPage() {
 
         {/* Right Side - Login Form */}
         <div className="w-full max-w-md flex justify-center lg:justify-end">
-          <Card className="w-full shadow-2xl backdrop-blur-sm bg-white/10 text-foreground">
+          <Card className="w-full border-0 shadow-2xl backdrop-blur-sm bg-white/10 text-foreground animate-float">
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <div className="h-12 w-12 rounded-lg bg-primary/10 grid place-items-center">
@@ -175,7 +175,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <CardTitle className="text-2xl">E-Result</CardTitle>
-              <CardDescription>Connectez-vous à votre compte</CardDescription>
+              <CardDescription className="text-white font-bold">Connectez-vous à votre compte</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -218,7 +218,7 @@ export default function LoginPage() {
                   {isLoading ? "Connexion..." : "Se connecter"}
                 </Button>
 
-                <p className="text-xs text-center text-muted-foreground">
+                <p className="text-xs text-center text-white font-bold">
                   Les sessions expirent après 1 heure d'inactivité
                 </p>
               </form>
