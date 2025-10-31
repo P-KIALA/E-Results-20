@@ -513,6 +513,53 @@ export default function HistoryTab({
               </Card>
             ))}
 
+            {/* Files dialog */}
+            <Dialog open={filesModalOpen} onOpenChange={(open) => { if (!open) { setFilesModalOpen(false); setSelectedLog(null); setLogFiles([]); } else { setFilesModalOpen(true); } }}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Fichiers uploadés</DialogTitle>
+                  <DialogDescription>
+                    Visualiser les fichiers associés et les renvoyer au médecin.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-3">
+                  {filesLoading ? (
+                    <p>Chargement des fichiers...</p>
+                  ) : logFiles.length === 0 ? (
+                    <p className="text-muted-foreground">Aucun fichier attaché à cet envoi.</p>
+                  ) : (
+                    <ul className="space-y-2 max-h-60 overflow-auto">
+                      {logFiles.map((f) => (
+                        <li key={f.id} className="flex items-center justify-between gap-3">
+                          <div className="truncate text-sm">{f.file_name || f.storage_path}</div>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant="ghost" onClick={() => openFileUrl(f.storage_path)}>
+                              Ouvrir
+                            </Button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <DialogFooter>
+                  <div className="flex items-center justify-between w-full">
+                    <div />
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" onClick={() => { setFilesModalOpen(false); setSelectedLog(null); setLogFiles([]); }}>
+                        Fermer
+                      </Button>
+                      <Button onClick={resendFilesToDoctor} disabled={resendLoading || logFiles.length === 0}>
+                        {resendLoading ? "Envoi..." : "Renvoyer au médecin"}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <div className="flex items-center justify-between mt-4">
               <div className="flex items-center gap-2">
                 <label className="text-sm">Afficher</label>
