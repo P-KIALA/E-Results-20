@@ -60,24 +60,26 @@
   }
 
   .dark {
-    /* Use the provided black sample: slightly lighter than pure black to match slider */
-    --background: 0 0% 8%; /* ~#1a1a1a */
+    /* Central dark color token matching the provided sample */
+    --dark-black: 0 0% 8%; /* ~#1a1a1a */
+
+    --background: var(--dark-black);
     --foreground: 210 40% 98%;
 
-    /* Cards slightly lighter than the background for separation */
-    --card: 0 0% 12%; /* ~#202020 */
+    /* Use the same dark token for related surfaces to ensure consistency */
+    --card: var(--dark-black);
     --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 12%;
+    --popover: var(--dark-black);
     --popover-foreground: 210 40% 98%;
 
     --primary: 146 62% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 12% 12%;
+    --secondary: var(--dark-black);
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 210 12% 12%;
+    --muted: var(--dark-black);
     --muted-foreground: 215 20.2% 65.1%;
 
     --accent: 146 30% 20%;
@@ -86,17 +88,19 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    /* borders/inputs */
+    /* borders/inputs - slightly lighter for separation but derived from dark token */
     --border: 0 0% 14%;
     --input: 0 0% 14%;
     --ring: 146 62% 45%;
-    --sidebar-background: 0 0% 10%;
+
+    /* Sidebar surfaces use the same dark token */
+    --sidebar-background: var(--dark-black);
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 146 62% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent: var(--dark-black);
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 0 0% 16%;
+    --sidebar-border: 0 0% 14%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
