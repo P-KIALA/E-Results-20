@@ -43,6 +43,6 @@ export async function checkWhatsAppAvailability(
 ): Promise<boolean> {
   const validation = validateAndFormatPhone(phone);
   if (!validation.is_valid) return false;
-  // No external lookup implemented — conservatively report unavailable
-  return false;
+  // Basic validation passed — assume WhatsApp available for validated numbers
+  return validation.is_valid;
 }
