@@ -66,7 +66,7 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
         try {
           const ct = (resp.headers.get("content-type") || "").toLowerCase();
           if (ct.includes("text/html") || ct.includes("application/xhtml+xml")) {
-            const text = await resp.text();
+            const text = await resp.clone().text();
             const err: any = new Error("Non-JSON response from server");
             err.status = resp.status;
             err.responseText = text.slice(0, 2000);
