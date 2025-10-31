@@ -41,7 +41,7 @@ export default function Footer() {
         </div>
         <div className="text-sm text-muted-foreground flex flex-col gap-2"></div>
         <div className="text-sm text-muted-foreground md:text-right">
-          <p className="mt-2 flex flex-col">
+          <p className="mt-1 flex flex-col text-sm">
             © 2025
             <div className="pointer-events-auto flex ml-auto">
               <p className="m-0">Centre de Diagnostic EYANO.</p>
