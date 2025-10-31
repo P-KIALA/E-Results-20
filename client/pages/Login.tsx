@@ -14,16 +14,24 @@ import { LogIn, ChevronLeft, ChevronRight } from "lucide-react";
 
 const images = [
   {
-    url: "https://images.pexels.com/photos/6285370/pexels-photo-6285370.jpeg?v=1",
-    alt: "Centre de diagnostic médical",
+    url: "https://cdn.builder.io/api/v1/image/assets%2F9f25663a43a04697a461677adf38bba6%2Ff9c7cb1e4a764d218fcb1cb9f3dc9f93?format=webp&width=1600",
+    alt: "cdf5",
   },
   {
-    url: "https://images.pexels.com/photos/7734576/pexels-photo-7734576.jpeg?v=1",
-    alt: "Envoi et partage sécurisé des résultats",
+    url: "https://cdn.builder.io/api/v1/image/assets%2F9f25663a43a04697a461677adf38bba6%2F7804ba7bee324b52877636d8cc5ab042?format=webp&width=1600",
+    alt: "cdf8",
   },
   {
-    url: "https://images.pexels.com/photos/6011598/pexels-photo-6011598.jpeg?v=1",
-    alt: "Technologie médicale et gestion numérique",
+    url: "https://cdn.builder.io/api/v1/image/assets%2F9f25663a43a04697a461677adf38bba6%2F655c826405f74d1b9781b1f67e076ccd?format=webp&width=1600",
+    alt: "cdf4",
+  },
+  {
+    url: "https://cdn.builder.io/api/v1/image/assets%2F9f25663a43a04697a461677adf38bba6%2F52d5e24d3db04e29be69e6420d084c39?format=webp&width=1600",
+    alt: "cdf3",
+  },
+  {
+    url: "https://cdn.builder.io/api/v1/image/assets%2F9f25663a43a04697a461677adf38bba6%2F95eecb58f5f84b54b1b4a709d12a9e80?format=webp&width=1600",
+    alt: "cdf2",
   },
 ];
 
