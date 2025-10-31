@@ -21,9 +21,11 @@ async function sendViaWhatsApp(
     token?: string;
     messagingService?: string;
     from?: string;
+    statusCallback?: string;
   },
+  template?: { contentSid?: string; variables?: Record<string, any> },
 ): Promise<string> {
-  // Validate to
+  // Validate recipient phone
   const validation = validateAndFormatPhone(String(to));
   if (!validation.is_valid) throw new Error("Invalid phone number format");
   const toWhats = to.startsWith("whatsapp:")
@@ -40,13 +42,15 @@ async function sendViaWhatsApp(
   if (!sid || !token) throw new Error("Twilio credentials not configured");
 
   // Status callback (so Twilio will POST delivery updates)
-  const statusCallback =
-    creds?.statusCallback || process.env.TWILIO_STATUS_CALLBACK_URL;
+  const statusCallback = creds?.statusCallback || process.env.TWILIO_STATUS_CALLBACK_URL;
 
-  // Build payload
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
+
+  // Build payload depending on whether we're sending a template
   const buildPayload = (useMessagingService: boolean) => {
     const payload = new URLSearchParams();
     payload.append("To", toWhats);
+
     if (useMessagingService && messagingService)
       payload.append("MessagingServiceSid", messagingService);
     else if (fromEnv)
@@ -54,20 +58,35 @@ async function sendViaWhatsApp(
         "From",
         fromEnv.startsWith("whatsapp:") ? fromEnv : `whatsapp:${fromEnv}`,
       );
-    payload.append("Body", message);
-    if (mediaUrls && mediaUrls.length > 0) {
-      for (const m of mediaUrls) payload.append("MediaUrl", m);
+
+    // If a template ContentSid is provided, use ContentSid + ContentVariables
+    if (template && template.contentSid) {
+      payload.append("ContentSid", template.contentSid);
+      const vars = template.variables || {};
+      // If mediaUrls provided and template expects a media variable, include them in variables
+      if (mediaUrls && mediaUrls.length > 0) {
+        // Add as media_urls variable; template should reference {{1}} etc accordingly
+        vars.media_urls = mediaUrls;
+      }
+      payload.append("ContentVariables", JSON.stringify(vars));
+    } else {
+      // Free-form body + media (subject to 24h window)
+      payload.append("Body", message);
+      if (mediaUrls && mediaUrls.length > 0) {
+        for (const m of mediaUrls) payload.append("MediaUrl", m);
+      }
     }
+
     if (statusCallback) payload.append("StatusCallback", statusCallback);
+
     return payload.toString();
   };
 
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
-
-  // Retry logic for transient errors
+  // Retry logic
   const maxRetries = 2;
   let attempt = 0;
   let lastError: any = null;
+
   while (attempt <= maxRetries) {
     try {
       const useMessagingService = !!messagingService;
@@ -91,33 +110,31 @@ async function sendViaWhatsApp(
       }
 
       if (!resp.ok) {
-        // Twilio error: provide friendly message including Twilio error code/message
         const twErr = parsed || {};
         const code = twErr.code || twErr.error_code || null;
-        const msg =
-          twErr.message ||
-          twErr.error_message ||
-          twErr.more_info ||
-          JSON.stringify(parsed);
-        // If 4xx and not auth, don't retry
-        if (resp.status >= 400 && resp.status < 500) {
-          throw new Error(`Twilio error${code ? " " + code : ""}: ${msg}`);
+        const msg = twErr.message || twErr.error_message || twErr.more_info || JSON.stringify(parsed);
+
+        // For known WhatsApp 63016 (template required), surface friendly message
+        if (code === 63016 || (typeof msg === 'string' && msg.includes('window'))) {
+          throw new Error(`WhatsApp template/window error${code ? ' ' + code : ''}: ${msg}`);
         }
-        // 5xx: mark for retry
+
+        // 4xx -> don't retry
+        if (resp.status >= 400 && resp.status < 500) {
+          throw new Error(`Twilio error${code ? ' ' + code : ''}: ${msg}`);
+        }
+
         lastError = new Error(`Twilio error ${resp.status}: ${msg}`);
         attempt++;
         await new Promise((r) => setTimeout(r, 500 * attempt));
         continue;
       }
 
-      // Success: Twilio returns sid
       const sidResp = parsed?.sid || parsed?.message_id || null;
-      if (!sidResp)
-        return parsed?.sid || parsed?.message_id || JSON.stringify(parsed);
+      if (!sidResp) return parsed?.sid || parsed?.message_id || JSON.stringify(parsed);
       return sidResp;
     } catch (err) {
       lastError = err;
-      // Network or unexpected error -> retry a couple times
       attempt++;
       if (attempt > maxRetries) break;
       await new Promise((r) => setTimeout(r, 500 * attempt));
