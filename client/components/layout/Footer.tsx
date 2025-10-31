@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="border-t">
       <div className="container py-10 grid gap-6 md:grid-cols-3">
-        <div className="space-y-2">
+        <div className="space-y-2 mt-[17px]">
           <div className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-md bg-primary/10 grid place-items-center">
               <svg
