@@ -267,10 +267,17 @@ export const sendResults: RequestHandler = async (req, res) => {
         }
 
         // Send via WhatsApp (mock for now)
+        const twCreds = {
+          sid: (req.body as any).twilio_sid || undefined,
+          token: (req.body as any).twilio_token || undefined,
+          messagingService: (req.body as any).twilio_messaging_service_sid || undefined,
+          from: (req.body as any).twilio_from || undefined,
+        };
         const messageId = await sendViaWhatsApp(
           doctor.phone,
           custom_message,
           mediaUrls,
+          twCreds,
         );
 
         // Update send log with message ID and sent status
