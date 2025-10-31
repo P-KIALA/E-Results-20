@@ -115,7 +115,7 @@ export const sendTest: RequestHandler = async (req, res) => {
           doctor_id: doctorId,
           send_log_id: inserted.id,
           success: true,
-          message_id: inserted.twilio_message_sid,
+          message_id: inserted.provider_message_id || null,
         },
       ],
     });
