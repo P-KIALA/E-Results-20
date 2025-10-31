@@ -9,11 +9,9 @@ import {
   deleteDoctor,
   verifyDoctor,
 } from "./routes/doctors";
-import { sendResults, getSendLogs, webhookInfobip } from "./routes/send";
+import { sendResults, getSendLogs } from "./routes/send";
 import { debugInfo, sendTest } from "./routes/debug";
 import { proxyHandler } from "./routes/proxy";
-import { twilioTestHandler } from "./routes/twilio";
-import { twilioSendHandler } from "./routes/twilio_send";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import {
   login,
@@ -164,22 +162,14 @@ export function createServer() {
   app.post("/api/send-results", requireAuth, sendResults);
   app.get("/api/send-logs", requireAuth, getSendLogs);
 
-  // Infobip webhook (public)
-  app.post("/api/webhook/infobip", webhookInfobip);
 
   // Debug endpoints (public in dev only)
   app.get("/api/debug", debugInfo);
   // Debug: simulate sending a result without external provider (useful for testing)
   app.post("/api/debug/send-test", sendTest);
 
-  // Twilio connectivity test (protected)
-  app.get("/api/debug/twilio-test", requireAuth, twilioTestHandler);
-  // Public (dev) twilio connectivity test - useful for quick checks when embedding/testing
-  // WARNING: This endpoint is intentionally public for development convenience; remove or protect in production.
-  app.get("/api/debug/twilio-test-public", twilioTestHandler);
-
-  // Public dev endpoint to send a WhatsApp test message (use 'to' query param). Remove or protect in production.
-  app.post("/api/debug/twilio-send-public", twilioSendHandler);
+  // Debug endpoints
+  // (Messaging provider webhooks and test endpoints removed.)
 
   // Server-side proxy to forward requests from embedded clients (iframes) to the app base URL.
   // Example: client calls /api/proxy/send-logs -> server forwards to APP_BASE_URL/api/send-logs
