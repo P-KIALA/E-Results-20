@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { useSidebar } from "@/lib/sidebar-context";
-import { User } from "lucide-react";
+import { useTheme } from "next-themes";
+import { User, Sun, Moon } from "lucide-react";
 
 export default function Header() {
   const location = useLocation();
