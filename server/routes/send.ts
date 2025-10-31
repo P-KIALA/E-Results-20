@@ -279,6 +279,7 @@ export const sendResults: RequestHandler = async (req, res) => {
           .update({
             status: "sent",
             sent_at: new Date().toISOString(),
+            provider_message_id: messageId,
           })
           .eq("id", sendLogId);
 
