@@ -302,26 +302,25 @@ export const sendResults: RequestHandler = async (req, res) => {
         sendLog = inserted;
         sendLogId = inserted?.id || null;
 
-        // Get media files if any
-        let mediaUrls: string[] = [];
+        // Get media files if any (include id so we can attach them to send_logs)
+        let mediaFiles: { id: string; storage_path: string; publicUrl: string }[] = [];
         if (file_ids && file_ids.length > 0) {
           const { data: files, error: filesError } = await supabase
             .from("result_files")
-            .select("storage_path")
+            .select("id, storage_path")
             .in("id", file_ids);
 
           if (filesError) throw filesError;
 
           // Generate public URLs for providers to download files
-          mediaUrls = (files || []).map((f) => {
+          mediaFiles = (files || []).map((f: any) => {
             const publicUrl = supabase.storage
               .from("results")
               .getPublicUrl(f.storage_path).data.publicUrl;
-            return publicUrl;
+            return { id: f.id, storage_path: f.storage_path, publicUrl };
           });
         }
 
-        // Send via WhatsApp (mock for now)
         const twCreds = {
           sid: (req.body as any).twilio_sid || undefined,
           token: (req.body as any).twilio_token || undefined,
@@ -334,6 +333,64 @@ export const sendResults: RequestHandler = async (req, res) => {
         // Prefer using a pre-approved WhatsApp template when available (to avoid 63016)
         const templateContentSid = (req.body as any).template_content_sid || process.env.WHATSAPP_TEMPLATE_CONTENT_SID || undefined;
         const templateVars = (req.body as any).template_variables || undefined;
+
+        // If we have multiple files and a template, send one message per file because many WhatsApp template headers
+        // or providers accept a single document in the header. Sending multiple files in one templated message may result
+        // in only the first being delivered. We therefore create a separate send_log and send for each file.
+        if (templateContentSid && mediaFiles.length > 1) {
+          for (const mf of mediaFiles) {
+            // Create a send_log per file
+            const { data: insertedLog, error: logErr } = await supabase
+              .from("send_logs")
+              .insert({
+                doctor_id,
+                custom_message,
+                patient_name: patient_name || null,
+                patient_site: (req.body as any).patient_site || null,
+                sender_id: (req as any).userId || null,
+                status: "pending",
+              })
+              .select()
+              .single();
+
+            const currentSendLogId = insertedLog?.id || null;
+
+            try {
+              const messageId = await sendViaWhatsApp(
+                doctor.phone,
+                custom_message,
+                [mf.publicUrl],
+                twCreds,
+                { contentSid: templateContentSid, variables: templateVars || { doctor_name: doctor.name, patient_name } },
+              );
+
+              // Update send log with message ID and sent status
+              await supabase
+                .from("send_logs")
+                .update({ status: "sent", sent_at: new Date().toISOString(), provider_message_id: messageId })
+                .eq("id", currentSendLogId);
+
+              // Attach this file record to this send_log
+              try {
+                await supabase.from("result_files").update({ send_log_id: currentSendLogId }).eq("id", mf.id);
+              } catch (e) {
+                console.warn("Failed to attach file to send_log", e);
+              }
+
+              results.push({ doctor_id, send_log_id: currentSendLogId, success: true, message_id: messageId, file_id: mf.id });
+            } catch (err) {
+              // Mark send_log failed
+              await supabase.from("send_logs").update({ status: "failed", error_message: String(err) }).eq("id", currentSendLogId);
+              results.push({ doctor_id, send_log_id: currentSendLogId, success: false, error: String(err), file_id: mf.id });
+            }
+          }
+
+          // Skip the rest of the loop since we've processed files
+          continue;
+        }
+
+        // Otherwise send as single message (default behavior)
+        const mediaUrls = mediaFiles.map((f) => f.publicUrl);
 
         const messageId = await sendViaWhatsApp(
           doctor.phone,
@@ -354,6 +411,15 @@ export const sendResults: RequestHandler = async (req, res) => {
           .eq("id", sendLogId);
 
         if (updateError) throw updateError;
+
+        // If we attached files, link them to the send_log
+        if (mediaFiles.length > 0) {
+          try {
+            await supabase.from("result_files").update({ send_log_id: sendLogId }).in("id", mediaFiles.map((m) => m.id));
+          } catch (e) {
+            console.warn("Failed to attach files to send_log:", e);
+          }
+        }
 
         results.push({
           doctor_id,
