@@ -1,17 +1,12 @@
 export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+  const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
 
   const baseHeaders: Record<string, string> = {
     ...((init.headers as Record<string, string>) || {}),
   };
 
   // Only set JSON content-type when body is present and not FormData
-  if (
-    init.body &&
-    !((init as any).body instanceof FormData) &&
-    !baseHeaders["Content-Type"]
-  ) {
+  if (init.body && !((init as any).body instanceof FormData) && !baseHeaders["Content-Type"]) {
     baseHeaders["Content-Type"] = "application/json";
   }
 
@@ -28,62 +23,59 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   let lastErr: any = null;
   const asStr = typeof input === "string" ? input : (input as Request).url;
 
-  // If this looks like an internal API path (/api/...), prefer relative fetch first which works in most embedding contexts
+  // Build known origins once
+  const viteBase = (typeof import.meta !== "undefined" && (import.meta as any).env && (import.meta as any).env.VITE_APP_BASE_URL) || null;
+  const runtimeBase = (typeof window !== "undefined" ? (window as any).__APP_BASE_URL__ : null) || null;
+  const origin = viteBase || runtimeBase || (typeof window !== "undefined" && window.location && window.location.origin) || "";
+  const isEmbedded = typeof window !== "undefined" && window.self !== window.top;
+
+  // If this looks like an internal API path (/api/...), try strategies to reach the backend depending on environment
   if (asStr && asStr.startsWith("/api")) {
-    // 1) Try relative path (fastest, usually correct for deployed apps)
-    try {
-      return await fetch(asStr, defaultOpts);
-    } catch (e) {
-      lastErr = e;
-    }
+    // If embedded (iframe) or origin differs from app base, prefer absolute URL first to avoid iframe-relative resolution issues
+    const absolute = `${origin}${asStr}`;
 
-    // 2) Try explicit base URL provided at build-time (Vite) or runtime via window.__APP_BASE_URL__
-    try {
-      // Prefer Vite injected env var VITE_APP_BASE_URL, then runtime global, then window.location.origin
-      const viteBase =
-        (typeof import.meta !== "undefined" &&
-          (import.meta as any).env &&
-          (import.meta as any).env.VITE_APP_BASE_URL) ||
-        null;
-      const runtimeBase =
-        (typeof window !== "undefined"
-          ? (window as any).__APP_BASE_URL__
-          : null) || null;
-      const origin =
-        viteBase ||
-        runtimeBase ||
-        (typeof window !== "undefined" &&
-          window.location &&
-          window.location.origin) ||
-        "";
-      const absolute = `${origin}${asStr}`;
-      return await fetch(absolute, defaultOpts);
-    } catch (e) {
-      lastErr = e;
+    if (isEmbedded) {
       try {
-        console.warn("authFetch: absolute fetch failed", {
-          url: asStr,
-          err: String(e),
-          online:
-            typeof navigator !== "undefined" ? navigator.onLine : undefined,
-        });
-      } catch (_) {}
+        return await fetch(absolute, { ...defaultOpts, mode: "cors" });
+      } catch (e) {
+        lastErr = e;
+        try {
+          console.warn("authFetch: absolute (embedded) attempt failed", { url: absolute, err: String(e) });
+        } catch (_) {}
+      }
+
+      // Fallback to relative
+      try {
+        return await fetch(asStr, defaultOpts);
+      } catch (e) {
+        lastErr = e;
+      }
+    } else {
+      // Not embedded: try relative first (faster, local dev) then absolute
+      try {
+        return await fetch(asStr, defaultOpts);
+      } catch (e) {
+        lastErr = e;
+      }
+
+      try {
+        return await fetch(absolute, defaultOpts);
+      } catch (e) {
+        lastErr = e;
+        try {
+          console.warn("authFetch: absolute fetch failed", { url: asStr, err: String(e), online: typeof navigator !== "undefined" ? navigator.onLine : undefined });
+        } catch (_) {}
+      }
     }
 
-    // 3) As a last resort, try serverless function proxy (Netlify /functions) if present
+    // Last resort: serverless function proxy (Netlify functions)
     try {
       const fallback = `/.netlify/functions/api${asStr.replace(/^\/api/, "")}`;
       return await fetch(fallback, defaultOpts);
     } catch (e) {
       lastErr = e;
       try {
-        console.warn("authFetch: netlify fallback failed", {
-          url: asStr,
-          fallback,
-          err: String(e),
-          online:
-            typeof navigator !== "undefined" ? navigator.onLine : undefined,
-        });
+        console.warn("authFetch: netlify fallback failed", { url: asStr, fallback, err: String(e), online: typeof navigator !== "undefined" ? navigator.onLine : undefined });
       } catch (_) {}
     }
   }
@@ -95,10 +87,6 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     lastErr = e;
   }
 
-  console.error("authFetch: all fetch attempts failed", {
-    input: asStr,
-    opts: defaultOpts,
-    lastErr,
-  });
+  console.error("authFetch: all fetch attempts failed", { input: asStr, opts: defaultOpts, lastErr });
   throw lastErr || new Error("Network request failed");
 }
