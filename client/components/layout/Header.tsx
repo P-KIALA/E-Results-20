@@ -6,6 +6,29 @@ import { useSidebar } from "@/lib/sidebar-context";
 import { useTheme } from "next-themes";
 import { User, Sun, Moon } from "lucide-react";
 
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label="Toggle theme"
+      className="p-2"
+    >
+      {isDark ? <Sun size={16} /> : <Moon size={16} />}
+    </Button>
+  );
+}
+
 export default function Header() {
   const location = useLocation();
   const { user, logout, isAuthenticated } = useAuth();
