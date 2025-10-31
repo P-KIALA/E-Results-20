@@ -168,8 +168,8 @@ export function createServer() {
   // Debug: simulate sending a result without external provider (useful for testing)
   app.post("/api/debug/send-test", sendTest);
 
-  // Debug endpoints
-  // (Messaging provider webhooks and test endpoints removed.)
+  // Twilio debug send endpoint (public, dev only). Sends a simple WhatsApp text message.
+  app.post("/api/debug/twilio-send-public", twilioSendHandler);
 
   // Server-side proxy to forward requests from embedded clients (iframes) to the app base URL.
   // Example: client calls /api/proxy/send-logs -> server forwards to APP_BASE_URL/api/send-logs
