@@ -80,7 +80,9 @@ export function createServer() {
 
           const appBaseHost = (() => {
             try {
-              return process.env.APP_BASE_URL ? new URL(process.env.APP_BASE_URL).hostname : null;
+              return process.env.APP_BASE_URL
+                ? new URL(process.env.APP_BASE_URL).hostname
+                : null;
             } catch (_) {
               return null;
             }
@@ -88,7 +90,10 @@ export function createServer() {
 
           const isAllowed =
             allowed.some((allowedOrigin) => origin === allowedOrigin) ||
-            (hostname && appBaseHost && (hostname === appBaseHost || hostname.endsWith('.' + appBaseHost))) ||
+            (hostname &&
+              appBaseHost &&
+              (hostname === appBaseHost ||
+                hostname.endsWith("." + appBaseHost))) ||
             /(^|\.)builder\.io$/.test(hostname || "");
 
           if (isAllowed) return callback(null, true);

@@ -42,7 +42,8 @@ async function sendViaWhatsApp(
   if (!sid || !token) throw new Error("Twilio credentials not configured");
 
   // Status callback (so Twilio will POST delivery updates)
-  const statusCallback = creds?.statusCallback || process.env.TWILIO_STATUS_CALLBACK_URL;
+  const statusCallback =
+    creds?.statusCallback || process.env.TWILIO_STATUS_CALLBACK_URL;
 
   const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
 
@@ -112,16 +113,25 @@ async function sendViaWhatsApp(
       if (!resp.ok) {
         const twErr = parsed || {};
         const code = twErr.code || twErr.error_code || null;
-        const msg = twErr.message || twErr.error_message || twErr.more_info || JSON.stringify(parsed);
+        const msg =
+          twErr.message ||
+          twErr.error_message ||
+          twErr.more_info ||
+          JSON.stringify(parsed);
 
         // For known WhatsApp 63016 (template required), surface friendly message
-        if (code === 63016 || (typeof msg === 'string' && msg.includes('window'))) {
-          throw new Error(`WhatsApp template/window error${code ? ' ' + code : ''}: ${msg}`);
+        if (
+          code === 63016 ||
+          (typeof msg === "string" && msg.includes("window"))
+        ) {
+          throw new Error(
+            `WhatsApp template/window error${code ? " " + code : ""}: ${msg}`,
+          );
         }
 
         // 4xx -> don't retry
         if (resp.status >= 400 && resp.status < 500) {
-          throw new Error(`Twilio error${code ? ' ' + code : ''}: ${msg}`);
+          throw new Error(`Twilio error${code ? " " + code : ""}: ${msg}`);
         }
 
         lastError = new Error(`Twilio error ${resp.status}: ${msg}`);
@@ -131,7 +141,8 @@ async function sendViaWhatsApp(
       }
 
       const sidResp = parsed?.sid || parsed?.message_id || null;
-      if (!sidResp) return parsed?.sid || parsed?.message_id || JSON.stringify(parsed);
+      if (!sidResp)
+        return parsed?.sid || parsed?.message_id || JSON.stringify(parsed);
       return sidResp;
     } catch (err) {
       lastError = err;
@@ -303,7 +314,11 @@ export const sendResults: RequestHandler = async (req, res) => {
         sendLogId = inserted?.id || null;
 
         // Get media files if any (include id so we can attach them to send_logs)
-        let mediaFiles: { id: string; storage_path: string; publicUrl: string }[] = [];
+        let mediaFiles: {
+          id: string;
+          storage_path: string;
+          publicUrl: string;
+        }[] = [];
         if (file_ids && file_ids.length > 0) {
           const { data: files, error: filesError } = await supabase
             .from("result_files")
@@ -331,7 +346,10 @@ export const sendResults: RequestHandler = async (req, res) => {
         };
 
         // Prefer using a pre-approved WhatsApp template when available (to avoid 63016)
-        const templateContentSid = (req.body as any).template_content_sid || process.env.WHATSAPP_TEMPLATE_CONTENT_SID || undefined;
+        const templateContentSid =
+          (req.body as any).template_content_sid ||
+          process.env.WHATSAPP_TEMPLATE_CONTENT_SID ||
+          undefined;
         const templateVars = (req.body as any).template_variables || undefined;
 
         // If we have multiple files and a template, send one message per file because many WhatsApp template headers
@@ -361,27 +379,55 @@ export const sendResults: RequestHandler = async (req, res) => {
                 custom_message,
                 [mf.publicUrl],
                 twCreds,
-                { contentSid: templateContentSid, variables: templateVars || { doctor_name: doctor.name, patient_name } },
+                {
+                  contentSid: templateContentSid,
+                  variables: templateVars || {
+                    doctor_name: doctor.name,
+                    patient_name,
+                  },
+                },
               );
 
               // Update send log with message ID and sent status
               await supabase
                 .from("send_logs")
-                .update({ status: "sent", sent_at: new Date().toISOString(), provider_message_id: messageId })
+                .update({
+                  status: "sent",
+                  sent_at: new Date().toISOString(),
+                  provider_message_id: messageId,
+                })
                 .eq("id", currentSendLogId);
 
               // Attach this file record to this send_log
               try {
-                await supabase.from("result_files").update({ send_log_id: currentSendLogId }).eq("id", mf.id);
+                await supabase
+                  .from("result_files")
+                  .update({ send_log_id: currentSendLogId })
+                  .eq("id", mf.id);
               } catch (e) {
                 console.warn("Failed to attach file to send_log", e);
               }
 
-              results.push({ doctor_id, send_log_id: currentSendLogId, success: true, message_id: messageId, file_id: mf.id });
+              results.push({
+                doctor_id,
+                send_log_id: currentSendLogId,
+                success: true,
+                message_id: messageId,
+                file_id: mf.id,
+              });
             } catch (err) {
               // Mark send_log failed
-              await supabase.from("send_logs").update({ status: "failed", error_message: String(err) }).eq("id", currentSendLogId);
-              results.push({ doctor_id, send_log_id: currentSendLogId, success: false, error: String(err), file_id: mf.id });
+              await supabase
+                .from("send_logs")
+                .update({ status: "failed", error_message: String(err) })
+                .eq("id", currentSendLogId);
+              results.push({
+                doctor_id,
+                send_log_id: currentSendLogId,
+                success: false,
+                error: String(err),
+                file_id: mf.id,
+              });
             }
           }
 
@@ -397,7 +443,15 @@ export const sendResults: RequestHandler = async (req, res) => {
           custom_message,
           mediaUrls,
           twCreds,
-          templateContentSid ? { contentSid: templateContentSid, variables: templateVars || { doctor_name: doctor.name, patient_name } } : undefined,
+          templateContentSid
+            ? {
+                contentSid: templateContentSid,
+                variables: templateVars || {
+                  doctor_name: doctor.name,
+                  patient_name,
+                },
+              }
+            : undefined,
         );
 
         // Update send log with message ID and sent status
@@ -415,7 +469,13 @@ export const sendResults: RequestHandler = async (req, res) => {
         // If we attached files, link them to the send_log
         if (mediaFiles.length > 0) {
           try {
-            await supabase.from("result_files").update({ send_log_id: sendLogId }).in("id", mediaFiles.map((m) => m.id));
+            await supabase
+              .from("result_files")
+              .update({ send_log_id: sendLogId })
+              .in(
+                "id",
+                mediaFiles.map((m) => m.id),
+              );
           } catch (e) {
             console.warn("Failed to attach files to send_log:", e);
           }
