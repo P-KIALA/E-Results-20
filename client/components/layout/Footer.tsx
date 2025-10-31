@@ -44,8 +44,8 @@ export default function Footer() {
           <p className="mt-[52px] flex flex-col">
             © 2025
             <div className="pointer-events-auto flex ml-auto">
-              <span>CENTRE DE DIAGNOSTIC EYANO.</span>
-              <span className="ml-2">Tous droits réservés.</span>
+              <p className="m-0">Centre de Diagnostic EYANO.</p>
+              <div className="ml-2">Tous droits réservés.</div>
             </div>
           </p>
         </div>
