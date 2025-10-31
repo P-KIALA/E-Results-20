@@ -30,7 +30,7 @@ export interface SendLogEntry {
   delivered_at?: string;
   read_at?: string;
   error_message?: string;
-  twilio_message_sid?: string;
+  provider_message_id?: string;
   created_at: string;
   updated_at: string;
 }
