@@ -103,6 +103,18 @@
     @apply border-border;
   }
 
+  /* Floating animation for login card */
+  @keyframes float {
+    0% { transform: translateY(0px) translateZ(0); }
+    50% { transform: translateY(-8px) translateZ(0); }
+    100% { transform: translateY(0px) translateZ(0); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+    will-change: transform;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
