@@ -19,6 +19,54 @@ export const debugInfo: RequestHandler = async (_req, res) => {
 
 // Debug helper to simulate sending a result to a doctor without external provider.
 // Accepts { doctor_id?, phone?, custom_message, file_ids?, patient_site?, patient_name? }
+export const uploadPublic: RequestHandler = async (req, res) => {
+  try {
+    const { file } = req.body as any;
+    if (!file || !file.name || !file.data || !file.type) {
+      return res.status(400).json({ error: "file object with name,type,data required" });
+    }
+
+    const MAX_FILE_SIZE = 16 * 1024 * 1024;
+    const sizeBytes = Buffer.byteLength(file.data, "base64");
+    if (sizeBytes > MAX_FILE_SIZE) return res.status(400).json({ error: "File too large" });
+
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2, 8);
+    const ext = file.name.includes(".") ? file.name.substring(file.name.lastIndexOf('.')) : '';
+    const storagePath = `results/${timestamp}_${randomId}${ext}`;
+    const buffer = Buffer.from(file.data, "base64");
+
+    const { data: storageData, error: storageError } = await supabase.storage.from("results").upload(storagePath, buffer, {
+      contentType: file.type,
+      upsert: false,
+    });
+    if (storageError) throw storageError;
+
+    const { data: fileRecord, error: dbError } = await supabase
+      .from("result_files")
+      .insert({
+        file_name: file.name,
+        file_type: file.type,
+        file_size: sizeBytes,
+        storage_path: storagePath,
+      })
+      .select()
+      .single();
+    if (dbError) {
+      await supabase.storage.from("results").remove([storagePath]);
+      throw dbError;
+    }
+
+    const { data: publicData, error: publicErr } = supabase.storage.from("results").getPublicUrl(storagePath);
+    if (publicErr) throw publicErr;
+
+    res.status(201).json({ file: fileRecord, publicUrl: publicData.publicUrl });
+  } catch (err: any) {
+    console.error("uploadPublic error:", err);
+    res.status(500).json({ error: String(err) });
+  }
+};
+
 export const sendTest: RequestHandler = async (req, res) => {
   try {
     const {
