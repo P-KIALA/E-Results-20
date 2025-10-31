@@ -680,9 +680,12 @@ export const getSendLogs: RequestHandler = async (req, res) => {
 // Get files associated with a send_log
 export const getSendLogFiles: RequestHandler = async (req, res) => {
   try {
-    console.log(`[getSendLogFiles] incoming request path=${req.path} params=${JSON.stringify(req.params)} query=${JSON.stringify(req.query)} origin=${req.headers.origin || req.headers.referer || '<no-origin>'} auth=${req.headers.authorization ? 'present' : 'missing'}`);
+    console.log(
+      `[getSendLogFiles] incoming request path=${req.path} params=${JSON.stringify(req.params)} query=${JSON.stringify(req.query)} origin=${req.headers.origin || req.headers.referer || "<no-origin>"} auth=${req.headers.authorization ? "present" : "missing"}`,
+    );
     const sendLogId = req.params.id || req.query.send_log_id;
-    if (!sendLogId) return res.status(400).json({ error: "send_log_id is required" });
+    if (!sendLogId)
+      return res.status(400).json({ error: "send_log_id is required" });
 
     // Primary: files explicitly linked to send_log
     const { data, error } = await supabase
@@ -706,8 +709,12 @@ export const getSendLogFiles: RequestHandler = async (req, res) => {
 
         if (sendLog && sendLog.created_at) {
           const createdAt = new Date(sendLog.created_at);
-          const from = new Date(createdAt.getTime() - 5 * 60 * 1000).toISOString();
-          const to = new Date(createdAt.getTime() + 5 * 60 * 1000).toISOString();
+          const from = new Date(
+            createdAt.getTime() - 5 * 60 * 1000,
+          ).toISOString();
+          const to = new Date(
+            createdAt.getTime() + 5 * 60 * 1000,
+          ).toISOString();
 
           const { data: fallbackFiles, error: fbErr } = await supabase
             .from("result_files")
@@ -718,7 +725,9 @@ export const getSendLogFiles: RequestHandler = async (req, res) => {
 
           if (!fbErr && fallbackFiles && fallbackFiles.length > 0) {
             files = fallbackFiles;
-            console.warn(`getSendLogFiles: using fallback ${fallbackFiles.length} files for send_log ${sendLogId}`);
+            console.warn(
+              `getSendLogFiles: using fallback ${fallbackFiles.length} files for send_log ${sendLogId}`,
+            );
           }
         }
       } catch (e) {
@@ -726,7 +735,9 @@ export const getSendLogFiles: RequestHandler = async (req, res) => {
       }
     }
 
-    console.log(`[getSendLogFiles] returning ${((files||[]).length)} files for send_log ${String(sendLogId)}`);
+    console.log(
+      `[getSendLogFiles] returning ${(files || []).length} files for send_log ${String(sendLogId)}`,
+    );
     res.json({ files: files || [] });
   } catch (error: any) {
     console.error("Error fetching send log files:", error);

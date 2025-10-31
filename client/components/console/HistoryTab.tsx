@@ -48,7 +48,9 @@ export default function HistoryTab({
   const [pageSize, setPageSize] = useState(25);
   const [total, setTotal] = useState(0);
   const [filesModalOpen, setFilesModalOpen] = useState(false);
-  const [selectedLog, setSelectedLog] = useState<null | (SendLogEntry & { doctors?: any })>(null);
+  const [selectedLog, setSelectedLog] = useState<
+    null | (SendLogEntry & { doctors?: any })
+  >(null);
   const [logFiles, setLogFiles] = useState<any[]>([]);
   const [filesLoading, setFilesLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -107,7 +109,10 @@ export default function HistoryTab({
         // Try to extract JSON error if present using a clone so we don't consume the original stream
         let errText = `HTTP ${res.status}`;
         try {
-          const errBody = await res.clone().json().catch(() => null);
+          const errBody = await res
+            .clone()
+            .json()
+            .catch(() => null);
           if (errBody && errBody.error) errText = errBody.error;
         } catch (_) {}
         throw new Error(errText);
@@ -126,7 +131,10 @@ export default function HistoryTab({
     } catch (e: any) {
       console.error("Failed to load files for log", e);
       setLogFiles([]);
-      setMessage({ type: "error", text: e?.message || "Impossible de charger les fichiers" });
+      setMessage({
+        type: "error",
+        text: e?.message || "Impossible de charger les fichiers",
+      });
     } finally {
       setFilesLoading(false);
     }
@@ -134,11 +142,16 @@ export default function HistoryTab({
 
   const openFileUrl = async (storagePath: string) => {
     try {
-      const res = await safeFetch(`/api/file-url?storage_path=${encodeURIComponent(storagePath)}`);
+      const res = await safeFetch(
+        `/api/file-url?storage_path=${encodeURIComponent(storagePath)}`,
+      );
       if (!res.ok) {
         let errText = `HTTP ${res.status}`;
         try {
-          const errBody = await res.clone().json().catch(() => null);
+          const errBody = await res
+            .clone()
+            .json()
+            .catch(() => null);
           if (errBody && errBody.error) errText = errBody.error;
         } catch (_) {}
         throw new Error(errText);
@@ -157,7 +170,10 @@ export default function HistoryTab({
       }
     } catch (e: any) {
       console.error("Failed to get file URL", e);
-      setMessage({ type: "error", text: e?.message || "Impossible d'ouvrir le fichier" });
+      setMessage({
+        type: "error",
+        text: e?.message || "Impossible d'ouvrir le fichier",
+      });
     }
   };
 
@@ -180,7 +196,10 @@ export default function HistoryTab({
         headers: { "Content-Type": "application/json" },
       });
       if (!res.ok) {
-        const err = await res.clone().json().catch(() => ({}));
+        const err = await res
+          .clone()
+          .json()
+          .catch(() => ({}));
         throw new Error(err.error || "Failed to resend files");
       }
       setMessage({ type: "success", text: "Fichiers renvoyés avec succès" });
@@ -189,7 +208,10 @@ export default function HistoryTab({
       await fetchLogs();
     } catch (e: any) {
       console.error("Failed to resend files:", e);
-      setMessage({ type: "error", text: e?.message || "Erreur lors du renvoi" });
+      setMessage({
+        type: "error",
+        text: e?.message || "Erreur lors du renvoi",
+      });
     } finally {
       setResendLoading(false);
     }
@@ -255,7 +277,10 @@ export default function HistoryTab({
       if (!res.ok) {
         let errMsg = `Failed to fetch logs: ${res.status}`;
         try {
-          const errBody = await res.clone().json().catch(() => ({}));
+          const errBody = await res
+            .clone()
+            .json()
+            .catch(() => ({}));
           if (errBody && errBody.error) errMsg = errBody.error;
         } catch (e) {
           // ignore
@@ -532,7 +557,11 @@ export default function HistoryTab({
                       )}
 
                       <div className="mt-2 flex justify-end gap-2">
-                        <Button size="sm" variant="outline" onClick={() => openFilesForLog(log)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openFilesForLog(log)}
+                        >
                           Fichiers
                         </Button>
                       </div>
@@ -543,7 +572,18 @@ export default function HistoryTab({
             ))}
 
             {/* Files dialog */}
-            <Dialog open={filesModalOpen} onOpenChange={(open) => { if (!open) { setFilesModalOpen(false); setSelectedLog(null); setLogFiles([]); } else { setFilesModalOpen(true); } }}>
+            <Dialog
+              open={filesModalOpen}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setFilesModalOpen(false);
+                  setSelectedLog(null);
+                  setLogFiles([]);
+                } else {
+                  setFilesModalOpen(true);
+                }
+              }}
+            >
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Fichiers uploadés</DialogTitle>
@@ -556,14 +596,25 @@ export default function HistoryTab({
                   {filesLoading ? (
                     <p>Chargement des fichiers...</p>
                   ) : logFiles.length === 0 ? (
-                    <p className="text-muted-foreground">Aucun fichier attaché à cet envoi.</p>
+                    <p className="text-muted-foreground">
+                      Aucun fichier attaché à cet envoi.
+                    </p>
                   ) : (
                     <ul className="space-y-2 max-h-60 overflow-auto">
                       {logFiles.map((f) => (
-                        <li key={f.id} className="flex items-center justify-between gap-3">
-                          <div className="truncate text-sm">{f.file_name || f.storage_path}</div>
+                        <li
+                          key={f.id}
+                          className="flex items-center justify-between gap-3"
+                        >
+                          <div className="truncate text-sm">
+                            {f.file_name || f.storage_path}
+                          </div>
                           <div className="flex items-center gap-2">
-                            <Button size="sm" variant="ghost" onClick={() => openFileUrl(f.storage_path)}>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => openFileUrl(f.storage_path)}
+                            >
                               Ouvrir
                             </Button>
                           </div>
@@ -577,10 +628,20 @@ export default function HistoryTab({
                   <div className="flex items-center justify-between w-full">
                     <div />
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" onClick={() => { setFilesModalOpen(false); setSelectedLog(null); setLogFiles([]); }}>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setFilesModalOpen(false);
+                          setSelectedLog(null);
+                          setLogFiles([]);
+                        }}
+                      >
                         Fermer
                       </Button>
-                      <Button onClick={resendFilesToDoctor} disabled={resendLoading || logFiles.length === 0}>
+                      <Button
+                        onClick={resendFilesToDoctor}
+                        disabled={resendLoading || logFiles.length === 0}
+                      >
                         {resendLoading ? "Envoi..." : "Renvoyer au médecin"}
                       </Button>
                     </div>
