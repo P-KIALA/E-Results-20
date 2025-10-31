@@ -103,13 +103,30 @@ export default function HistoryTab({
     setLogFiles([]);
     try {
       const res = await safeFetch(`/api/send-logs/${log.id}/files`);
-      if (!res.ok) throw new Error("Failed to fetch files");
+      if (!res.ok) {
+        // Try to extract JSON error if present
+        let errText = `HTTP ${res.status}`;
+        try {
+          const errBody = await res.json().catch(() => null);
+          if (errBody && errBody.error) errText = errBody.error;
+        } catch (_) {}
+        throw new Error(errText);
+      }
+
+      // Ensure response is JSON; if not, read as text for debugging
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const txt = await res.text();
+        console.error("getSendLogFiles: expected JSON but got:", txt);
+        throw new Error("Réponse inattendue du serveur (non JSON)");
+      }
+
       const data = await res.json();
       setLogFiles(data.files || []);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to load files for log", e);
       setLogFiles([]);
-      setMessage({ type: "error", text: "Impossible de charger les fichiers" });
+      setMessage({ type: "error", text: e?.message || "Impossible de charger les fichiers" });
     } finally {
       setFilesLoading(false);
     }
