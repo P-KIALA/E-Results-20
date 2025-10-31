@@ -5,65 +5,13 @@ import {
   validateAndFormatPhone,
   checkWhatsAppAvailability,
 } from "../lib/phone";
-import { sendViaNotifyer } from "../lib/notifyer";
-import { sendViaInfobip } from "../lib/infobip";
-
-// Note: Twilio removed from the codebase — messaging will use configured providers (Infobip / Notifyer) only.
-// If no provider is configured, sending will fail with a clear error.
-
+// Messaging providers removed. Placeholder send function that returns an error informing no provider is configured.
 async function sendViaWhatsApp(
-  to: string,
-  message: string,
-  mediaUrls: string[],
+  _to: string,
+  _message: string,
+  _mediaUrls: string[],
 ): Promise<string> {
-  const useInfobip =
-    !!process.env.INFOBIP_API_KEY && process.env.USE_INFOBIP !== "false";
-  const useNotifyer =
-    !!process.env.NOTIFYER_API_KEY && process.env.USE_NOTIFYER !== "false";
-
-  if (useInfobip) {
-    try {
-      const id = await sendViaInfobip(to, message, mediaUrls);
-      console.log(`Infobip sent message to ${to}: ${id}`);
-      return id;
-    } catch (error) {
-      try {
-        console.error(`Infobip send error for ${to}:`, {
-          message: (error as any)?.message,
-          stack: (error as any)?.stack,
-          details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
-        });
-      } catch (e) {
-        console.error(`Infobip send error for ${to}:`, error);
-      }
-      // fallthrough to other providers
-      console.warn("Falling back from Infobip to other provider");
-    }
-  }
-
-  if (useNotifyer) {
-    try {
-      const id = await sendViaNotifyer(to, message, mediaUrls);
-      console.log(`Notifyer sent message to ${to}: ${id}`);
-      return id;
-    } catch (error) {
-      try {
-        console.error(`Notifyer send error for ${to}:`, {
-          message: (error as any)?.message,
-          stack: (error as any)?.stack,
-          details: JSON.stringify(error, Object.getOwnPropertyNames(error)),
-        });
-      } catch (e) {
-        console.error(`Notifyer send error for ${to}:`, error);
-      }
-      console.warn("Both Infobip and Notifyer failed to deliver the message.");
-    }
-  }
-
-  // If no provider succeeded, fail with clear message (Twilio removed)
-  throw new Error(
-    "No messaging provider configured or all providers failed. Twilio integration has been removed from the codebase.",
-  );
+  throw new Error("Aucun fournisseur de messagerie configuré. Veuillez configurer un fournisseur pour l'envoi de messages.");
 }
 
 export const sendResults: RequestHandler = async (req, res) => {
