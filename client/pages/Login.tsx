@@ -144,7 +144,7 @@ export default function LoginPage() {
 
         {/* Right Side - Login Form */}
         <div className="w-full max-w-md flex justify-center lg:justify-end">
-          <Card className="w-full shadow-2xl backdrop-blur-sm bg-white/30">
+          <Card className="w-full shadow-2xl backdrop-blur-sm bg-white/10 text-foreground">
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <div className="h-12 w-12 rounded-lg bg-primary/10 grid place-items-center">
