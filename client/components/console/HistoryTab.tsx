@@ -135,14 +135,29 @@ export default function HistoryTab({
   const openFileUrl = async (storagePath: string) => {
     try {
       const res = await safeFetch(`/api/file-url?storage_path=${encodeURIComponent(storagePath)}`);
-      if (!res.ok) throw new Error("Failed to get file URL");
+      if (!res.ok) {
+        let errText = `HTTP ${res.status}`;
+        try {
+          const errBody = await res.json().catch(() => null);
+          if (errBody && errBody.error) errText = errBody.error;
+        } catch (_) {}
+        throw new Error(errText);
+      }
+
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const txt = await res.text();
+        console.error("getFileUrl: expected JSON but got:", txt);
+        throw new Error("Réponse inattendue du serveur");
+      }
+
       const data = await res.json();
       if (data && data.url) {
         window.open(data.url, "_blank");
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Failed to get file URL", e);
-      setMessage({ type: "error", text: "Impossible d'ouvrir le fichier" });
+      setMessage({ type: "error", text: e?.message || "Impossible d'ouvrir le fichier" });
     }
   };
 
