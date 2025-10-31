@@ -115,6 +115,16 @@
     will-change: transform;
   }
 
+  /* In dark mode reduce the intensity of pure white text slightly */
+  .dark .text-white {
+    color: rgba(255,255,255,0.88) !important;
+  }
+
+  /* Also reduce opacity for elements that use text-white/70 etc to keep contrast */
+  .dark .text-white\/70 {
+    color: rgba(255,255,255,0.7) !important;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
