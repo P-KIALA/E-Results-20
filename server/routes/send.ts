@@ -680,6 +680,7 @@ export const getSendLogs: RequestHandler = async (req, res) => {
 // Get files associated with a send_log
 export const getSendLogFiles: RequestHandler = async (req, res) => {
   try {
+    console.log(`[getSendLogFiles] incoming request path=${req.path} params=${JSON.stringify(req.params)} query=${JSON.stringify(req.query)} origin=${req.headers.origin || req.headers.referer || '<no-origin>'} auth=${req.headers.authorization ? 'present' : 'missing'}`);
     const sendLogId = req.params.id || req.query.send_log_id;
     if (!sendLogId) return res.status(400).json({ error: "send_log_id is required" });
 
