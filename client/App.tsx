@@ -83,11 +83,12 @@ function RootRedirector() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AuthProvider>
-        <SidebarProvider>
+    <ThemeProvider attribute="class" defaultTheme="system">
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AuthProvider>
+          <SidebarProvider>
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<RootRedirector />} />
@@ -177,8 +178,9 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </SidebarProvider>
-      </AuthProvider>
-    </TooltipProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
