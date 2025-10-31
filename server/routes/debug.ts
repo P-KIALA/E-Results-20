@@ -23,23 +23,30 @@ export const uploadPublic: RequestHandler = async (req, res) => {
   try {
     const { file } = req.body as any;
     if (!file || !file.name || !file.data || !file.type) {
-      return res.status(400).json({ error: "file object with name,type,data required" });
+      return res
+        .status(400)
+        .json({ error: "file object with name,type,data required" });
     }
 
     const MAX_FILE_SIZE = 16 * 1024 * 1024;
     const sizeBytes = Buffer.byteLength(file.data, "base64");
-    if (sizeBytes > MAX_FILE_SIZE) return res.status(400).json({ error: "File too large" });
+    if (sizeBytes > MAX_FILE_SIZE)
+      return res.status(400).json({ error: "File too large" });
 
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substring(2, 8);
-    const ext = file.name.includes(".") ? file.name.substring(file.name.lastIndexOf('.')) : '';
+    const ext = file.name.includes(".")
+      ? file.name.substring(file.name.lastIndexOf("."))
+      : "";
     const storagePath = `results/${timestamp}_${randomId}${ext}`;
     const buffer = Buffer.from(file.data, "base64");
 
-    const { data: storageData, error: storageError } = await supabase.storage.from("results").upload(storagePath, buffer, {
-      contentType: file.type,
-      upsert: false,
-    });
+    const { data: storageData, error: storageError } = await supabase.storage
+      .from("results")
+      .upload(storagePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
     if (storageError) throw storageError;
 
     const { data: fileRecord, error: dbError } = await supabase
@@ -57,7 +64,9 @@ export const uploadPublic: RequestHandler = async (req, res) => {
       throw dbError;
     }
 
-    const { data: publicData, error: publicErr } = supabase.storage.from("results").getPublicUrl(storagePath);
+    const { data: publicData, error: publicErr } = supabase.storage
+      .from("results")
+      .getPublicUrl(storagePath);
     if (publicErr) throw publicErr;
 
     res.status(201).json({ file: fileRecord, publicUrl: publicData.publicUrl });

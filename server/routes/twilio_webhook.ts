@@ -5,8 +5,12 @@ export async function twilioStatusWebhook(req: Request, res: Response) {
   try {
     // Twilio will POST form-encoded fields like MessageSid, MessageStatus
     const body = req.body || {};
-    const messageSid = body.MessageSid || body.MessageSid || body.SmsSid || body.SmsMessageSid;
-    const messageStatus = (body.MessageStatus || body.MessageStatus || body.SmsStatus || null) as string | null;
+    const messageSid =
+      body.MessageSid || body.MessageSid || body.SmsSid || body.SmsMessageSid;
+    const messageStatus = (body.MessageStatus ||
+      body.MessageStatus ||
+      body.SmsStatus ||
+      null) as string | null;
 
     if (!messageSid) {
       console.warn("twilioStatusWebhook: no MessageSid in payload", body);
@@ -24,11 +28,14 @@ export async function twilioStatusWebhook(req: Request, res: Response) {
       undelivered: "failed",
     };
 
-    const mapped = messageStatus ? map[messageStatus.toLowerCase()] || messageStatus : "sent";
+    const mapped = messageStatus
+      ? map[messageStatus.toLowerCase()] || messageStatus
+      : "sent";
 
     const updateData: any = { status: mapped };
     if (mapped === "sent") updateData.sent_at = new Date().toISOString();
-    if (mapped === "delivered") updateData.delivered_at = new Date().toISOString();
+    if (mapped === "delivered")
+      updateData.delivered_at = new Date().toISOString();
     if (mapped === "read") updateData.read_at = new Date().toISOString();
 
     // Update send_logs where provider_message_id equals messageSid
@@ -39,7 +46,9 @@ export async function twilioStatusWebhook(req: Request, res: Response) {
 
     if (error) {
       console.error("twilioStatusWebhook: failed to update send_logs", error);
-      return res.status(500).json({ ok: false, error: "Failed to update send log" });
+      return res
+        .status(500)
+        .json({ ok: false, error: "Failed to update send log" });
     }
 
     res.json({ ok: true });

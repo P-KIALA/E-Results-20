@@ -1,38 +1,59 @@
 import { RequestHandler } from "express";
 import { supabase } from "../lib/supabase";
-import dotenv from 'dotenv';
-import path from 'path';
+import dotenv from "dotenv";
+import path from "path";
 // Ensure .env is loaded (in case env vars were modified at runtime)
-try { dotenv.config({ path: path.resolve(process.cwd(), '.env'), override: true }); } catch (_) {}
+try {
+  dotenv.config({ path: path.resolve(process.cwd(), ".env"), override: true });
+} catch (_) {}
 import { SendResultsRequest } from "@shared/api";
 import {
   validateAndFormatPhone,
   checkWhatsAppAvailability,
 } from "../lib/phone";
 // Twilio send implementation with retries, validation and friendly errors
-async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[], creds?: { sid?: string; token?: string; messagingService?: string; from?: string }): Promise<string> {
+async function sendViaWhatsApp(
+  to: string,
+  message: string,
+  mediaUrls: string[],
+  creds?: {
+    sid?: string;
+    token?: string;
+    messagingService?: string;
+    from?: string;
+  },
+): Promise<string> {
   // Validate to
   const validation = validateAndFormatPhone(String(to));
   if (!validation.is_valid) throw new Error("Invalid phone number format");
-  const toWhats = to.startsWith("whatsapp:") ? to : `whatsapp:${validation.formatted_phone}`;
+  const toWhats = to.startsWith("whatsapp:")
+    ? to
+    : `whatsapp:${validation.formatted_phone}`;
 
   // Credentials
   const sid = creds?.sid || process.env.TWILIO_ACCOUNT_SID;
   const token = creds?.token || process.env.TWILIO_AUTH_TOKEN;
-  const messagingService = creds?.messagingService || process.env.TWILIO_MESSAGING_SERVICE_SID;
+  const messagingService =
+    creds?.messagingService || process.env.TWILIO_MESSAGING_SERVICE_SID;
   const fromEnv = creds?.from || process.env.TWILIO_PHONE_NUMBER;
 
   if (!sid || !token) throw new Error("Twilio credentials not configured");
 
   // Status callback (so Twilio will POST delivery updates)
-  const statusCallback = creds?.statusCallback || process.env.TWILIO_STATUS_CALLBACK_URL;
+  const statusCallback =
+    creds?.statusCallback || process.env.TWILIO_STATUS_CALLBACK_URL;
 
   // Build payload
   const buildPayload = (useMessagingService: boolean) => {
     const payload = new URLSearchParams();
     payload.append("To", toWhats);
-    if (useMessagingService && messagingService) payload.append("MessagingServiceSid", messagingService);
-    else if (fromEnv) payload.append("From", fromEnv.startsWith("whatsapp:") ? fromEnv : `whatsapp:${fromEnv}`);
+    if (useMessagingService && messagingService)
+      payload.append("MessagingServiceSid", messagingService);
+    else if (fromEnv)
+      payload.append(
+        "From",
+        fromEnv.startsWith("whatsapp:") ? fromEnv : `whatsapp:${fromEnv}`,
+      );
     payload.append("Body", message);
     if (mediaUrls && mediaUrls.length > 0) {
       for (const m of mediaUrls) payload.append("MediaUrl", m);
@@ -63,16 +84,24 @@ async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[],
 
       const text = await resp.text();
       let parsed: any = null;
-      try { parsed = JSON.parse(text); } catch (e) { parsed = { raw: text }; }
+      try {
+        parsed = JSON.parse(text);
+      } catch (e) {
+        parsed = { raw: text };
+      }
 
       if (!resp.ok) {
         // Twilio error: provide friendly message including Twilio error code/message
         const twErr = parsed || {};
         const code = twErr.code || twErr.error_code || null;
-        const msg = twErr.message || twErr.error_message || twErr.more_info || JSON.stringify(parsed);
+        const msg =
+          twErr.message ||
+          twErr.error_message ||
+          twErr.more_info ||
+          JSON.stringify(parsed);
         // If 4xx and not auth, don't retry
         if (resp.status >= 400 && resp.status < 500) {
-          throw new Error(`Twilio error${code ? ' ' + code : ''}: ${msg}`);
+          throw new Error(`Twilio error${code ? " " + code : ""}: ${msg}`);
         }
         // 5xx: mark for retry
         lastError = new Error(`Twilio error ${resp.status}: ${msg}`);
@@ -83,7 +112,8 @@ async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[],
 
       // Success: Twilio returns sid
       const sidResp = parsed?.sid || parsed?.message_id || null;
-      if (!sidResp) return parsed?.sid || parsed?.message_id || JSON.stringify(parsed);
+      if (!sidResp)
+        return parsed?.sid || parsed?.message_id || JSON.stringify(parsed);
       return sidResp;
     } catch (err) {
       lastError = err;
@@ -278,7 +308,8 @@ export const sendResults: RequestHandler = async (req, res) => {
         const twCreds = {
           sid: (req.body as any).twilio_sid || undefined,
           token: (req.body as any).twilio_token || undefined,
-          messagingService: (req.body as any).twilio_messaging_service_sid || undefined,
+          messagingService:
+            (req.body as any).twilio_messaging_service_sid || undefined,
           from: (req.body as any).twilio_from || undefined,
         };
         const messageId = await sendViaWhatsApp(
