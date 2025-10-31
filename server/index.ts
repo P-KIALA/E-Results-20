@@ -171,6 +171,9 @@ export function createServer() {
   // Public upload endpoint for testing (dev only)
   app.post("/api/debug/upload-public", uploadPublic);
 
+  // Twilio webhook for status callbacks
+  app.post("/api/webhook/twilio", twilioStatusWebhook);
+
   // Twilio debug send endpoint (public, dev only). Sends a simple WhatsApp text message.
   app.post("/api/debug/twilio-send-public", twilioSendHandler);
 
