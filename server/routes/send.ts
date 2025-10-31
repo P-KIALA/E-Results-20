@@ -6,7 +6,7 @@ import {
   checkWhatsAppAvailability,
 } from "../lib/phone";
 // Twilio send implementation with retries, validation and friendly errors
-async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[]): Promise<string> {
+async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[], creds?: { sid?: string; token?: string; messagingService?: string; from?: string }): Promise<string> {
   // Validate to
   const validation = validateAndFormatPhone(String(to));
   if (!validation.is_valid) throw new Error("Invalid phone number format");
