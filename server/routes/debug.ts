@@ -87,7 +87,6 @@ export const sendTest: RequestHandler = async (req, res) => {
         sender_id: (req as any).userId || null,
         status: "sent",
         sent_at: new Date().toISOString(),
-        provider_message_id: simulatedMessageId,
       })
       .select()
       .single();
