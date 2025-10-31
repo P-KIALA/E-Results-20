@@ -328,12 +328,19 @@ export const sendResults: RequestHandler = async (req, res) => {
           messagingService:
             (req.body as any).twilio_messaging_service_sid || undefined,
           from: (req.body as any).twilio_from || undefined,
+          statusCallback: (req.body as any).twilio_status_callback || undefined,
         };
+
+        // Prefer using a pre-approved WhatsApp template when available (to avoid 63016)
+        const templateContentSid = (req.body as any).template_content_sid || process.env.WHATSAPP_TEMPLATE_CONTENT_SID || undefined;
+        const templateVars = (req.body as any).template_variables || undefined;
+
         const messageId = await sendViaWhatsApp(
           doctor.phone,
           custom_message,
           mediaUrls,
           twCreds,
+          templateContentSid ? { contentSid: templateContentSid, variables: templateVars || { doctor_name: doctor.name, patient_name } } : undefined,
         );
 
         // Update send log with message ID and sent status
