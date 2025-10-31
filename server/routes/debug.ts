@@ -76,6 +76,7 @@ export const sendTest: RequestHandler = async (req, res) => {
     }
 
     // Create a send_log and mark as sent (simulate provider)
+    const simulatedMessageId = `SIMULATED_${Date.now()}`;
     const { data: inserted, error: logError } = await supabase
       .from("send_logs")
       .insert({
@@ -86,7 +87,7 @@ export const sendTest: RequestHandler = async (req, res) => {
         sender_id: (req as any).userId || null,
         status: "sent",
         sent_at: new Date().toISOString(),
-        twilio_message_sid: `SIMULATED_${Date.now()}`,
+        provider_message_id: simulatedMessageId,
       })
       .select()
       .single();
