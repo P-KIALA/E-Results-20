@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase";
 import dotenv from 'dotenv';
 import path from 'path';
 // Ensure .env is loaded (in case env vars were modified at runtime)
-try { dotenv.config({ path: path.resolve(process.cwd(), '.env') }); } catch (_) {}
+try { dotenv.config({ path: path.resolve(process.cwd(), '.env'), override: true }); } catch (_) {}
 import { SendResultsRequest } from "@shared/api";
 import {
   validateAndFormatPhone,
