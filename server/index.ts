@@ -14,6 +14,7 @@ import { debugInfo, sendTest, uploadPublic } from "./routes/debug";
 import { proxyHandler } from "./routes/proxy";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import { twilioSendHandler } from "./routes/twilio_send";
+import { twilioStatusWebhook } from "./routes/twilio_webhook";
 import {
   login,
   register,
