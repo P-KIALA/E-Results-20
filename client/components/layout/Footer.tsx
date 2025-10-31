@@ -41,8 +41,12 @@ export default function Footer() {
         </div>
         <div className="text-sm text-muted-foreground flex flex-col gap-2"></div>
         <div className="text-sm text-muted-foreground md:text-right">
-          <p className="mt-[52px]">
-            © {new Date().getFullYear()} Le PARACLET. Tous droits réservés.
+          <p className="mt-[52px] flex flex-col">
+            © 2025
+            <div className="pointer-events-auto flex ml-auto">
+              <span>CENTRE DE DIAGNOSTIC EYANO.</span>
+              <span className="ml-2">Tous droits réservés.</span>
+            </div>
           </p>
         </div>
       </div>
