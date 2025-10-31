@@ -87,7 +87,7 @@ export type Database = {
           read_at: string | null;
           sent_at: string | null;
           status: string | null;
-          twilio_message_sid: string | null;
+          provider_message_id: string | null;
           updated_at: string | null;
         };
         Insert: {
@@ -103,7 +103,7 @@ export type Database = {
           read_at?: string | null;
           sent_at?: string | null;
           status?: string | null;
-          twilio_message_sid?: string | null;
+          provider_message_id?: string | null;
           updated_at?: string | null;
         };
         Update: {
@@ -119,7 +119,7 @@ export type Database = {
           read_at?: string | null;
           sent_at?: string | null;
           status?: string | null;
-          twilio_message_sid?: string | null;
+          provider_message_id?: string | null;
           updated_at?: string | null;
         };
       };
