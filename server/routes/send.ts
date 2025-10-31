@@ -5,13 +5,88 @@ import {
   validateAndFormatPhone,
   checkWhatsAppAvailability,
 } from "../lib/phone";
-// Messaging providers removed. Placeholder send function that returns an error informing no provider is configured.
-async function sendViaWhatsApp(
-  _to: string,
-  _message: string,
-  _mediaUrls: string[],
-): Promise<string> {
-  throw new Error("Aucun fournisseur de messagerie configuré. Veuillez configurer un fournisseur pour l'envoi de messages.");
+// Twilio send implementation with retries, validation and friendly errors
+async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[]): Promise<string> {
+  // Validate to
+  const validation = validateAndFormatPhone(String(to));
+  if (!validation.is_valid) throw new Error("Invalid phone number format");
+  const toWhats = to.startsWith("whatsapp:") ? to : `whatsapp:${validation.formatted_phone}`;
+
+  // Credentials
+  const sid = process.env.TWILIO_ACCOUNT_SID;
+  const token = process.env.TWILIO_AUTH_TOKEN;
+  const messagingService = process.env.TWILIO_MESSAGING_SERVICE_SID;
+  const fromEnv = process.env.TWILIO_PHONE_NUMBER;
+
+  if (!sid || !token) throw new Error("Twilio credentials not configured");
+
+  // Build payload
+  const buildPayload = (useMessagingService: boolean) => {
+    const payload = new URLSearchParams();
+    payload.append("To", toWhats);
+    if (useMessagingService && messagingService) payload.append("MessagingServiceSid", messagingService);
+    else if (fromEnv) payload.append("From", fromEnv.startsWith("whatsapp:") ? fromEnv : `whatsapp:${fromEnv}`);
+    payload.append("Body", message);
+    if (mediaUrls && mediaUrls.length > 0) {
+      for (const m of mediaUrls) payload.append("MediaUrl", m);
+    }
+    return payload.toString();
+  };
+
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
+
+  // Retry logic for transient errors
+  const maxRetries = 2;
+  let attempt = 0;
+  let lastError: any = null;
+  while (attempt <= maxRetries) {
+    try {
+      const useMessagingService = !!messagingService;
+      const body = buildPayload(useMessagingService);
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        },
+        body,
+      });
+
+      const text = await resp.text();
+      let parsed: any = null;
+      try { parsed = JSON.parse(text); } catch (e) { parsed = { raw: text }; }
+
+      if (!resp.ok) {
+        // Twilio error: provide friendly message including Twilio error code/message
+        const twErr = parsed || {};
+        const code = twErr.code || twErr.error_code || null;
+        const msg = twErr.message || twErr.error_message || twErr.more_info || JSON.stringify(parsed);
+        // If 4xx and not auth, don't retry
+        if (resp.status >= 400 && resp.status < 500) {
+          throw new Error(`Twilio error${code ? ' ' + code : ''}: ${msg}`);
+        }
+        // 5xx: mark for retry
+        lastError = new Error(`Twilio error ${resp.status}: ${msg}`);
+        attempt++;
+        await new Promise((r) => setTimeout(r, 500 * attempt));
+        continue;
+      }
+
+      // Success: Twilio returns sid
+      const sidResp = parsed?.sid || parsed?.message_id || null;
+      if (!sidResp) return parsed?.sid || parsed?.message_id || JSON.stringify(parsed);
+      return sidResp;
+    } catch (err) {
+      lastError = err;
+      // Network or unexpected error -> retry a couple times
+      attempt++;
+      if (attempt > maxRetries) break;
+      await new Promise((r) => setTimeout(r, 500 * attempt));
+    }
+  }
+
+  throw lastError || new Error("Failed to send message via Twilio");
 }
 
 export const sendResults: RequestHandler = async (req, res) => {
