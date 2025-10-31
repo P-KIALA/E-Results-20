@@ -88,9 +88,9 @@ export default function LoginPage() {
       </div>
 
       {/* Content Container */}
-      <div className="container mx-auto px-4 py-12 flex-1 flex items-center justify-between relative z-10">
-        {/* Left Side - Hero Content */}
-        <div className="w-full lg:w-1/2 space-y-8 text-white">
+      <div className="container mx-auto px-4 py-12 flex-1 flex items-center justify-center relative z-10">
+        {/* Left Side - Hero Content (hidden on small screens) */}
+        <div className="hidden lg:block w-1/2 pr-8 space-y-8 text-white">
           <div className="space-y-4">
             <div className="inline-block">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm px-4 py-2 text-sm font-medium text-white">
@@ -100,7 +100,7 @@ export default function LoginPage() {
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-black leading-tight tracking-tight">
-              Bienvenu au service{" "}
+              Bienvenu au service
               <span className="block text-emerald-400 font-montserrat font-black">
                 E-Result
               </span>
@@ -135,8 +135,8 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
-          <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
+        <div className="w-full max-w-md flex justify-center lg:justify-end">
+          <Card className="w-full shadow-2xl backdrop-blur-sm bg-white/95">
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <div className="h-12 w-12 rounded-lg bg-primary/10 grid place-items-center">
