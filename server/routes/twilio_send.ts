@@ -51,6 +51,27 @@ export async function twilioSendHandler(req: Request, res: Response) {
     }
     payload.append("Body", msg);
 
+    // Support media URLs (media_urls can be an array or comma-separated string)
+    const mediaUrlsRaw = (req.body && (req.body.media_urls as any)) || (req.query && (req.query.media_urls as any)) || null;
+    let mediaUrls: string[] = [];
+    if (mediaUrlsRaw) {
+      if (Array.isArray(mediaUrlsRaw)) mediaUrls = mediaUrlsRaw;
+      else if (typeof mediaUrlsRaw === "string") {
+        try {
+          // try parse JSON array
+          const parsed = JSON.parse(mediaUrlsRaw);
+          if (Array.isArray(parsed)) mediaUrls = parsed;
+          else mediaUrls = mediaUrlsRaw.split(",").map((s) => s.trim()).filter(Boolean);
+        } catch (e) {
+          mediaUrls = mediaUrlsRaw.split(",").map((s) => s.trim()).filter(Boolean);
+        }
+      }
+    }
+
+    for (const m of mediaUrls) {
+      if (m) payload.append("MediaUrl", m);
+    }
+
     const url = `https://api.twilio.com/2010-04-01/Accounts/${useSid}/Messages.json`;
 
     const resp = await fetch(url, {
