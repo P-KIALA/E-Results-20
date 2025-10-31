@@ -25,7 +25,7 @@ function ThemeToggle() {
       aria-label="Toggle theme"
       className="p-2"
     >
-      {isDark ? <Sun size={16} /> : <Moon size={16} />}
+      {isDark ? <Moon size={16} /> : <Sun size={16} />}
     </Button>
   );
 }
