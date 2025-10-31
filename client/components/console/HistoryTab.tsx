@@ -255,10 +255,7 @@ export default function HistoryTab({
       if (!res.ok) {
         let errMsg = `Failed to fetch logs: ${res.status}`;
         try {
-          const errBody = await res
-            .clone()
-            .json()
-            .catch(() => ({}));
+          const errBody = await res.clone().json().catch(() => ({}));
           if (errBody && errBody.error) errMsg = errBody.error;
         } catch (e) {
           // ignore
@@ -266,7 +263,7 @@ export default function HistoryTab({
         throw new Error(errMsg);
       }
 
-      const data = await res.json();
+      const data = await res.clone().json();
       setLogs(data.logs || []);
       setTotal(data.total || 0);
     } catch (error) {
