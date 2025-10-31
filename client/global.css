@@ -134,11 +134,17 @@
 
   /* Ensure slider uses the dark background color in dark mode */
   .dark .slider-track {
-    background-color: hsl(var(--background)) !important;
+    background-color: hsl(var(--dark-black)) !important;
   }
 
   .dark .slider-range {
-    background-color: hsl(var(--background)) !important;
+    background-color: hsl(var(--dark-black)) !important;
+  }
+
+  /* Ensure the slider thumb contrasts on the dark background */
+  .dark .slider-thumb {
+    background-color: hsl(var(--card)) !important;
+    border-color: hsl(var(--primary)) !important;
   }
 
   body {
