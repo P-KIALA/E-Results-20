@@ -20,6 +20,9 @@ async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[],
 
   if (!sid || !token) throw new Error("Twilio credentials not configured");
 
+  // Status callback (so Twilio will POST delivery updates)
+  const statusCallback = creds?.statusCallback || process.env.TWILIO_STATUS_CALLBACK_URL;
+
   // Build payload
   const buildPayload = (useMessagingService: boolean) => {
     const payload = new URLSearchParams();
@@ -30,6 +33,7 @@ async function sendViaWhatsApp(to: string, message: string, mediaUrls: string[],
     if (mediaUrls && mediaUrls.length > 0) {
       for (const m of mediaUrls) payload.append("MediaUrl", m);
     }
+    if (statusCallback) payload.append("StatusCallback", statusCallback);
     return payload.toString();
   };
 
