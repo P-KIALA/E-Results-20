@@ -95,11 +95,15 @@ export default function Sidebar() {
 
             <Link
               to="/console?tab=stats"
-              className={navItemClass(isConsoleActive && currentTab === "stats")}
+              className={navItemClass(
+                isConsoleActive && currentTab === "stats",
+              )}
               title="Statistiques"
             >
               <BarChart3 size={20} className="flex-shrink-0" />
-              {!isMinimized && <span className="font-medium">Statistiques</span>}
+              {!isMinimized && (
+                <span className="font-medium">Statistiques</span>
+              )}
             </Link>
 
             <div className="my-2 border-t border-border" />
@@ -110,7 +114,9 @@ export default function Sidebar() {
               title="Utilisateurs"
             >
               <Users size={20} className="flex-shrink-0" />
-              {!isMinimized && <span className="font-medium">Utilisateurs</span>}
+              {!isMinimized && (
+                <span className="font-medium">Utilisateurs</span>
+              )}
             </Link>
 
             <Link
@@ -157,7 +163,9 @@ export default function Sidebar() {
               title="Statistiques"
             >
               <BarChart3 size={20} className="flex-shrink-0" />
-              {!isMinimized && <span className="font-medium">Statistiques</span>}
+              {!isMinimized && (
+                <span className="font-medium">Statistiques</span>
+              )}
             </Link>
 
             <Link
@@ -196,39 +204,60 @@ export default function Sidebar() {
         <nav className="bg-background/95 backdrop-blur rounded-xl shadow-lg px-3 py-2 flex gap-3 items-center">
           {user?.role === "admin" ? (
             <>
-              <Link to="/console?tab=doctors" className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60">
+              <Link
+                to="/console?tab=doctors"
+                className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60"
+              >
                 <Stethoscope size={20} />
                 <span className="mt-1 text-xs">Médecins</span>
               </Link>
 
-              <Link to="/console?tab=results" className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60">
+              <Link
+                to="/console?tab=results"
+                className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60"
+              >
                 <Send size={20} />
                 <span className="mt-1 text-xs">Envoi</span>
               </Link>
 
-              <Link to="/console?tab=history" className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60">
+              <Link
+                to="/console?tab=history"
+                className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60"
+              >
                 <Clock size={20} />
                 <span className="mt-1 text-xs">Historique</span>
               </Link>
 
-              <Link to="/admin" className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60">
+              <Link
+                to="/admin"
+                className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60"
+              >
                 <Users size={20} />
                 <span className="mt-1 text-xs">Util.</span>
               </Link>
             </>
           ) : (
             <>
-              <Link to="/dashboard" className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60">
+              <Link
+                to="/dashboard"
+                className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60"
+              >
                 <LayoutDashboard size={20} />
                 <span className="mt-1 text-xs">Envois</span>
               </Link>
 
-              <Link to="/history" className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60">
+              <Link
+                to="/history"
+                className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60"
+              >
                 <Clock size={20} />
                 <span className="mt-1 text-xs">Historique</span>
               </Link>
 
-              <Link to="/stats" className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60">
+              <Link
+                to="/stats"
+                className="flex flex-col items-center px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted/60"
+              >
                 <BarChart3 size={20} />
                 <span className="mt-1 text-xs">Stats</span>
               </Link>
@@ -248,7 +277,10 @@ function MobileDrawer() {
   const currentTab = searchParams.get("tab") || "doctors";
 
   return (
-    <div className={`fixed inset-0 z-50 md:hidden ${openMobile ? "" : "pointer-events-none"}`} aria-hidden={!openMobile}>
+    <div
+      className={`fixed inset-0 z-50 md:hidden ${openMobile ? "" : "pointer-events-none"}`}
+      aria-hidden={!openMobile}
+    >
       {/* overlay */}
       <div
         onClick={() => setOpenMobile(false)}
@@ -256,14 +288,32 @@ function MobileDrawer() {
       />
 
       {/* panel */}
-      <aside className={`fixed top-0 left-0 h-full w-72 bg-background border-r border-border shadow-xl transform transition-transform ${openMobile ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside
+        className={`fixed top-0 left-0 h-full w-72 bg-background border-r border-border shadow-xl transform transition-transform ${openMobile ? "translate-x-0" : "-translate-x-full"}`}
+      >
         <div className="p-4 flex items-center justify-between border-b border-border">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-md bg-primary/10 grid place-items-center">E</div>
+            <div className="h-8 w-8 rounded-md bg-primary/10 grid place-items-center">
+              E
+            </div>
             <span className="font-semibold">Menu</span>
           </div>
-          <button onClick={() => setOpenMobile(false)} aria-label="Fermer le menu" className="p-2 rounded-md hover:bg-muted">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <button
+            onClick={() => setOpenMobile(false)}
+            aria-label="Fermer le menu"
+            className="p-2 rounded-md hover:bg-muted"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M18 6L6 18"></path>
               <path d="M6 6l12 12"></path>
             </svg>
@@ -279,7 +329,11 @@ function MobileDrawer() {
   );
 }
 
-function MobileMenuItems({ setOpenMobile }: { setOpenMobile: (v: boolean) => void }) {
+function MobileMenuItems({
+  setOpenMobile,
+}: {
+  setOpenMobile: (v: boolean) => void;
+}) {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user, logout } = useAuth();
@@ -299,61 +353,111 @@ function MobileMenuItems({ setOpenMobile }: { setOpenMobile: (v: boolean) => voi
     <>
       {user?.role === "admin" ? (
         <>
-          <Link onClick={() => setOpenMobile(false)} to="/console?tab=doctors" className={navItemClass(isConsoleActive && currentTab === "doctors")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/console?tab=doctors"
+            className={navItemClass(
+              isConsoleActive && currentTab === "doctors",
+            )}
+          >
             <Stethoscope size={18} />
             <span>Médecins</span>
           </Link>
 
-          <Link onClick={() => setOpenMobile(false)} to="/console?tab=results" className={navItemClass(isConsoleActive && currentTab === "results")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/console?tab=results"
+            className={navItemClass(
+              isConsoleActive && currentTab === "results",
+            )}
+          >
             <Send size={18} />
             <span>Envoi résultat</span>
           </Link>
 
-          <Link onClick={() => setOpenMobile(false)} to="/console?tab=history" className={navItemClass(isConsoleActive && currentTab === "history")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/console?tab=history"
+            className={navItemClass(
+              isConsoleActive && currentTab === "history",
+            )}
+          >
             <Clock size={18} />
             <span>Historique</span>
           </Link>
 
-          <Link onClick={() => setOpenMobile(false)} to="/console?tab=stats" className={navItemClass(isConsoleActive && currentTab === "stats")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/console?tab=stats"
+            className={navItemClass(isConsoleActive && currentTab === "stats")}
+          >
             <BarChart3 size={18} />
             <span>Statistiques</span>
           </Link>
 
           <div className="my-2 border-t border-border" />
 
-          <Link onClick={() => setOpenMobile(false)} to="/admin" className={navItemClass(location.pathname === "/admin")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/admin"
+            className={navItemClass(location.pathname === "/admin")}
+          >
             <Users size={18} />
             <span>Utilisateurs</span>
           </Link>
 
-          <Link onClick={() => setOpenMobile(false)} to="/sites" className={navItemClass(location.pathname === "/sites")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/sites"
+            className={navItemClass(location.pathname === "/sites")}
+          >
             <MapPin size={18} />
             <span>Sites</span>
           </Link>
 
-          <Link onClick={() => setOpenMobile(false)} to="/report" className={navItemClass(location.pathname === "/report")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/report"
+            className={navItemClass(location.pathname === "/report")}
+          >
             <BarChart3 size={18} />
             <span>Rapport</span>
           </Link>
         </>
       ) : (
         <>
-          <Link onClick={() => setOpenMobile(false)} to="/dashboard" className={navItemClass(location.pathname === "/dashboard")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/dashboard"
+            className={navItemClass(location.pathname === "/dashboard")}
+          >
             <LayoutDashboard size={18} />
             <span>Envois</span>
           </Link>
 
-          <Link onClick={() => setOpenMobile(false)} to="/history" className={navItemClass(location.pathname === "/history")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/history"
+            className={navItemClass(location.pathname === "/history")}
+          >
             <Clock size={18} />
             <span>Historique</span>
           </Link>
 
-          <Link onClick={() => setOpenMobile(false)} to="/stats" className={navItemClass(location.pathname === "/stats")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/stats"
+            className={navItemClass(location.pathname === "/stats")}
+          >
             <BarChart3 size={18} />
             <span>Statistiques</span>
           </Link>
 
-          <Link onClick={() => setOpenMobile(false)} to="/report" className={navItemClass(location.pathname === "/report")}>
+          <Link
+            onClick={() => setOpenMobile(false)}
+            to="/report"
+            className={navItemClass(location.pathname === "/report")}
+          >
             <BarChart3 size={18} />
             <span>Rapport</span>
           </Link>
@@ -362,7 +466,13 @@ function MobileMenuItems({ setOpenMobile }: { setOpenMobile: (v: boolean) => voi
 
       <div className="flex-1" />
 
-      <button onClick={() => { logout(); setOpenMobile(false); }} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 w-full">
+      <button
+        onClick={() => {
+          logout();
+          setOpenMobile(false);
+        }}
+        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 w-full"
+      >
         <LogOut size={18} />
         <span>Déconnexion</span>
       </button>

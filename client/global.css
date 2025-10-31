@@ -112,9 +112,15 @@
 
   /* Floating animation for login card */
   @keyframes float {
-    0% { transform: translateY(0px) translateZ(0); }
-    50% { transform: translateY(-8px) translateZ(0); }
-    100% { transform: translateY(0px) translateZ(0); }
+    0% {
+      transform: translateY(0px) translateZ(0);
+    }
+    50% {
+      transform: translateY(-8px) translateZ(0);
+    }
+    100% {
+      transform: translateY(0px) translateZ(0);
+    }
   }
 
   .animate-float {
@@ -124,12 +130,12 @@
 
   /* In dark mode reduce the intensity of pure white text slightly */
   .dark .text-white {
-    color: rgba(255,255,255,0.88) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
   }
 
   /* Also reduce opacity for elements that use text-white/70 etc to keep contrast */
   .dark .text-white\/70 {
-    color: rgba(255,255,255,0.7) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
   }
 
   /* Ensure slider uses the dark background color in dark mode */

@@ -192,7 +192,9 @@ export default function LoginPage() {
                 </div>
               </div>
               <CardTitle className="text-2xl">E-Result</CardTitle>
-              <CardDescription className="text-white font-bold">Connectez-vous à votre compte</CardDescription>
+              <CardDescription className="text-white font-bold">
+                Connectez-vous à votre compte
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">

@@ -15,7 +15,9 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [openMobile, setOpenMobile] = useState(false);
 
   return (
-    <SidebarContext.Provider value={{ isMinimized, setIsMinimized, openMobile, setOpenMobile }}>
+    <SidebarContext.Provider
+      value={{ isMinimized, setIsMinimized, openMobile, setOpenMobile }}
+    >
       {children}
     </SidebarContext.Provider>
   );
