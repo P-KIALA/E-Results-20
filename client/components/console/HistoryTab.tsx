@@ -482,7 +482,14 @@ export default function HistoryTab({
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <Input
+            placeholder="Rechercher un médecin..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="px-2 py-2 w-64"
+          />
+
           <Button
             variant="outline"
             onClick={async () => {
