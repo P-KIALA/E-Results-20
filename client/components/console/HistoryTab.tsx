@@ -55,6 +55,7 @@ export default function HistoryTab({
   const [filesLoading, setFilesLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Filter logs client-side by doctor name, patient name or doctor phone when a search query is provided
   const filteredLogs = (logs || []).filter((l) => {
