@@ -46,7 +46,6 @@ export default function Sidebar() {
     );
 
   const [chooseSiteOpen, setChooseSiteOpen] = useState(false);
-  const { sites, currentSiteId, setCurrentSiteId, canChangeSite } = useSite();
   const currentSiteName = sites.find((s: any) => s.id === currentSiteId)?.name || null;
 
   const selectSite = (id: string) => {
