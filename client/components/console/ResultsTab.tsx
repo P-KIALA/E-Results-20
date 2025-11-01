@@ -429,66 +429,75 @@ export default function ResultsTab() {
               )}
             </div>
 
-            {/* Add Message Floating Menu */}
+            {/* Add Message Centered Modal */}
             {showAddMenu && (
-              <div className="absolute z-50 right-0 mt-2 w-80 bg-white border rounded shadow p-3">
-                <label className="text-xs font-medium">Titre du message</label>
-                <Input
-                  value={newMessageTitle}
-                  onChange={(e) => setNewMessageTitle(e.target.value)}
-                  className="mt-1 mb-2"
-                  placeholder="Titre"
-                />
-                <label className="text-xs font-medium">Corps du message</label>
-                <Textarea
-                  value={newMessageBody}
-                  onChange={(e) => setNewMessageBody(e.target.value)}
-                  rows={4}
-                  className="mt-1"
-                  placeholder="Écrivez le corps du message..."
-                />
-                <div className="mt-3 flex justify-end gap-2">
-                  <Button size="sm" variant="outline" onClick={() => { setShowAddMenu(false); setNewMessageTitle(''); setNewMessageBody(''); }}>
-                    Annuler
-                  </Button>
-                  <Button size="sm" onClick={addNewMessage}>
-                    Enregistrer
-                  </Button>
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/30" onClick={() => { setShowAddMenu(false); }} />
+                <div className="relative z-10 w-11/12 sm:w-96 bg-white border rounded shadow p-4">
+                  <h4 className="text-sm font-semibold mb-2">Ajouter un message</h4>
+                  <label className="text-xs font-medium">Titre du message</label>
+                  <Input
+                    value={newMessageTitle}
+                    onChange={(e) => setNewMessageTitle(e.target.value)}
+                    className="mt-1 mb-2"
+                    placeholder="Titre"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <label className="text-xs font-medium">Corps du message</label>
+                  <Textarea
+                    value={newMessageBody}
+                    onChange={(e) => setNewMessageBody(e.target.value)}
+                    rows={6}
+                    className="mt-1"
+                    placeholder="Écrivez le corps du message..."
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <div className="mt-3 flex justify-end gap-2">
+                    <Button size="sm" variant="outline" onClick={() => { setShowAddMenu(false); setNewMessageTitle(''); setNewMessageBody(''); }}>
+                      Annuler
+                    </Button>
+                    <Button size="sm" onClick={addNewMessage}>
+                      Enregistrer
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* List Messages Floating Menu */}
+            {/* List Messages Centered Modal */}
             {showListMenu && (
-              <div className="absolute z-50 right-0 mt-2 w-80 bg-white border rounded shadow p-2 max-h-64 overflow-auto">
-                {savedMessages.length === 0 ? (
-                  <p className="p-2 text-sm text-muted-foreground">Aucun message enregistré</p>
-                ) : (
-                  savedMessages.map((m) => (
-                    <div key={m.id} className="p-2 hover:bg-muted rounded flex items-start gap-2">
-                      <div className="flex-1">
-                        <button
-                          className="text-sm font-medium text-left w-full"
-                          onClick={() => {
-                            setSelectedMessageId(m.id);
-                            setShowListMenu(false);
-                          }}
-                        >
-                          {m.title}
-                        </button>
-                        <p className="text-xs text-muted-foreground mt-1">{m.body.substring(0, 120)}{m.body.length>120? '...' : ''}</p>
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/30" onClick={() => { setShowListMenu(false); }} />
+                <div className="relative z-10 w-11/12 sm:w-96 bg-white border rounded shadow p-2 max-h-[70vh] overflow-auto">
+                  <div className="flex items-center justify-between p-2 border-b">
+                    <h4 className="text-sm font-semibold">Messages enregistrés</h4>
+                    <Button size="xs" variant="ghost" onClick={() => setShowListMenu(false)}>Fermer</Button>
+                  </div>
+                  {savedMessages.length === 0 ? (
+                    <p className="p-3 text-sm text-muted-foreground">Aucun message enregistré</p>
+                  ) : (
+                    savedMessages.map((m) => (
+                      <div key={m.id} className="p-2 hover:bg-muted rounded flex items-start gap-2">
+                        <div className="flex-1" onClick={() => { setSelectedMessageId(m.id); setShowListMenu(false); }}>
+                          <button
+                            className="text-sm font-medium text-left w-full"
+                          >
+                            {m.title}
+                          </button>
+                          <p className="text-xs text-muted-foreground mt-1">{m.body.substring(0, 120)}{m.body.length>120? '...' : ''}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <Button size="xs" variant="ghost" onClick={() => { setCustomMessage(m.body); setShowListMenu(false); setMessage({ type: 'success', text: 'Message inséré' }); }}>
+                            Insérer
+                          </Button>
+                          <Button size="xs" variant="ghost" onClick={() => deleteMessage(m.id)}>
+                            Supprimer
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <Button size="xs" variant="ghost" onClick={() => { setCustomMessage(m.body); setShowListMenu(false); setMessage({ type: 'success', text: 'Message inséré' }); }}>
-                          Insérer
-                        </Button>
-                        <Button size="xs" variant="ghost" onClick={() => deleteMessage(m.id)}>
-                          Supprimer
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                )}
+                    ))
+                  )}
+                </div>
               </div>
             )}
           </div>
