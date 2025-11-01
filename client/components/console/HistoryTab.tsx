@@ -35,7 +35,6 @@ export default function HistoryTab({
   const { user } = useAuth();
   const [logs, setLogs] = useState<(SendLogEntry & { doctors?: any })[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDoctor, setFilterDoctor] = useState("");
