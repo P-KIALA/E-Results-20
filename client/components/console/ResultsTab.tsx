@@ -13,6 +13,7 @@ import { Doctor } from "@shared/api";
 import { Upload, Send, CheckCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { authFetch } from "@/lib/api";
+import { useSite } from "@/lib/site-context";
 
 export default function ResultsTab() {
   const { user } = useAuth();
@@ -30,6 +31,8 @@ export default function ResultsTab() {
   } | null>(null);
   const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { sites, currentSiteId, canChangeSite } = useSite();
+  const [siteFilter, setSiteFilter] = useState<string>(() => (canChangeSite ? "all" : (localStorage.getItem("current_site_id") || "")));
   const [savedMessages, setSavedMessages] = useState<{ id: string; title: string; body: string; createdAt: number }[]>([]);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showListMenu, setShowListMenu] = useState(false);
@@ -90,16 +93,35 @@ export default function ResultsTab() {
     if (user?.primary_site?.name) {
       setPatientSite(user.primary_site.name);
     }
-  }, [user?.primary_site?.name]);
+  }, [user?.primary_site?.name, siteFilter, currentSiteId]);
 
   const fetchDoctors = async () => {
     try {
-      const res = await authFetch("/api/doctors");
+      let url = "/api/doctors";
+      // If a specific site is selected, try to pass it to the API
+      if (siteFilter && siteFilter !== "all") {
+        url += `?site_id=${encodeURIComponent(siteFilter)}`;
+      } else if (!canChangeSite && currentSiteId) {
+        url += `?site_id=${encodeURIComponent(currentSiteId)}`;
+      }
+
+      const res = await authFetch(url);
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
-      setDoctors(
-        data.doctors?.filter((d: Doctor) => d.whatsapp_verified) || [],
-      );
+      // If API doesn't return site-scoped doctors, we still filter client-side when possible
+      const loaded: Doctor[] = data.doctors || [];
+      const filtered = loaded.filter((d: any) => d.whatsapp_verified);
+      // client-side site filtering if doctor has site_id
+      const final = filtered.filter((d: any) => {
+        if (siteFilter && siteFilter !== "all") {
+          if (d.site_id) return d.site_id === siteFilter;
+        }
+        if (!canChangeSite && currentSiteId) {
+          if (d.site_id) return d.site_id === currentSiteId;
+        }
+        return true;
+      });
+      setDoctors(final);
     } catch (error) {
       setMessage({ type: "error", text: "Erreur lors du chargement" });
     }
@@ -352,7 +374,15 @@ export default function ResultsTab() {
         </CardHeader>
         <CardContent className="space-y-2">
           <div>
-            <label className="text-sm font-medium">Rechercher un médecin (nom, prénom, téléphone)</label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Rechercher un médecin (nom, prénom, téléphone)</label>
+              <select value={siteFilter} onChange={(e) => setSiteFilter(e.target.value)} className="px-2 py-1 border rounded text-sm" disabled={!canChangeSite}>
+                {canChangeSite ? <option value="all">Tout le site</option> : null}
+                {sites.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
             <Input
               placeholder="Rechercher par nom ou téléphone"
               value={searchQuery}
