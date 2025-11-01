@@ -422,7 +422,7 @@ export default function ResultsTab() {
                 Messages enregistrés
               </Button>
 
-              {selectedMessage && (
+              {previewVisible && selectedMessage && (
                 <div className="ml-auto flex items-center gap-2 text-sm">
                   <span className="font-medium">Prévisualisation:</span>
                   <span className="text-muted-foreground">{selectedMessage.title}</span>
