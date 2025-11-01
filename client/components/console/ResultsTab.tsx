@@ -32,6 +32,47 @@ export default function ResultsTab() {
   } | null>(null);
   const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [savedMessages, setSavedMessages] = useState<{ id: string; title: string; body: string; createdAt: number }[]>([]);
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const [showListMenu, setShowListMenu] = useState(false);
+  const [newMessageTitle, setNewMessageTitle] = useState("");
+  const [newMessageBody, setNewMessageBody] = useState("");
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("savedMessages");
+      if (raw) setSavedMessages(JSON.parse(raw));
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("savedMessages", JSON.stringify(savedMessages));
+    } catch (e) {}
+  }, [savedMessages]);
+
+  const selectedMessage = savedMessages.find((m) => m.id === selectedMessageId) || null;
+
+  const addNewMessage = () => {
+    if (!newMessageTitle.trim() || !newMessageBody.trim()) {
+      setMessage({ type: "error", text: "Titre et corps du message requis" });
+      return;
+    }
+    const msg = { id: String(Date.now()), title: newMessageTitle.trim(), body: newMessageBody, createdAt: Date.now() };
+    setSavedMessages([msg, ...savedMessages]);
+    setNewMessageTitle("");
+    setNewMessageBody("");
+    setShowAddMenu(false);
+    setMessage({ type: "success", text: "Message enregistré" });
+  };
+
+  const deleteMessage = (id: string) => {
+    setSavedMessages(savedMessages.filter((m) => m.id !== id));
+    if (selectedMessageId === id) setSelectedMessageId(null);
+  };
 
   const filteredDoctors = doctors.filter((d) => {
     if (!searchQuery || searchQuery.trim().length === 0) return false; // hide all until user searches
@@ -358,12 +399,126 @@ export default function ResultsTab() {
           <CardTitle>Message personnalisé</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="relative">
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setShowAddMenu((s) => !s);
+                  setShowListMenu(false);
+                }}
+              >
+                Ajouter un message
+              </Button>
+
+              <Button
+                size="sm"
+                onClick={() => {
+                  setShowListMenu((s) => !s);
+                  setShowAddMenu(false);
+                }}
+              >
+                Messages enregistrés
+              </Button>
+
+              {selectedMessage && (
+                <div className="ml-auto flex items-center gap-2 text-sm">
+                  <span className="font-medium">Prévisualisation:</span>
+                  <span className="text-muted-foreground">{selectedMessage.title}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Add Message Floating Menu */}
+            {showAddMenu && (
+              <div className="absolute z-50 right-0 mt-2 w-80 bg-white border rounded shadow p-3">
+                <label className="text-xs font-medium">Titre du message</label>
+                <Input
+                  value={newMessageTitle}
+                  onChange={(e) => setNewMessageTitle(e.target.value)}
+                  className="mt-1 mb-2"
+                  placeholder="Titre"
+                />
+                <label className="text-xs font-medium">Corps du message</label>
+                <Textarea
+                  value={newMessageBody}
+                  onChange={(e) => setNewMessageBody(e.target.value)}
+                  rows={4}
+                  className="mt-1"
+                  placeholder="Écrivez le corps du message..."
+                />
+                <div className="mt-3 flex justify-end gap-2">
+                  <Button size="sm" variant="outline" onClick={() => { setShowAddMenu(false); setNewMessageTitle(''); setNewMessageBody(''); }}>
+                    Annuler
+                  </Button>
+                  <Button size="sm" onClick={addNewMessage}>
+                    Enregistrer
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* List Messages Floating Menu */}
+            {showListMenu && (
+              <div className="absolute z-50 right-0 mt-2 w-80 bg-white border rounded shadow p-2 max-h-64 overflow-auto">
+                {savedMessages.length === 0 ? (
+                  <p className="p-2 text-sm text-muted-foreground">Aucun message enregistré</p>
+                ) : (
+                  savedMessages.map((m) => (
+                    <div key={m.id} className="p-2 hover:bg-muted rounded flex items-start gap-2">
+                      <div className="flex-1">
+                        <button
+                          className="text-sm font-medium text-left w-full"
+                          onClick={() => {
+                            setSelectedMessageId(m.id);
+                            setShowListMenu(false);
+                          }}
+                        >
+                          {m.title}
+                        </button>
+                        <p className="text-xs text-muted-foreground mt-1">{m.body.substring(0, 120)}{m.body.length>120? '...' : ''}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <Button size="xs" variant="ghost" onClick={() => { setCustomMessage(m.body); setShowListMenu(false); setMessage({ type: 'success', text: 'Message inséré' }); }}>
+                          Insérer
+                        </Button>
+                        <Button size="xs" variant="ghost" onClick={() => deleteMessage(m.id)}>
+                          Supprimer
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
           <Textarea
             value={customMessage}
             onChange={(e) => setCustomMessage(e.target.value)}
             rows={6}
             placeholder="Écrivez votre message..."
           />
+
+          {selectedMessage && (
+            <div className="p-3 border rounded bg-gray-50">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-medium">{selectedMessage.title}</p>
+                  <pre className="whitespace-pre-wrap text-sm text-muted-foreground mt-1">{selectedMessage.body}</pre>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <Button size="sm" onClick={() => setCustomMessage(selectedMessage.body)}>
+                    Insérer
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setSelectedMessageId(null)}>
+                    Fermer
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <Button
             onClick={handleSend}
             disabled={
