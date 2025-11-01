@@ -18,9 +18,7 @@ export default function ResultsTab() {
   const { user } = useAuth();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedDoctors, setSelectedDoctors] = useState<string[]>([]);
-  const [customMessage, setCustomMessage] = useState(
-    "Bonjour,\n\nVous trouverez ci-joint les résultats d'analyse demandés.\n\nCordialement",
-  );
+  const [customMessage, setCustomMessage] = useState("");
   const [patientName, setPatientName] = useState("");
   const [patientSite, setPatientSite] = useState("");
   const [files, setFiles] = useState<File[]>([]);
