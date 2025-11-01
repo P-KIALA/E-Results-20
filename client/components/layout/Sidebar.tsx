@@ -59,6 +59,8 @@ export default function Sidebar() {
   }, []);
 
   const currentSiteName = sites.find((s) => s.id === currentSiteId)?.name || null;
+  const canChangeSite =
+    user?.role === "admin" || (user?.permissions || []).includes("access_all_sites");
 
   const selectSite = (id: string) => {
     setCurrentSiteId(id);
