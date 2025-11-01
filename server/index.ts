@@ -9,7 +9,7 @@ import {
   deleteDoctor,
   verifyDoctor,
 } from "./routes/doctors";
-import { sendResults, getSendLogs } from "./routes/send";
+import { sendResults, getSendLogs, getSendLogFiles } from "./routes/send";
 import { debugInfo, sendTest, uploadPublic } from "./routes/debug";
 import { proxyHandler } from "./routes/proxy";
 import { uploadFiles, getFileUrl } from "./routes/upload";
