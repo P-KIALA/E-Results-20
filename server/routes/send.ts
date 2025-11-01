@@ -155,25 +155,17 @@ async function sendViaWhatsApp(
       });
 
       const text = await resp.text();
-      let parsed: any = null;
-      try {
-        parsed = JSON.parse(text);
-      } catch (e) {
-        parsed = { raw: text };
-      }
+    let parsed: any = null;
+    try {
+      parsed = JSON.parse(text);
+    } catch (e) {
+      parsed = { raw: text };
+    }
 
-      // Log Twilio response for debugging
-      try {
-        console.log("[Twilio DEBUG] Response", { status: resp.status, parsed });
-      } catch (e) {}
-
-      const text = await resp.text();
-      let parsed: any = null;
-      try {
-        parsed = JSON.parse(text);
-      } catch (e) {
-        parsed = { raw: text };
-      }
+    // Log Twilio response for debugging
+    try {
+      console.log("[Twilio DEBUG] Response", { status: resp.status, parsed });
+    } catch (e) {}
 
       if (!resp.ok) {
         const twErr = parsed || {};
