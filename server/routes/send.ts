@@ -459,21 +459,38 @@ export const sendResults: RequestHandler = async (req, res) => {
         // Otherwise send as single message (default behavior)
         const mediaUrls = mediaFiles.map((f) => f.publicUrl);
 
-        const messageId = await sendViaWhatsApp(
-          doctor.phone,
-          custom_message,
-          mediaUrls,
-          twCreds,
-          templateContentSid
-            ? {
-                contentSid: templateContentSid,
-                variables: templateVars || {
-                  doctor_name: doctor.name,
-                  patient_name,
-                },
-              }
-            : undefined,
-        );
+        let messageId;
+        try {
+          messageId = await sendViaWhatsApp(
+            doctor.phone,
+            custom_message,
+            mediaUrls,
+            twCreds,
+            templateContentSid
+              ? {
+                  contentSid: templateContentSid,
+                  variables: templateVars || {
+                    doctor_name: doctor.name,
+                    patient_name,
+                  },
+                }
+              : undefined,
+          );
+        } catch (templateErr: any) {
+          const msg = String(templateErr?.message || templateErr);
+          if (msg.includes("template") || msg.includes("window") || msg.includes("63016")) {
+            // Retry without template
+            messageId = await sendViaWhatsApp(
+              doctor.phone,
+              custom_message,
+              mediaUrls,
+              twCreds,
+              undefined,
+            );
+          } else {
+            throw templateErr;
+          }
+        }
 
         // Update send log with message ID and sent status
         const { error: updateError } = await supabase
