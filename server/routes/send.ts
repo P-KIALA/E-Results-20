@@ -374,19 +374,40 @@ export const sendResults: RequestHandler = async (req, res) => {
             const currentSendLogId = insertedLog?.id || null;
 
             try {
-              const messageId = await sendViaWhatsApp(
-                doctor.phone,
-                custom_message,
-                [mf.publicUrl],
-                twCreds,
-                {
-                  contentSid: templateContentSid,
-                  variables: templateVars || {
-                    doctor_name: doctor.name,
-                    patient_name,
+              let messageId;
+              try {
+                messageId = await sendViaWhatsApp(
+                  doctor.phone,
+                  custom_message,
+                  [mf.publicUrl],
+                  twCreds,
+                  {
+                    contentSid: templateContentSid,
+                    variables: templateVars || {
+                      doctor_name: doctor.name,
+                      patient_name,
+                    },
                   },
-                },
-              );
+                );
+              } catch (templateErr: any) {
+                // If Twilio complains about template/window (63016) or similar, retry with free-form body
+                const msg = String(templateErr?.message || templateErr);
+                if (msg.includes("template") || msg.includes("window") || msg.includes("63016")) {
+                  try {
+                    messageId = await sendViaWhatsApp(
+                      doctor.phone,
+                      custom_message,
+                      [mf.publicUrl],
+                      twCreds,
+                      undefined,
+                    );
+                  } catch (retryErr) {
+                    throw retryErr;
+                  }
+                } else {
+                  throw templateErr;
+                }
+              }
 
               // Update send log with message ID and sent status
               await supabase
