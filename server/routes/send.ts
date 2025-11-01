@@ -124,6 +124,26 @@ async function sendViaWhatsApp(
     try {
       const useMessagingService = !!messagingService;
       const body = buildPayload(useMessagingService);
+
+      // Debug logging: payload and metadata (do not log secrets)
+      try {
+        const redactedHeaders = {
+          Authorization: "REDACTED",
+          "Content-Type": "application/x-www-form-urlencoded",
+          Accept: "application/json",
+        };
+        console.log("[Twilio DEBUG] Sending payload", {
+          url,
+          attempt,
+          useMessagingService,
+          template: Boolean(template && template.contentSid),
+          body_preview: body.length > 1000 ? body.slice(0, 1000) + "..." : body,
+          headers: redactedHeaders,
+        });
+      } catch (e) {
+        // ignore logging errors
+      }
+
       const resp = await fetch(url, {
         method: "POST",
         headers: {
@@ -133,6 +153,19 @@ async function sendViaWhatsApp(
         },
         body,
       });
+
+      const text = await resp.text();
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(text);
+      } catch (e) {
+        parsed = { raw: text };
+      }
+
+      // Log Twilio response for debugging
+      try {
+        console.log("[Twilio DEBUG] Response", { status: resp.status, parsed });
+      } catch (e) {}
 
       const text = await resp.text();
       let parsed: any = null;
