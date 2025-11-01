@@ -31,6 +31,18 @@ export default function ResultsTab() {
     text: string;
   } | null>(null);
   const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredDoctors = doctors.filter((d) => {
+    if (!searchQuery || searchQuery.trim().length === 0) return false; // hide all until user searches
+    const q = searchQuery.toLowerCase().trim();
+    // match on name or phone; also split tokens
+    const name = (d.name || "").toLowerCase();
+    const phone = (d.phone || "").toLowerCase();
+    if (name.includes(q) || phone.includes(q)) return true;
+    const tokens = q.split(/\s+/).filter(Boolean);
+    return tokens.every((t) => name.includes(t) || phone.includes(t));
+  });
 
   useEffect(() => {
     fetchDoctors();
