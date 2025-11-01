@@ -409,10 +409,18 @@ export const sendResults: RequestHandler = async (req, res) => {
           undefined;
         const templateVars = (req.body as any).template_variables || undefined;
 
+        // If attached files include PDFs, prefer sending as MediaUrl (document) via free-form message
+        const hasPdf = mediaFiles.some((m) => {
+          const lc = String((m.storage_path || m.publicUrl || "")).toLowerCase();
+          return lc.endsWith(".pdf") || lc.includes(".pdf");
+        });
+
         // If we have multiple files and a template, send one message per file because many WhatsApp template headers
         // or providers accept a single document in the header. Sending multiple files in one templated message may result
         // in only the first being delivered. We therefore create a separate send_log and send for each file.
-        if (templateContentSid && mediaFiles.length > 1) {
+        // However, if files include PDFs and the template is not guaranteed to support document headers,
+        // prefer sending free-form messages with MediaUrl so Twilio attaches the PDF itself.
+        if (templateContentSid && mediaFiles.length > 1 && !hasPdf) {
           for (const mf of mediaFiles) {
             // Create a send_log per file
             const { data: insertedLog, error: logErr } = await supabase
@@ -518,12 +526,13 @@ export const sendResults: RequestHandler = async (req, res) => {
 
         let messageId;
         try {
+          const useTemplate = Boolean(templateContentSid && !hasPdf);
           messageId = await sendViaWhatsApp(
             doctor.phone,
             custom_message,
             mediaUrls,
             twCreds,
-            templateContentSid
+            useTemplate
               ? {
                   contentSid: templateContentSid,
                   variables: templateVars || {
