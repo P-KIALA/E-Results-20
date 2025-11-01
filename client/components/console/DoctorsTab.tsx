@@ -353,9 +353,17 @@ export default function DoctorsTab() {
             Ajoutez et gérez les médecins destinataires
           </p>
         </div>
-        <Button onClick={() => setShowAddForm(true)} className="gap-2">
-          <Plus size={16} /> Ajouter médecin
-        </Button>
+        <div className="flex items-center gap-2">
+          <select value={siteFilter} onChange={(e) => setSiteFilter(e.target.value)} disabled={!canChangeSite} className="px-2 py-1 border rounded text-sm mr-2">
+            {canChangeSite ? <option value="all">Tout le site</option> : null}
+            {sites.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+          <Button onClick={() => setShowAddForm(true)} className="gap-2">
+            <Plus size={16} /> Ajouter médecin
+          </Button>
+        </div>
       </div>
 
       {message && !showAddForm && editingDoctorId === null && (
