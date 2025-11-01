@@ -299,12 +299,21 @@ export default function ResultsTab() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          {doctors.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Aucun médecin disponible
-            </p>
+          <div>
+            <label className="text-sm font-medium">Rechercher un médecin (nom, prénom, téléphone)</label>
+            <Input
+              placeholder="Rechercher par nom ou téléphone"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="mt-2"
+            />
+            <p className="text-xs text-muted-foreground mt-1">Tapez le nom, prénom ou téléphone pour afficher les médecins correspondants.</p>
+          </div>
+
+          {filteredDoctors.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucun médecin correspondant</p>
           ) : (
-            doctors.map((doctor) => (
+            filteredDoctors.map((doctor) => (
               <label
                 key={doctor.id}
                 className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer"
@@ -324,9 +333,7 @@ export default function ResultsTab() {
                 />
                 <div className="flex-1">
                   <p className="font-medium text-sm">{doctor.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {doctor.phone}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{doctor.phone}</p>
                 </div>
               </label>
             ))
