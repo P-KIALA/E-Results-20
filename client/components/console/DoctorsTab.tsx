@@ -101,7 +101,13 @@ export default function DoctorsTab() {
         });
         return;
       }
-      const res = await authFetch("/api/doctors");
+      let url = "/api/doctors";
+      if (siteFilter && siteFilter !== "all") {
+        url += `?site_id=${encodeURIComponent(siteFilter)}`;
+      } else if (!canChangeSite && currentSiteId) {
+        url += `?site_id=${encodeURIComponent(currentSiteId)}`;
+      }
+      const res = await authFetch(url);
       const parsed = await readResponse(res);
       if (!parsed.ok) {
         throw new Error(
