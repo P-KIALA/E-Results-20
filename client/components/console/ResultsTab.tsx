@@ -479,7 +479,7 @@ export default function ResultsTab() {
                   ) : (
                     savedMessages.map((m) => (
                       <div key={m.id} className="p-2 hover:bg-muted rounded flex items-start gap-2">
-                        <div className="flex-1" onClick={() => { setSelectedMessageId(m.id); setShowListMenu(false); }}>
+                        <div className="flex-1" onClick={() => { setSelectedMessageId(m.id); setPreviewVisible(true); setShowListMenu(false); }}>
                           <button
                             className="text-sm font-medium text-left w-full"
                           >
