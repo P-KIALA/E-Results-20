@@ -58,6 +58,16 @@ export default function Sidebar() {
     })();
   }, []);
 
+  useEffect(() => {
+    // If no currentSiteId stored, fallback to user's primary site
+    if (!currentSiteId && user?.primary_site_id) {
+      setCurrentSiteId(user.primary_site_id);
+      try {
+        localStorage.setItem("current_site_id", user.primary_site_id);
+      } catch (e) {}
+    }
+  }, [user, currentSiteId]);
+
   const currentSiteName = sites.find((s) => s.id === currentSiteId)?.name || null;
   const canChangeSite =
     user?.role === "admin" || (user?.permissions || []).includes("access_all_sites");
