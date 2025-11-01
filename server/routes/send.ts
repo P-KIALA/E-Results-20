@@ -64,11 +64,20 @@ async function sendViaWhatsApp(
     if (template && template.contentSid) {
       payload.append("ContentSid", template.contentSid);
       const vars = template.variables || {};
-      // If mediaUrls provided and template expects a media variable, include them in variables
+      // Ensure custom_message is available to templates (map to 'body' if not provided)
+      if (!vars.body && (req as any).body?.custom_message) {
+        vars.body = (req as any).body.custom_message;
+      }
+
+      // If mediaUrls provided and template expects a media variable, include them in variables.
+      // Some WhatsApp templates reference media via indexed placeholders like {{1}}, so we map each URL to numeric keys starting at "1".
       if (mediaUrls && mediaUrls.length > 0) {
-        // Add as media_urls variable; template should reference a single URL or a comma-separated list
-        // Convert to strings to avoid sending raw arrays/objects which Twilio may reject
-        vars.media_urls = mediaUrls.map((m) => String(m));
+        // also provide media_urls as a comma-separated string for templates expecting a single variable
+        vars.media_urls = mediaUrls.map((m) => String(m)).join(", ");
+        mediaUrls.forEach((m, idx) => {
+          // Twilio templates may reference {{1}}, {{2}}, ... — map accordingly
+          vars[String(idx + 1)] = String(m);
+        });
       }
 
       // Sanitize variables: Twilio expects primitive values (strings/numbers). Convert objects/arrays to strings.
