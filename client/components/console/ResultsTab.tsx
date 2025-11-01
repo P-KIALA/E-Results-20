@@ -38,6 +38,7 @@ export default function ResultsTab() {
   const [newMessageTitle, setNewMessageTitle] = useState("");
   const [newMessageBody, setNewMessageBody] = useState("");
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [previewVisible, setPreviewVisible] = useState(false);
 
   useEffect(() => {
     try {
