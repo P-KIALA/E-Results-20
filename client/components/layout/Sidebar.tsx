@@ -29,6 +29,9 @@ export default function Sidebar() {
   const isConsoleActive = isActive("/console");
   const currentTab = searchParams.get("tab") || "doctors";
 
+  // site context hook must be called unconditionally to respect hooks order
+  const { sites, currentSiteId, setCurrentSiteId, canChangeSite } = useSite();
+
   if (!isAuthenticated) {
     return null;
   }
