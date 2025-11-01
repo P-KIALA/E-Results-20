@@ -403,10 +403,22 @@ export const sendResults: RequestHandler = async (req, res) => {
         };
 
         // Prefer using a pre-approved WhatsApp template when available (to avoid 63016)
-        const templateContentSid =
-          (req.body as any).template_content_sid ||
-          process.env.WHATSAPP_TEMPLATE_CONTENT_SID ||
-          undefined;
+        // Accept multiple template SIDs (comma-separated string or array) and try them in order.
+        const rawTemplateSid = (req.body as any).template_content_sid || process.env.WHATSAPP_TEMPLATE_CONTENT_SID;
+        const templateCandidates: string[] = [];
+        if (rawTemplateSid) {
+          if (Array.isArray(rawTemplateSid)) {
+            rawTemplateSid.forEach((s: any) => {
+              if (s) templateCandidates.push(String(s).trim());
+            });
+          } else if (typeof rawTemplateSid === "string") {
+            String(rawTemplateSid)
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+              .forEach((s) => templateCandidates.push(s));
+          }
+        }
         const templateVars = (req.body as any).template_variables || undefined;
 
         // If attached files include PDFs, prefer sending as MediaUrl (document) via free-form message
@@ -420,7 +432,7 @@ export const sendResults: RequestHandler = async (req, res) => {
         // in only the first being delivered. We therefore create a separate send_log and send for each file.
         // However, if files include PDFs and the template is not guaranteed to support document headers,
         // prefer sending free-form messages with MediaUrl so Twilio attaches the PDF itself.
-        if (templateContentSid && mediaFiles.length > 1 && !hasPdf) {
+        if (templateCandidates.length > 0 && mediaFiles.length > 1 && !hasPdf) {
           for (const mf of mediaFiles) {
             // Create a send_log per file
             const { data: insertedLog, error: logErr } = await supabase
@@ -439,25 +451,41 @@ export const sendResults: RequestHandler = async (req, res) => {
             const currentSendLogId = insertedLog?.id || null;
 
             try {
-              let messageId;
-              try {
-                messageId = await sendViaWhatsApp(
-                  doctor.phone,
-                  custom_message,
-                  [mf.publicUrl],
-                  twCreds,
-                  {
-                    contentSid: templateContentSid,
-                    variables: templateVars || {
-                      doctor_name: doctor.name,
-                      patient_name,
-                    },
-                  },
-                );
-              } catch (templateErr: any) {
-                // If Twilio complains about template/window (63016) or similar, retry with free-form body
-                const msg = String(templateErr?.message || templateErr);
-                if (msg.includes("template") || msg.includes("window") || msg.includes("63016")) {
+              let messageId: any = null;
+              // Try each candidate template SID in order; if none succeed, fallback to free-form
+              if (templateCandidates.length > 0) {
+                let lastErr: any = null;
+                for (const candidateSid of templateCandidates) {
+                  try {
+                    messageId = await sendViaWhatsApp(
+                      doctor.phone,
+                      custom_message,
+                      [mf.publicUrl],
+                      twCreds,
+                      {
+                        contentSid: candidateSid,
+                        variables: templateVars || {
+                          doctor_name: doctor.name,
+                          patient_name,
+                        },
+                      },
+                    );
+                    // success
+                    break;
+                  } catch (templateErr: any) {
+                    lastErr = templateErr;
+                    const msg = String(templateErr?.message || templateErr);
+                    // If this candidate failed due to template/window, try next candidate
+                    if (msg.includes("template") || msg.includes("window") || msg.includes("63016") || msg.includes("ContentVariables")) {
+                      continue;
+                    }
+                    // Unexpected error -> rethrow
+                    throw templateErr;
+                  }
+                }
+
+                // If none of the template candidates worked, fallback to free-form send
+                if (!messageId) {
                   try {
                     messageId = await sendViaWhatsApp(
                       doctor.phone,
@@ -469,9 +497,16 @@ export const sendResults: RequestHandler = async (req, res) => {
                   } catch (retryErr) {
                     throw retryErr;
                   }
-                } else {
-                  throw templateErr;
                 }
+              } else {
+                // No template candidates -> send free-form
+                messageId = await sendViaWhatsApp(
+                  doctor.phone,
+                  custom_message,
+                  [mf.publicUrl],
+                  twCreds,
+                  undefined,
+                );
               }
 
               // Update send log with message ID and sent status
@@ -524,24 +559,58 @@ export const sendResults: RequestHandler = async (req, res) => {
         // Otherwise send as single message (default behavior)
         const mediaUrls = mediaFiles.map((f) => f.publicUrl);
 
-        let messageId;
+        let messageId: any = null;
         try {
-          const useTemplate = Boolean(templateContentSid && !hasPdf);
-          messageId = await sendViaWhatsApp(
-            doctor.phone,
-            custom_message,
-            mediaUrls,
-            twCreds,
-            useTemplate
-              ? {
-                  contentSid: templateContentSid,
-                  variables: templateVars || {
-                    doctor_name: doctor.name,
-                    patient_name,
+          const useTemplate = Boolean(templateCandidates.length > 0 && !hasPdf);
+          if (useTemplate) {
+            // Try candidates in order
+            let lastErr: any = null;
+            for (const candidateSid of templateCandidates) {
+              try {
+                messageId = await sendViaWhatsApp(
+                  doctor.phone,
+                  custom_message,
+                  mediaUrls,
+                  twCreds,
+                  {
+                    contentSid: candidateSid,
+                    variables: templateVars || {
+                      doctor_name: doctor.name,
+                      patient_name,
+                    },
                   },
+                );
+                break;
+              } catch (templateErr: any) {
+                lastErr = templateErr;
+                const msg = String(templateErr?.message || templateErr);
+                if (msg.includes("template") || msg.includes("window") || msg.includes("63016") || msg.includes("ContentVariables")) {
+                  continue; // try next candidate
                 }
-              : undefined,
-          );
+                throw templateErr;
+              }
+            }
+
+            // If no template candidate succeeded, fallback to free-form
+            if (!messageId) {
+              messageId = await sendViaWhatsApp(
+                doctor.phone,
+                custom_message,
+                mediaUrls,
+                twCreds,
+                undefined,
+              );
+            }
+          } else {
+            // Not using template => free-form
+            messageId = await sendViaWhatsApp(
+              doctor.phone,
+              custom_message,
+              mediaUrls,
+              twCreds,
+              undefined,
+            );
+          }
         } catch (templateErr: any) {
           const msg = String(templateErr?.message || templateErr);
           if (msg.includes("template") || msg.includes("window") || msg.includes("63016")) {
