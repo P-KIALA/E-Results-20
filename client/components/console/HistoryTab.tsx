@@ -512,7 +512,7 @@ export default function HistoryTab({
           </Card>
         ) : (
           <>
-            {logs.map((log) => (
+            {filteredLogs.map((log) => (
               <Card key={log.id}>
                 <CardContent className="pt-6">
                   <div className="flex items-start justify-between gap-4">
