@@ -41,44 +41,14 @@ export default function Sidebar() {
         : "text-foreground hover:bg-muted/60 hover:text-primary",
     );
 
-  const [sites, setSites] = useState<any[]>([]);
   const [chooseSiteOpen, setChooseSiteOpen] = useState(false);
-  const [currentSiteId, setCurrentSiteId] = useState<string | null>(localStorage.getItem("current_site_id") || null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await authFetch("/api/sites");
-        if (!res.ok) return;
-        const data = await res.json();
-        setSites(data.sites || []);
-      } catch (e) {
-        console.error("Failed to load sites", e);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    // If no currentSiteId stored, fallback to user's primary site
-    if (!currentSiteId && user?.primary_site_id) {
-      setCurrentSiteId(user.primary_site_id);
-      try {
-        localStorage.setItem("current_site_id", user.primary_site_id);
-      } catch (e) {}
-    }
-  }, [user, currentSiteId]);
-
-  const currentSiteName = sites.find((s) => s.id === currentSiteId)?.name || null;
-  const canChangeSite =
-    user?.role === "admin" || (user?.permissions || []).includes("access_all_sites");
+  const { sites, currentSiteId, setCurrentSiteId, canChangeSite } = useSite();
+  const currentSiteName = sites.find((s: any) => s.id === currentSiteId)?.name || null;
 
   const selectSite = (id: string) => {
     setCurrentSiteId(id);
-    try {
-      localStorage.setItem("current_site_id", id);
-    } catch (e) {}
     setChooseSiteOpen(false);
-    toast({ title: "Centre sélectionné", description: sites.find((s) => s.id === id)?.name || "" });
+    toast({ title: "Centre sélectionné", description: sites.find((s: any) => s.id === id)?.name || "" });
   };
 
   return (
