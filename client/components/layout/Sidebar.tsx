@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useSidebar } from "@/lib/sidebar-context";
 import { cn } from "@/lib/utils";
-import { authFetch } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { useSite } from "@/lib/site-context";
 import {
   LayoutDashboard,
   Users,
