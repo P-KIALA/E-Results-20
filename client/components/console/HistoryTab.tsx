@@ -278,9 +278,12 @@ export default function HistoryTab({
       if (filterStatus) params.append("status", filterStatus);
       if (filterDoctor) params.append("doctor_id", filterDoctor);
       // site filtering: if admin chose 'all' -> no site param, otherwise use selected site
-      if (filterSite && filterSite !== "all") params.append("site_id", filterSite);
-      // if user cannot change site and no filter chosen, default to currentSiteId
-      if (!canChangeSite && currentSiteId) params.append("site_id", currentSiteId);
+      if (filterSite && filterSite !== "all") {
+        params.append("site_id", filterSite);
+      } else if (!canChangeSite && currentSiteId) {
+        // only default to currentSiteId when no filter selected
+        params.append("site_id", currentSiteId);
+      }
       if (startDate) params.append("startDate", startDate);
       if (endDate) params.append("endDate", endDate);
       if (filterSender) params.append("sender_id", filterSender);
