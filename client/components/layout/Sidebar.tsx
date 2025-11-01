@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { useSidebar } from "@/lib/sidebar-context";
@@ -31,6 +32,9 @@ export default function Sidebar() {
   // site context hook must be called unconditionally to respect hooks order
   const { sites, currentSiteId, setCurrentSiteId, canChangeSite } = useSite();
 
+  // Keep hook calls unconditional — move local state hooks here
+  const [chooseSiteOpen, setChooseSiteOpen] = useState(false);
+
   if (!isAuthenticated) {
     return null;
   }
@@ -44,7 +48,6 @@ export default function Sidebar() {
         : "text-foreground hover:bg-muted/60 hover:text-primary",
     );
 
-  const [chooseSiteOpen, setChooseSiteOpen] = useState(false);
   const currentSiteName = sites.find((s: any) => s.id === currentSiteId)?.name || null;
 
   const selectSite = (id: string) => {
