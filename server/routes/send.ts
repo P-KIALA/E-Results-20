@@ -65,8 +65,8 @@ async function sendViaWhatsApp(
       payload.append("ContentSid", template.contentSid);
       const vars = template.variables || {};
       // Ensure custom_message is available to templates (map to 'body' if not provided)
-      if (!vars.body && (req as any).body?.custom_message) {
-        vars.body = (req as any).body.custom_message;
+      if (!vars.body && message) {
+        vars.body = message;
       }
 
       // If mediaUrls provided and template expects a media variable, include them in variables.
