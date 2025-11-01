@@ -56,12 +56,21 @@ export default function HistoryTab({
   const [resendLoading, setResendLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter logs client-side by doctor name when a search query is provided
+  // Filter logs client-side by doctor name, patient name or doctor phone when a search query is provided
   const filteredLogs = (logs || []).filter((l) => {
     if (!searchQuery || searchQuery.trim().length === 0) return true; // no search -> keep all
     const q = searchQuery.toLowerCase().trim();
+
     const doctorName = ((l as any).doctors?.name || getDoctorName(l.doctor_id) || "").toLowerCase();
-    return doctorName.includes(q);
+    const patientName = ((l as any).patient_name || "").toLowerCase();
+    const doctorPhone = (doctors.find((d) => d.id === l.doctor_id)?.phone || "").toLowerCase();
+
+    // If the full query matches any field, include
+    if (doctorName.includes(q) || patientName.includes(q) || doctorPhone.includes(q)) return true;
+
+    // Otherwise try tokenized match: all tokens must appear in either doctorName, patientName or phone
+    const tokens = q.split(/\s+/).filter(Boolean);
+    return tokens.every((t) => doctorName.includes(t) || patientName.includes(t) || doctorPhone.includes(t));
   });
 
   const getToken = () => localStorage.getItem("auth_token");
