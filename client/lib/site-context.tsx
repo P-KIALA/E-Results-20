@@ -78,6 +78,15 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
 
 export function useSite() {
   const c = useContext(SiteContext);
-  if (!c) throw new Error("useSite must be used within SiteProvider");
+  if (!c) {
+    // Fallback to safe defaults to avoid throwing during SSR or early renders
+    return {
+      sites: [],
+      currentSiteId: null,
+      setCurrentSiteId: () => {},
+      canChangeSite: false,
+      refreshSites: async () => {},
+    } as SiteContextValue;
+  }
   return c;
 }
