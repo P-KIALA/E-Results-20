@@ -32,6 +32,7 @@ import {
 } from "./routes/sites";
 import { exportReport } from "./routes/reports";
 import { createInitialAdmin } from "./routes/seed";
+import { setTemplateContentSid } from "./routes/settings";
 import { authMiddleware, requireAuth } from "./lib/middleware";
 
 export function createServer() {
@@ -190,6 +191,9 @@ export function createServer() {
   app.post("/api/send-results", requireAuth, sendResults);
   app.get("/api/send-logs", requireAuth, getSendLogs);
   app.get("/api/send-logs/:id/files", requireAuth, getSendLogFiles);
+
+  // Settings (admin) - allows updating runtime settings such as the WhatsApp template Content SID
+  app.post("/api/settings/template-content-sid", requireAuth, setTemplateContentSid);
 
   // Debug endpoints (public in dev only)
   app.get("/api/debug", debugInfo);
