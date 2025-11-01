@@ -54,6 +54,15 @@ export default function HistoryTab({
   const [logFiles, setLogFiles] = useState<any[]>([]);
   const [filesLoading, setFilesLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter logs client-side by doctor name when a search query is provided
+  const filteredLogs = (logs || []).filter((l) => {
+    if (!searchQuery || searchQuery.trim().length === 0) return true; // no search -> keep all
+    const q = searchQuery.toLowerCase().trim();
+    const doctorName = ((l as any).doctors?.name || getDoctorName(l.doctor_id) || "").toLowerCase();
+    return doctorName.includes(q);
+  });
 
   const getToken = () => localStorage.getItem("auth_token");
 
