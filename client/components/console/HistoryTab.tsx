@@ -237,16 +237,15 @@ export default function HistoryTab({
     }
   };
 
+  const { refreshSites } = useSite();
+
   const fetchSites = useCallback(async () => {
     try {
-      const res = await safeFetch("/api/sites");
-      if (!res.ok) throw new Error("Failed to fetch sites");
-      const data = await res.json();
-      setSites(data.sites || []);
+      await refreshSites();
     } catch (error) {
-      console.error("Error fetching sites:", error);
+      console.error("Error refreshing sites:", error);
     }
-  }, []);
+  }, [refreshSites]);
 
   const fetchDoctors = useCallback(async () => {
     try {
