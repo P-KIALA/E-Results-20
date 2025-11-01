@@ -88,8 +88,9 @@ const App = () => (
         <Toaster />
         <Sonner />
         <AuthProvider>
-          <SidebarProvider>
-            <BrowserRouter>
+          <SiteProvider>
+            <SidebarProvider>
+              <BrowserRouter>
               <Routes>
                 <Route path="/" element={<RootRedirector />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -177,7 +178,8 @@ const App = () => (
                 />
               </Routes>
             </BrowserRouter>
-          </SidebarProvider>
+            </SidebarProvider>
+          </SiteProvider>
         </AuthProvider>
       </TooltipProvider>
     </ThemeProvider>
