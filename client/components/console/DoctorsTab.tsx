@@ -25,6 +25,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { authFetch } from "@/lib/api";
+import { useSite } from "@/lib/site-context";
 
 export default function DoctorsTab() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
