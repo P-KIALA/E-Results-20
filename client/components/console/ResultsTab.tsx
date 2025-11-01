@@ -432,9 +432,9 @@ export default function ResultsTab() {
 
             {/* Add Message Centered Modal */}
             {showAddMenu && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="fixed inset-0 z-60 flex items-center justify-center pointer-events-auto">
                 <div className="absolute inset-0 bg-black/30" onClick={() => { setShowAddMenu(false); }} />
-                <div className="relative z-10 w-11/12 sm:w-96 bg-white border rounded shadow p-4">
+                <div className="relative z-50 w-11/12 sm:w-96 bg-white border rounded-lg shadow-xl p-4 transform-gpu transition-all duration-150" onClick={(e) => e.stopPropagation()}>
                   <h4 className="text-sm font-semibold mb-2">Ajouter un message</h4>
                   <label className="text-xs font-medium">Titre du message</label>
                   <Input
@@ -467,9 +467,9 @@ export default function ResultsTab() {
 
             {/* List Messages Centered Modal */}
             {showListMenu && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="fixed inset-0 z-60 flex items-center justify-center pointer-events-auto">
                 <div className="absolute inset-0 bg-black/30" onClick={() => { setShowListMenu(false); }} />
-                <div className="relative z-10 w-11/12 sm:w-96 bg-white border rounded shadow p-2 max-h-[70vh] overflow-auto">
+                <div className="relative z-50 w-11/12 sm:w-96 bg-white border rounded-lg shadow-xl p-2 max-h-[70vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-between p-2 border-b">
                     <h4 className="text-sm font-semibold">Messages enregistrés</h4>
                     <Button size="xs" variant="ghost" onClick={() => setShowListMenu(false)}>Fermer</Button>
@@ -487,11 +487,11 @@ export default function ResultsTab() {
                           </button>
                           <p className="text-xs text-muted-foreground mt-1">{m.body.substring(0, 120)}{m.body.length>120? '...' : ''}</p>
                         </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <Button size="xs" variant="ghost" onClick={() => { setCustomMessage(m.body); setShowListMenu(false); setMessage({ type: 'success', text: 'Message inséré' }); }}>
+                        <div className="flex items-center gap-2">
+                          <Button size="xs" onClick={() => { setCustomMessage(m.body); setShowListMenu(false); setMessage({ type: 'success', text: 'Message inséré' }); }}>
                             Insérer
                           </Button>
-                          <Button size="xs" variant="ghost" onClick={() => deleteMessage(m.id)}>
+                          <Button size="xs" variant="ghost" className="text-red-600" onClick={() => deleteMessage(m.id)}>
                             Supprimer
                           </Button>
                         </div>
