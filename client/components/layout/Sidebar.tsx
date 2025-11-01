@@ -223,6 +223,7 @@ export default function Sidebar() {
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                 "w-full text-left no-underline text-foreground",
                 "hover:bg-muted/60 hover:text-primary font-semibold whitespace-nowrap",
+                !canChangeSite && "opacity-60 cursor-not-allowed hover:bg-transparent hover:text-foreground"
               )}
               title="Choisir le centre"
             >
