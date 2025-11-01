@@ -72,7 +72,7 @@ export default function ResultsTab() {
 
   const deleteMessage = (id: string) => {
     setSavedMessages(savedMessages.filter((m) => m.id !== id));
-    if (selectedMessageId === id) setSelectedMessageId(null);
+    if (selectedMessageId === id) { setSelectedMessageId(null); setPreviewVisible(false); }
   };
 
   const filteredDoctors = doctors.filter((d) => {
