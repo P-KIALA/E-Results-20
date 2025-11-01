@@ -66,10 +66,33 @@ async function sendViaWhatsApp(
       const vars = template.variables || {};
       // If mediaUrls provided and template expects a media variable, include them in variables
       if (mediaUrls && mediaUrls.length > 0) {
-        // Add as media_urls variable; template should reference {{1}} etc accordingly
-        vars.media_urls = mediaUrls;
+        // Add as media_urls variable; template should reference a single URL or a comma-separated list
+        // Convert to strings to avoid sending raw arrays/objects which Twilio may reject
+        vars.media_urls = mediaUrls.map((m) => String(m));
       }
-      payload.append("ContentVariables", JSON.stringify(vars));
+
+      // Sanitize variables: Twilio expects primitive values (strings/numbers). Convert objects/arrays to strings.
+      const sanitizedVars: Record<string, any> = {};
+      for (const k of Object.keys(vars)) {
+        const v = (vars as any)[k];
+        if (v === null || v === undefined) {
+          sanitizedVars[k] = null;
+        } else if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
+          sanitizedVars[k] = v;
+        } else if (Array.isArray(v)) {
+          // Join arrays with comma — templates should handle this as plain text
+          sanitizedVars[k] = v.map((x) => (x === null || x === undefined ? "" : String(x))).join(", ");
+        } else {
+          // For objects, stringify to avoid sending complex nested types
+          try {
+            sanitizedVars[k] = JSON.stringify(v);
+          } catch (e) {
+            sanitizedVars[k] = String(v);
+          }
+        }
+      }
+
+      payload.append("ContentVariables", JSON.stringify(sanitizedVars));
     } else {
       // Free-form body + media (subject to 24h window)
       payload.append("Body", message);
