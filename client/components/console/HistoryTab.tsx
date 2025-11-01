@@ -454,6 +454,17 @@ export default function HistoryTab({
             </select>
           )}
 
+          {/* Search by doctor name (client-side) */}
+          <div className="sm:col-span-2">
+            <label className="text-sm font-medium">Recherche médecin</label>
+            <Input
+              placeholder="Rechercher par nom du médecin"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="mt-2"
+            />
+          </div>
+
           <input
             type="date"
             value={startDate}
