@@ -56,7 +56,7 @@ export default function DoctorsTab() {
 
   useEffect(() => {
     fetchDoctors();
-  }, []);
+  }, [siteFilter, currentSiteId]);
 
   const readResponse = async (res: Response) => {
     try {
