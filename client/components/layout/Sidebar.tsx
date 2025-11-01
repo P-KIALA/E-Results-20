@@ -212,6 +212,60 @@ export default function Sidebar() {
 
         <div className="flex-1" />
 
+        {user?.role === "admin" && (
+          <>
+            <button
+              onClick={() => setChooseSiteOpen(true)}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                "w-full text-left no-underline text-foreground",
+                "hover:bg-muted/60 hover:text-primary font-semibold whitespace-nowrap",
+              )}
+              title="Choisir le centre"
+            >
+              <MapPin size={20} className="flex-shrink-0" />
+              {!isMinimized && (
+                <span>{currentSiteName ? `Centre: ${currentSiteName}` : "Choisir centre"}</span>
+              )}
+            </button>
+
+            {/* Choose site modal */}
+            {chooseSiteOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/30" onClick={() => setChooseSiteOpen(false)} />
+                <div className="relative z-10 w-11/12 sm:w-96 bg-white border rounded shadow p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-semibold">Choisir un centre</h4>
+                    <Button size="xs" variant="ghost" onClick={() => setChooseSiteOpen(false)}>Fermer</Button>
+                  </div>
+                  <div className="max-h-64 overflow-auto">
+                    {sites.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">Aucun centre trouvé</p>
+                    ) : (
+                      sites.map((s) => (
+                        <div key={s.id} className="flex items-center justify-between p-2 hover:bg-muted rounded">
+                          <div>
+                            <div className="font-medium">{s.name}</div>
+                            {s.address && <div className="text-xs text-muted-foreground">{s.address}</div>}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button size="xs" onClick={() => selectSite(s.id)}>
+                              Sélectionner
+                            </Button>
+                            {currentSiteId === s.id && (
+                              <span className="text-xs text-green-600">Actuel</span>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
         <button
           onClick={logout}
           className={cn(
