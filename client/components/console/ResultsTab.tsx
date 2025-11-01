@@ -510,7 +510,7 @@ export default function ResultsTab() {
             placeholder="Écrivez votre message..."
           />
 
-          {selectedMessage && (
+          {previewVisible && selectedMessage && (
             <div className="p-3 border rounded bg-gray-50">
               <div className="flex justify-between items-start">
                 <div>
@@ -521,7 +521,7 @@ export default function ResultsTab() {
                   <Button size="sm" onClick={() => setCustomMessage(selectedMessage.body)}>
                     Insérer
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setSelectedMessageId(null)}>
+                  <Button size="sm" variant="ghost" onClick={() => { setSelectedMessageId(null); setPreviewVisible(false); }}>
                     Fermer
                   </Button>
                 </div>
