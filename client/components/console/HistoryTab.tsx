@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { SendLogEntry, Doctor, Site } from "@shared/api";
 import { Clock, CheckCircle, AlertCircle, Loader, MapPin } from "lucide-react";
 import { authFetch } from "@/lib/api";
+import { useSite } from "@/lib/site-context";
 import {
   Dialog,
   DialogContent,
@@ -38,7 +39,8 @@ export default function HistoryTab({
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDoctor, setFilterDoctor] = useState("");
-  const [filterSite, setFilterSite] = useState("");
+  const { sites, currentSiteId, canChangeSite } = useSite();
+  const [filterSite, setFilterSite] = useState<string>(() => (canChangeSite ? "all" : (localStorage.getItem("current_site_id") || "")));
   const [filterSender, setFilterSender] = useState("");
   const [users, setUsers] = useState<any[]>([]);
   const today = new Date().toISOString().split("T")[0];
@@ -275,7 +277,10 @@ export default function HistoryTab({
       const params = new URLSearchParams();
       if (filterStatus) params.append("status", filterStatus);
       if (filterDoctor) params.append("doctor_id", filterDoctor);
-      if (filterSite) params.append("site_id", filterSite);
+      // site filtering: if admin chose 'all' -> no site param, otherwise use selected site
+      if (filterSite && filterSite !== "all") params.append("site_id", filterSite);
+      // if user cannot change site and no filter chosen, default to currentSiteId
+      if (!canChangeSite && currentSiteId) params.append("site_id", currentSiteId);
       if (startDate) params.append("startDate", startDate);
       if (endDate) params.append("endDate", endDate);
       if (filterSender) params.append("sender_id", filterSender);
@@ -439,8 +444,14 @@ export default function HistoryTab({
               value={filterSite}
               onChange={(e) => setFilterSite(e.target.value)}
               className="px-3 py-2 rounded-md border bg-background text-sm"
+              disabled={!canChangeSite}
             >
-              <option value="">Tous les sites</option>
+              {canChangeSite ? (
+                <>
+                  <option value="all">Tout le site</option>
+                  <option value="">-- Choisir un site --</option>
+                </>
+              ) : null}
               {sites.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
