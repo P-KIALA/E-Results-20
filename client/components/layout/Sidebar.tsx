@@ -41,6 +41,34 @@ export default function Sidebar() {
         : "text-foreground hover:bg-muted/60 hover:text-primary",
     );
 
+  const [sites, setSites] = useState<any[]>([]);
+  const [chooseSiteOpen, setChooseSiteOpen] = useState(false);
+  const [currentSiteId, setCurrentSiteId] = useState<string | null>(localStorage.getItem("current_site_id") || null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await authFetch("/api/sites");
+        if (!res.ok) return;
+        const data = await res.json();
+        setSites(data.sites || []);
+      } catch (e) {
+        console.error("Failed to load sites", e);
+      }
+    })();
+  }, []);
+
+  const currentSiteName = sites.find((s) => s.id === currentSiteId)?.name || null;
+
+  const selectSite = (id: string) => {
+    setCurrentSiteId(id);
+    try {
+      localStorage.setItem("current_site_id", id);
+    } catch (e) {}
+    setChooseSiteOpen(false);
+    toast({ title: "Centre sélectionné", description: sites.find((s) => s.id === id)?.name || "" });
+  };
+
   return (
     <>
       {/* Desktop sidebar: hidden on small screens */}
