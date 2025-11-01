@@ -94,7 +94,11 @@ export function createServer() {
               appBaseHost &&
               (hostname === appBaseHost ||
                 hostname.endsWith("." + appBaseHost))) ||
-            /(^|\.)builder\.io$/.test(hostname || "");
+            /(^|\.)builder\.io$/.test(hostname || "") ||
+            // Allow Builder project hostnames (projects.builder.* like projects.builder.my / projects.builder.codes)
+            (hostname && /projects\.builder\./.test(hostname)) ||
+            // Broad builder subdomain match (e.g. ce33...-main.projects.builder.codes)
+            (hostname && /(^|\.)builder\./.test(hostname));
 
           if (isAllowed) return callback(null, true);
 
