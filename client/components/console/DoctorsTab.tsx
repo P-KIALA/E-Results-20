@@ -28,6 +28,8 @@ import { authFetch } from "@/lib/api";
 import { useSite } from "@/lib/site-context";
 
 export default function DoctorsTab() {
+  const { sites, currentSiteId, canChangeSite } = useSite();
+  const [siteFilter, setSiteFilter] = useState<string>(() => (canChangeSite ? "all" : (localStorage.getItem("current_site_id") || "")));
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
