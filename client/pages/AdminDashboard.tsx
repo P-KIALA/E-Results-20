@@ -307,6 +307,8 @@ export default function AdminDashboard() {
                 password: "",
                 role: "user",
                 permissions: [],
+                primary_site_id: "",
+                accessible_site_ids: [],
               });
               setShowUserForm(true);
             }}
