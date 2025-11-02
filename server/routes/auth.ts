@@ -196,25 +196,27 @@ export const getMe: RequestHandler = async (req, res) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const { data: user, error } = await supabase
+    const { data, error } = await supabase
       .from("users")
       .select(USER_PUBLIC_FIELDS)
       .eq("id", userId)
       .single();
+
+    const user = (data as UserRecord | null) || null;
 
     if (error || !user) {
       return res.status(404).json({ error: "User not found" });
     }
 
     // Fetch primary site if exists
-    let primarySite = null;
+    let primarySite: SiteRecord | null = null;
     if (user.primary_site_id) {
-      const { data: site } = await supabase
+      const { data: siteData } = await supabase
         .from("sites")
         .select("id, name, address, created_at, updated_at")
         .eq("id", user.primary_site_id)
         .single();
-      primarySite = site;
+      primarySite = (siteData as SiteRecord | null) || null;
     }
 
     res.json({
