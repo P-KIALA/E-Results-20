@@ -679,7 +679,8 @@ export const sendResults: RequestHandler = async (req, res) => {
 
         // Mark send_log as failed with error message if we have a sendLogId
         try {
-          if (sendLogId) {
+          // Use typeof guard to avoid ReferenceError if bundler scope changes
+          if (typeof sendLogId !== "undefined" && sendLogId) {
             await supabase
               .from("send_logs")
               .update({ status: "failed", error_message: errorMessage })
