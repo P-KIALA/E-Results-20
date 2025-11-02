@@ -359,7 +359,7 @@ export const updateUser: RequestHandler = async (req, res) => {
       updateData.primary_site_id = primary_site_id;
     if (is_collector !== undefined) updateData.is_collector = is_collector;
 
-    const { data: user, error } = await supabase
+    const { data: updatedData, error } = await supabase
       .from("users")
       .update(updateData)
       .eq("id", targetUserId)
@@ -368,14 +368,18 @@ export const updateUser: RequestHandler = async (req, res) => {
 
     if (error) throw error;
 
+    const updatedUser = (updatedData as UserRecord | null) || null;
+    if (!updatedUser) {
+      throw new Error("Failed to update user");
+    }
+
     // Update accessible sites if provided
     if (
       accessible_site_ids !== undefined &&
       Array.isArray(accessible_site_ids)
     ) {
       // Delete existing access records
-      await supabase
-        .from("user_site_access")
+      await (supabase.from("user_site_access") as any)
         .delete()
         .eq("user_id", targetUserId);
 
@@ -386,7 +390,9 @@ export const updateUser: RequestHandler = async (req, res) => {
           site_id,
         }));
 
-        await supabase.from("user_site_access").insert(accessRecords);
+        await (supabase.from("user_site_access") as any).insert(
+          accessRecords,
+        );
       }
     }
 
@@ -399,16 +405,16 @@ export const updateUser: RequestHandler = async (req, res) => {
 
     res.json({
       user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        permissions: user.permissions || [],
-        primary_site_id: user.primary_site_id || null,
-        primary_site: user.primary_site_id
-          ? sitesMap.get(user.primary_site_id) || null
+        id: updatedUser.id,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        permissions: updatedUser.permissions || [],
+        primary_site_id: updatedUser.primary_site_id || null,
+        primary_site: updatedUser.primary_site_id
+          ? sitesMap.get(updatedUser.primary_site_id) || null
           : null,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
+        created_at: updatedUser.created_at,
+        updated_at: updatedUser.updated_at,
       },
     });
   } catch (error) {
