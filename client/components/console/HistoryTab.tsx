@@ -126,7 +126,7 @@ export default function HistoryTab({
   };
 
   // Open files modal for a specific send log
-  const openFilesForLog = async (log: any) => {
+  const openFilesForLog = async (log: SendLogWithExtras) => {
     setSelectedLog(log);
     setFilesModalOpen(true);
     setFilesLoading(true);
