@@ -57,9 +57,9 @@ export default function HistoryTab({
   const [pageSize, setPageSize] = useState(25);
   const [total, setTotal] = useState(0);
   const [filesModalOpen, setFilesModalOpen] = useState(false);
-  const [selectedLog, setSelectedLog] = useState<
-    null | (SendLogEntry & { doctors?: any })
-  >(null);
+  const [selectedLog, setSelectedLog] = useState<SendLogWithExtras | null>(
+    null,
+  );
   const [logFiles, setLogFiles] = useState<any[]>([]);
   const [filesLoading, setFilesLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
