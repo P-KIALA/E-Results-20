@@ -224,7 +224,7 @@ export default function Sidebar() {
                 <div className="relative z-10 w-11/12 sm:w-96 bg-white border rounded shadow p-3">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-sm font-semibold">Choisir un centre</h4>
-                    <Button size="xs" variant="ghost" onClick={() => setChooseSiteOpen(false)}>Fermer</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setChooseSiteOpen(false)}>Fermer</Button>
                   </div>
                   <div className="max-h-64 overflow-auto">
                     {sites.length === 0 ? (
@@ -237,7 +237,7 @@ export default function Sidebar() {
                             {s.address && <div className="text-xs text-muted-foreground">{s.address}</div>}
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button size="xs" onClick={() => selectSite(s.id)}>
+                            <Button size="sm" onClick={() => selectSite(s.id)}>
                               Sélectionner
                             </Button>
                             {currentSiteId === s.id && (
