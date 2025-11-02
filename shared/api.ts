@@ -37,8 +37,8 @@ export interface SendLogEntry {
 
 export interface SendResultsRequest {
   doctor_ids: string[];
-  custom_message: string;
-  file_ids: string[];
+  custom_message?: string;
+  file_ids?: string[];
   patient_name?: string;
   patient_site?: string;
   // Optional additional recipient phone numbers in E.164 or common formats
