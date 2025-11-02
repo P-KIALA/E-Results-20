@@ -37,11 +37,13 @@ export const login: RequestHandler = async (req, res) => {
     }
 
     // Get user from database
-    const { data: user, error } = await supabase
+    const { data, error } = await supabase
       .from("users")
       .select(USER_SECURE_FIELDS)
       .eq("email", email.toLowerCase())
       .single();
+
+    const user = (data as UserRecord | null) || null;
 
     if (error || !user) {
       return res.status(401).json({ error: "Invalid email or password" });
@@ -53,14 +55,14 @@ export const login: RequestHandler = async (req, res) => {
     }
 
     // Fetch primary site if exists
-    let primarySite = null;
+    let primarySite: SiteRecord | null = null;
     if (user.primary_site_id) {
-      const { data: site } = await supabase
+      const { data: siteData } = await supabase
         .from("sites")
         .select("id, name, address, created_at, updated_at")
         .eq("id", user.primary_site_id)
         .single();
-      primarySite = site;
+      primarySite = (siteData as SiteRecord | null) || null;
     }
 
     // Generate token
