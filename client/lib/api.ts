@@ -56,10 +56,16 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     const runFetch = async (
       url: string,
       opts: RequestInit,
-      timeout = 10000,
+      timeout = 20000,
     ) => {
       const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeout);
+      const id = setTimeout(() => {
+        try {
+          controller.abort(new Error("timeout"));
+        } catch (_) {
+          controller.abort();
+        }
+      }, timeout);
       try {
         const resp = await fetch(url, { ...opts, signal: controller.signal });
         // If server returned HTML (e.g., dev server error page or client index.html), treat as failure to allow fallbacks
@@ -79,6 +85,15 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
           // If reading headers or text failed, fall through to return the response
         }
         return resp;
+      } catch (e: any) {
+        // Normalize AbortError into a clearer timeout message
+        const name = e && (e.name || e.code);
+        if (name === "AbortError" || (controller.signal && controller.signal.aborted)) {
+          const err: any = new Error("Request timed out");
+          err.code = "ETIMEDOUT";
+          throw err;
+        }
+        throw e;
       } finally {
         clearTimeout(id);
       }
