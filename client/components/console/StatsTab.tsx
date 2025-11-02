@@ -22,9 +22,6 @@ import {
   Cell,
 } from "recharts";
 import {
-  CheckCircle,
-  AlertCircle,
-  Clock,
   MessageSquare,
   MapPin,
   BarChart3,
