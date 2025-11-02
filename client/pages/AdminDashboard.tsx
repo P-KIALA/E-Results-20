@@ -55,13 +55,13 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [showUserForm, setShowUserForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormState>({
     email: "",
     password: "",
-    role: "user" as const,
-    permissions: [] as string[],
+    role: "user",
+    permissions: [],
     primary_site_id: "",
-    accessible_site_ids: [] as string[],
+    accessible_site_ids: [],
   });
   const [message, setMessage] = useState<{
     type: "success" | "error";
