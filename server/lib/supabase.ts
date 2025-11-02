@@ -11,7 +11,7 @@ if (!supabaseServiceKey) {
   );
 }
 
-export const supabase = createClient<Database>(
+const supabaseClient = createClient<Database>(
   supabaseUrl,
   supabaseServiceKey || "",
   {
@@ -22,4 +22,6 @@ export const supabase = createClient<Database>(
   },
 );
 
-export type SupabaseClient = typeof supabase;
+export const supabase = supabaseClient as any;
+
+export type SupabaseClient = typeof supabaseClient;
