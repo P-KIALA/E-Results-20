@@ -100,30 +100,10 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     };
 
     if (isEmbedded) {
-      // Try absolute with CORS and include credentials if present
-      try {
-        return await runFetch(absolute, {
-          ...defaultOpts,
-          mode: "cors",
-          credentials: "include",
-        });
-      } catch (e) {
-        lastErr = e;
-        try {
-          console.warn("authFetch: absolute (embedded) attempt failed", {
-            url: absolute,
-            err: String(e),
-            online:
-              typeof navigator !== "undefined" ? navigator.onLine : undefined,
-          });
-        } catch (_) {}
-      }
-
-      // Fallback to relative (same-origin)
+      // Prefer relative (same-origin) first to avoid cross-origin/CORS in iframes
       try {
         return await runFetch(asStr, {
           ...defaultOpts,
-          credentials: "same-origin",
         });
       } catch (e) {
         lastErr = e;
@@ -136,12 +116,28 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
           });
         } catch (_) {}
       }
+
+      // Fallback to absolute without forcing CORS/credentials
+      try {
+        return await runFetch(absolute, {
+          ...defaultOpts,
+        });
+      } catch (e) {
+        lastErr = e;
+        try {
+          console.warn("authFetch: absolute (embedded) attempt failed", {
+            url: absolute,
+            err: String(e),
+            online:
+              typeof navigator !== "undefined" ? navigator.onLine : undefined,
+          });
+        } catch (_) {}
+      }
     } else {
-      // Not embedded: try relative first (faster, local dev) then absolute
+      // Not embedded: try relative first (faster), then absolute without extra CORS flags
       try {
         return await runFetch(asStr, {
           ...defaultOpts,
-          credentials: "same-origin",
         });
       } catch (e) {
         lastErr = e;
@@ -158,8 +154,6 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       try {
         return await runFetch(absolute, {
           ...defaultOpts,
-          mode: "cors",
-          credentials: "include",
         });
       } catch (e) {
         lastErr = e;
@@ -174,25 +168,8 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       }
     }
 
-    // Last resort: serverless function proxy (Netlify functions)
-    try {
-      const fallback = `/.netlify/functions/api${asStr.replace(/^\/api/, "")}`;
-      return await runFetch(fallback, {
-        ...defaultOpts,
-        credentials: "same-origin",
-      });
-    } catch (e) {
-      lastErr = e;
-      try {
-        console.warn("authFetch: netlify fallback failed", {
-          url: asStr,
-          fallback,
-          err: String(e),
-          online:
-            typeof navigator !== "undefined" ? navigator.onLine : undefined,
-        });
-      } catch (_) {}
-    }
+    // Last resort: skip serverless fallback to avoid hanging in non-Netlify envs
+    // (If needed, a proxy endpoint can be added on the server-side)
   }
 
   // Non-/api requests: try as given
