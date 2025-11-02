@@ -322,7 +322,7 @@ export default function HistoryTab({
       }
 
       const data = await res.clone().json();
-      setLogs(data.logs || []);
+      setLogs((data.logs || []) as SendLogWithExtras[]);
       setTotal(data.total || 0);
     } catch (error) {
       console.error("Error fetching logs:", error);
