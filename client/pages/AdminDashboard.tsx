@@ -18,13 +18,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { User, Trash2, Plus, Users, Edit2, X, MapPin } from "lucide-react";
-import type { Site } from "@shared/api";
+import type { Site, UserRole } from "@shared/api";
 import { authFetch } from "@/lib/api";
 
 interface UserItem {
   id: string;
   email: string;
-  role: "admin" | "user";
+  role: UserRole;
   permissions: string[];
   primary_site_id?: string | null;
   created_at: string;
