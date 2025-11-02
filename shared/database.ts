@@ -288,6 +288,26 @@ export type Database = {
           updated_at?: string;
         };
       };
+      user_site_access: {
+        Row: {
+          id: string;
+          user_id: string;
+          site_id: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          site_id: string;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          site_id?: string;
+          created_at?: string | null;
+        };
+      };
     };
   };
 };
