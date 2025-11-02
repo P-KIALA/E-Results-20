@@ -22,6 +22,6 @@ const supabaseClient = createClient<Database>(
   },
 );
 
-export const supabase = supabaseClient as any;
+export const supabase: any = supabaseClient;
 
 export type SupabaseClient = typeof supabaseClient;
