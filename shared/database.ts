@@ -233,7 +233,8 @@ export type Database = {
           email: string;
           password_hash: string;
           role: "admin" | "user" | "prelevement";
-          permissions: string[];
+          permissions: string[] | null;
+          primary_site_id: string | null;
           is_collector: boolean;
           site: string | null;
           created_at: string;
@@ -244,7 +245,8 @@ export type Database = {
           email: string;
           password_hash: string;
           role?: "admin" | "user" | "prelevement";
-          permissions?: string[];
+          permissions?: string[] | null;
+          primary_site_id?: string | null;
           is_collector?: boolean;
           site?: string | null;
           created_at?: string;
@@ -255,7 +257,8 @@ export type Database = {
           email?: string;
           password_hash?: string;
           role?: "admin" | "user" | "prelevement";
-          permissions?: string[];
+          permissions?: string[] | null;
+          primary_site_id?: string | null;
           is_collector?: boolean;
           site?: string | null;
           created_at?: string;
