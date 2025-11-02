@@ -31,6 +31,15 @@ interface UserItem {
   updated_at: string;
 }
 
+type FormState = {
+  email: string;
+  password: string;
+  role: UserRole;
+  permissions: string[];
+  primary_site_id: string;
+  accessible_site_ids: string[];
+};
+
 const AVAILABLE_PERMISSIONS = [
   { id: "manage_doctors", label: "Ajouter des médecins" },
   { id: "view_reports", label: "Afficher les rapports" },
