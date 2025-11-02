@@ -1,5 +1,3 @@
-import { RequestHandler } from "express";
-import { RequestHandler } from "express";
 import { supabase } from "../lib/supabase";
 import { hashPassword, verifyPassword, generateToken } from "../lib/auth";
 import { LoginRequest, RegisterRequest } from "@shared/api";
