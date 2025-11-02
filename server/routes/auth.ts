@@ -19,7 +19,7 @@ export const login: RequestHandler = async (req, res) => {
     // Get user from database
     const { data: user, error } = await supabase
       .from("users")
-      .select("*")
+      .select(USER_SECURE_FIELDS)
       .eq("email", email.toLowerCase())
       .single();
 
