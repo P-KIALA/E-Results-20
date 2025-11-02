@@ -348,7 +348,7 @@ export const sendResults: RequestHandler = async (req, res) => {
           .from("send_logs")
           .insert({
             doctor_id,
-            custom_message,
+            custom_message: custom_message || null,
             patient_name: patient_name || null,
             patient_site: (req.body as any).patient_site || null,
             sender_id: (req as any).userId || null,
@@ -527,9 +527,9 @@ export const sendResults: RequestHandler = async (req, res) => {
               .from("send_logs")
               .insert({
                 doctor_id,
-                custom_message,
-                patient_name: patient_name || null,
-                patient_site: (req.body as any).patient_site || null,
+                custom_message: custom_message || null,
+            patient_name: patient_name || null,
+            patient_site: (req.body as any).patient_site || null,
                 sender_id: (req as any).userId || null,
                 status: "pending",
               })
