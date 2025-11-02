@@ -94,7 +94,7 @@ export const register: RequestHandler = async (req, res) => {
       .from("users")
       .select("id")
       .eq("email", email.toLowerCase())
-      .single();
+      .maybeSingle();
 
     if (existing) {
       return res.status(409).json({ error: "Email already exists" });
