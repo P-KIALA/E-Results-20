@@ -236,10 +236,10 @@ export const sendResults: RequestHandler = async (req, res) => {
     // To avoid blocking message sending while migrations propagate, do not enforce it server-side.
     const patient_name = (req.body as any).patient_name;
 
-    if (!doctor_ids || doctor_ids.length === 0 || !custom_message) {
+    if (!doctor_ids || doctor_ids.length === 0) {
       return res
         .status(400)
-        .json({ error: "doctor_ids and custom_message are required" });
+        .json({ error: "doctor_ids are required" });
     }
 
     const results: any[] = [];
