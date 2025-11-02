@@ -3,6 +3,11 @@ import { supabase } from "../lib/supabase";
 import { hashPassword, verifyPassword, generateToken } from "../lib/auth";
 import { LoginRequest, RegisterRequest } from "@shared/api";
 
+const USER_SECURE_FIELDS =
+  "id, email, role, permissions, password_hash, primary_site_id, created_at, updated_at";
+const USER_PUBLIC_FIELDS =
+  "id, email, role, permissions, primary_site_id, created_at, updated_at";
+
 export const login: RequestHandler = async (req, res) => {
   try {
     const { email, password } = req.body as LoginRequest;
