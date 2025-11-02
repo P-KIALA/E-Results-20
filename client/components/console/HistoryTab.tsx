@@ -67,9 +67,13 @@ export default function HistoryTab({
     if (!searchQuery || searchQuery.trim().length === 0) return true; // no search -> keep all
     const q = searchQuery.toLowerCase().trim();
 
-    const doctorName = ((l as any).doctors?.name || getDoctorName(l.doctor_id) || "").toLowerCase();
-    const patientName = ((l as any).patient_name || "").toLowerCase();
-    const doctorPhone = (doctors.find((d) => d.id === l.doctor_id)?.phone || "").toLowerCase();
+    const doctorName = (
+      l.doctors?.name || getDoctorName(l.doctor_id) || ""
+    ).toLowerCase();
+    const patientName = (l.patient_name || "").toLowerCase();
+    const doctorPhone = (
+      doctors.find((d) => d.id === l.doctor_id)?.phone || ""
+    ).toLowerCase();
 
     // If the full query matches any field, include
     if (doctorName.includes(q) || patientName.includes(q) || doctorPhone.includes(q)) return true;
