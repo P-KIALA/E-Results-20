@@ -37,7 +37,7 @@ export const login: RequestHandler = async (req, res) => {
     if (user.primary_site_id) {
       const { data: site } = await supabase
         .from("sites")
-        .select("*")
+        .select("id, name, address, created_at, updated_at")
         .eq("id", user.primary_site_id)
         .single();
       primarySite = site;
@@ -124,7 +124,7 @@ export const register: RequestHandler = async (req, res) => {
     if (user.primary_site_id) {
       const { data: site } = await supabase
         .from("sites")
-        .select("*")
+        .select("id, name, address, created_at, updated_at")
         .eq("id", user.primary_site_id)
         .single();
       primarySite = site;
@@ -183,7 +183,7 @@ export const getMe: RequestHandler = async (req, res) => {
     if (user.primary_site_id) {
       const { data: site } = await supabase
         .from("sites")
-        .select("*")
+        .select("id, name, address, created_at, updated_at")
         .eq("id", user.primary_site_id)
         .single();
       primarySite = site;
