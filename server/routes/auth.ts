@@ -114,7 +114,7 @@ export const register: RequestHandler = async (req, res) => {
         primary_site_id,
         is_collector: req.body.is_collector || false,
       })
-      .select()
+      .select(USER_SECURE_FIELDS)
       .single();
 
     if (error) throw error;
