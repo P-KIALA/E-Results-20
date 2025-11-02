@@ -118,7 +118,8 @@ export const register: RequestHandler = async (req, res) => {
       .eq("email", email.toLowerCase())
       .maybeSingle();
 
-    if (existing) {
+    const existingUser = (existing as { id: string } | null) || null;
+    if (existingUser) {
       return res.status(409).json({ error: "Email already exists" });
     }
 
@@ -126,8 +127,8 @@ export const register: RequestHandler = async (req, res) => {
     const passwordHash = hashPassword(password);
 
     // Create user
-    const { data: user, error } = await supabase
-      .from("users")
+    const { data: createdData, error } = await (supabase
+      .from("users") as any)
       .insert({
         email: email.toLowerCase(),
         password_hash: passwordHash,
@@ -141,15 +142,20 @@ export const register: RequestHandler = async (req, res) => {
 
     if (error) throw error;
 
+    const user = (createdData as UserRecord | null) || null;
+    if (!user) {
+      throw new Error("Unable to create user");
+    }
+
     // Fetch primary site if exists
-    let primarySite = null;
+    let primarySite: SiteRecord | null = null;
     if (user.primary_site_id) {
-      const { data: site } = await supabase
+      const { data: siteData } = await supabase
         .from("sites")
         .select("id, name, address, created_at, updated_at")
         .eq("id", user.primary_site_id)
         .single();
-      primarySite = site;
+      primarySite = (siteData as SiteRecord | null) || null;
     }
 
     // Generate token
