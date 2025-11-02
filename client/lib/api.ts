@@ -25,6 +25,56 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     headers: baseHeaders,
   };
 
+  // helper to run fetch with timeout and optional extra options
+  const runFetch = async (
+    url: string,
+    opts: RequestInit,
+    timeout = 20000,
+  ) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => {
+      try {
+        controller.abort(new Error("timeout"));
+      } catch (_) {
+        controller.abort();
+      }
+    }, timeout);
+    try {
+      const resp = await fetch(url, { ...opts, signal: controller.signal });
+      // If server returned HTML (e.g., dev server error page or client index.html), treat as failure to allow fallbacks
+      try {
+        const ct = (resp.headers.get("content-type") || "").toLowerCase();
+        if (
+          ct.includes("text/html") ||
+          ct.includes("application/xhtml+xml")
+        ) {
+          const text = await resp.clone().text();
+          const err: any = new Error("Non-JSON response from server");
+          err.status = resp.status;
+          err.responseText = text.slice(0, 2000);
+          throw err;
+        }
+      } catch (e) {
+        // If reading headers or text failed, fall through to return the response
+      }
+      return resp;
+    } catch (e: any) {
+      // Normalize AbortError into a clearer timeout message
+      const name = e && (e.name || e.code);
+      if (
+        name === "AbortError" ||
+        (controller.signal && controller.signal.aborted)
+      ) {
+        const err: any = new Error("Request timed out");
+        err.code = "ETIMEDOUT";
+        throw err;
+      }
+      throw e;
+    } finally {
+      clearTimeout(id);
+    }
+  };
+
   let lastErr: any = null;
   const asStr = typeof input === "string" ? input : (input as Request).url;
 
@@ -52,55 +102,6 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     // If embedded (iframe) or origin differs from app base, prefer absolute URL first to avoid iframe-relative resolution issues
     const absolute = `${origin}${asStr}`;
 
-    // helper to run fetch with timeout and optional extra options
-    const runFetch = async (
-      url: string,
-      opts: RequestInit,
-      timeout = 20000,
-    ) => {
-      const controller = new AbortController();
-      const id = setTimeout(() => {
-        try {
-          controller.abort(new Error("timeout"));
-        } catch (_) {
-          controller.abort();
-        }
-      }, timeout);
-      try {
-        const resp = await fetch(url, { ...opts, signal: controller.signal });
-        // If server returned HTML (e.g., dev server error page or client index.html), treat as failure to allow fallbacks
-        try {
-          const ct = (resp.headers.get("content-type") || "").toLowerCase();
-          if (
-            ct.includes("text/html") ||
-            ct.includes("application/xhtml+xml")
-          ) {
-            const text = await resp.clone().text();
-            const err: any = new Error("Non-JSON response from server");
-            err.status = resp.status;
-            err.responseText = text.slice(0, 2000);
-            throw err;
-          }
-        } catch (e) {
-          // If reading headers or text failed, fall through to return the response
-        }
-        return resp;
-      } catch (e: any) {
-        // Normalize AbortError into a clearer timeout message
-        const name = e && (e.name || e.code);
-        if (
-          name === "AbortError" ||
-          (controller.signal && controller.signal.aborted)
-        ) {
-          const err: any = new Error("Request timed out");
-          err.code = "ETIMEDOUT";
-          throw err;
-        }
-        throw e;
-      } finally {
-        clearTimeout(id);
-      }
-    };
 
     if (isEmbedded) {
       // Prefer relative (same-origin) first to avoid cross-origin/CORS in iframes
@@ -171,8 +172,19 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       }
     }
 
-    // Last resort: skip serverless fallback to avoid hanging in non-Netlify envs
-    // (If needed, a proxy endpoint can be added on the server-side)
+    // Final fallback: server proxy to APP_BASE_URL
+    try {
+      const proxied = `/api/proxy${asStr}`;
+      return await runFetch(proxied, { ...defaultOpts });
+    } catch (e) {
+      lastErr = e;
+      try {
+        console.warn("authFetch: proxy fallback failed", {
+          url: `/api/proxy${asStr}`,
+          err: String(e),
+        });
+      } catch (_) {}
+    }
   }
 
   // Non-/api requests: try as given
