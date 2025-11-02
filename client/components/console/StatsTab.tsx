@@ -27,6 +27,8 @@ import {
   Clock,
   MessageSquare,
   MapPin,
+  BarChart3,
+  PieChart as PieChartIcon,
 } from "lucide-react";
 import type { Site } from "@shared/api";
 import { authFetch } from "@/lib/api";
@@ -287,7 +289,7 @@ export default function StatsTab({ userOnly = false }: { userOnly?: boolean }) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart size={20} />
+                <BarChart3 size={20} />
                 Messages par site
               </CardTitle>
               <CardDescription>
@@ -341,7 +343,7 @@ export default function StatsTab({ userOnly = false }: { userOnly?: boolean }) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <PieChart size={20} />
+                <PieChartIcon size={20} />
                 Distribution des statuts
               </CardTitle>
               <CardDescription>
