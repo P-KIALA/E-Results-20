@@ -8,6 +8,26 @@ const USER_SECURE_FIELDS =
 const USER_PUBLIC_FIELDS =
   "id, email, role, permissions, primary_site_id, created_at, updated_at";
 
+type UserRecord = {
+  id: string;
+  email: string;
+  password_hash: string;
+  role: "admin" | "user" | "prelevement";
+  permissions: string[] | null;
+  primary_site_id: string | null;
+  is_collector?: boolean | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type SiteRecord = {
+  id: string;
+  name: string;
+  address: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
 export const login: RequestHandler = async (req, res) => {
   try {
     const { email, password } = req.body as LoginRequest;
