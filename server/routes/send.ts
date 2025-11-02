@@ -648,7 +648,7 @@ export const sendResults: RequestHandler = async (req, res) => {
               try {
                 messageId = await sendViaWhatsApp(
                   doctor.phone,
-                  custom_message,
+                  custom_message || "",
                   mediaUrls,
                   twCreds,
                   {
