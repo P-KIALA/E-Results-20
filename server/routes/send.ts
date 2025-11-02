@@ -379,13 +379,82 @@ export const sendResults: RequestHandler = async (req, res) => {
         if (file_ids && file_ids.length > 0) {
           const { data: files, error: filesError } = await supabase
             .from("result_files")
-            .select("id, storage_path")
+            .select("id, storage_path, file_name")
             .in("id", file_ids);
 
           if (filesError) throw filesError;
 
-          // Generate public URLs for providers to download files
-          mediaFiles = (files || []).map((f: any) => {
+          // Helper: convert image (jpg/png) to a single-page PDF and upload; keep quality
+          const convertIfImageToPdf = async (
+            f: { id: string; storage_path: string; file_name?: string },
+          ) => {
+            const lower = (f.storage_path || "").toLowerCase();
+            const isImage =
+              lower.endsWith(".jpg") ||
+              lower.endsWith(".jpeg") ||
+              lower.endsWith(".png");
+            if (!isImage) return f;
+
+            // Download image
+            const publicUrlResp = supabase.storage
+              .from("results")
+              .getPublicUrl(f.storage_path).data.publicUrl;
+            const imgResp = await fetch(publicUrlResp);
+            if (!imgResp.ok) throw new Error(`Failed to fetch image ${f.storage_path}`);
+            const imgBuffer = Buffer.from(await imgResp.arrayBuffer());
+
+            // Build PDF with image fitted to A4, no downscaling of source asset
+            const PDFDocument = (await import("pdfkit")).default;
+            const doc = new PDFDocument({ autoFirstPage: false });
+            const chunks: Buffer[] = [];
+            doc.on("data", (c) => chunks.push(c as Buffer));
+            const done = new Promise<Buffer>((resolve) =>
+              doc.on("end", () => resolve(Buffer.concat(chunks))),
+            );
+            const A4_W = 595.28; // points (72 dpi)
+            const A4_H = 841.89;
+            doc.addPage({ size: [A4_W, A4_H], margin: 0 });
+            // Fit inside A4 with max area, centered
+            doc.image(imgBuffer, 0, 0, { fit: [A4_W, A4_H], align: "center", valign: "center" });
+            doc.end();
+            const pdfBuffer = await done;
+
+            // Upload PDF next to original
+            const baseName = (f.file_name || f.storage_path.split("/").pop() || "file").replace(/\.(jpg|jpeg|png)$/i, "");
+            const timestamp = Date.now();
+            const newPath = `results/${timestamp}_${baseName}.pdf`;
+            const { error: upErr } = await supabase.storage
+              .from("results")
+              .upload(newPath, pdfBuffer, {
+                contentType: "application/pdf",
+                upsert: true,
+              });
+            if (upErr) throw upErr;
+
+            // Create DB record for converted file
+            const { data: rec, error: dbErr } = await supabase
+              .from("result_files")
+              .insert({
+                file_name: `${baseName}.pdf`,
+                file_type: "application/pdf",
+                file_size: pdfBuffer.length,
+                storage_path: newPath,
+              })
+              .select()
+              .single();
+            if (dbErr) throw dbErr;
+
+            return { id: rec.id, storage_path: newPath } as { id: string; storage_path: string };
+          };
+
+          // Convert images to PDF if necessary first
+          const prepared: { id: string; storage_path: string }[] = [];
+          for (const f of files || []) {
+            prepared.push(await convertIfImageToPdf(f as any));
+          }
+
+          // Generate public URLs for providers to download files (after conversion)
+          mediaFiles = (prepared || []).map((f: any) => {
             const publicUrl = supabase.storage
               .from("results")
               .getPublicUrl(f.storage_path).data.publicUrl;
