@@ -193,7 +193,11 @@ export function createServer() {
   app.get("/api/send-logs/:id/files", requireAuth, getSendLogFiles);
 
   // Settings (admin) - allows updating runtime settings such as the WhatsApp template Content SID
-  app.post("/api/settings/template-content-sid", requireAuth, setTemplateContentSid);
+  app.post(
+    "/api/settings/template-content-sid",
+    requireAuth,
+    setTemplateContentSid,
+  );
 
   // Debug endpoints (public in dev only)
   app.get("/api/debug", debugInfo);

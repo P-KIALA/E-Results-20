@@ -86,11 +86,17 @@ async function sendViaWhatsApp(
         const v = (vars as any)[k];
         if (v === null || v === undefined) {
           sanitizedVars[k] = null;
-        } else if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
+        } else if (
+          typeof v === "string" ||
+          typeof v === "number" ||
+          typeof v === "boolean"
+        ) {
           sanitizedVars[k] = v;
         } else if (Array.isArray(v)) {
           // Join arrays with comma — templates should handle this as plain text
-          sanitizedVars[k] = v.map((x) => (x === null || x === undefined ? "" : String(x))).join(", ");
+          sanitizedVars[k] = v
+            .map((x) => (x === null || x === undefined ? "" : String(x)))
+            .join(", ");
         } else {
           // For objects, stringify to avoid sending complex nested types
           try {
@@ -155,17 +161,17 @@ async function sendViaWhatsApp(
       });
 
       const text = await resp.text();
-    let parsed: any = null;
-    try {
-      parsed = JSON.parse(text);
-    } catch (e) {
-      parsed = { raw: text };
-    }
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(text);
+      } catch (e) {
+        parsed = { raw: text };
+      }
 
-    // Log Twilio response for debugging
-    try {
-      console.log("[Twilio DEBUG] Response", { status: resp.status, parsed });
-    } catch (e) {}
+      // Log Twilio response for debugging
+      try {
+        console.log("[Twilio DEBUG] Response", { status: resp.status, parsed });
+      } catch (e) {}
 
       if (!resp.ok) {
         const twErr = parsed || {};
@@ -385,9 +391,11 @@ export const sendResults: RequestHandler = async (req, res) => {
           if (filesError) throw filesError;
 
           // Helper: convert image (jpg/png) to a single-page PDF and upload; keep quality
-          const convertIfImageToPdf = async (
-            f: { id: string; storage_path: string; file_name?: string },
-          ) => {
+          const convertIfImageToPdf = async (f: {
+            id: string;
+            storage_path: string;
+            file_name?: string;
+          }) => {
             const lower = (f.storage_path || "").toLowerCase();
             const isImage =
               lower.endsWith(".jpg") ||
@@ -400,7 +408,8 @@ export const sendResults: RequestHandler = async (req, res) => {
               .from("results")
               .getPublicUrl(f.storage_path).data.publicUrl;
             const imgResp = await fetch(publicUrlResp);
-            if (!imgResp.ok) throw new Error(`Failed to fetch image ${f.storage_path}`);
+            if (!imgResp.ok)
+              throw new Error(`Failed to fetch image ${f.storage_path}`);
             const imgBuffer = Buffer.from(await imgResp.arrayBuffer());
 
             // Build PDF with image fitted to A4, no downscaling of source asset
@@ -415,12 +424,20 @@ export const sendResults: RequestHandler = async (req, res) => {
             const A4_H = 841.89;
             doc.addPage({ size: [A4_W, A4_H], margin: 0 });
             // Fit inside A4 with max area, centered
-            doc.image(imgBuffer, 0, 0, { fit: [A4_W, A4_H], align: "center", valign: "center" });
+            doc.image(imgBuffer, 0, 0, {
+              fit: [A4_W, A4_H],
+              align: "center",
+              valign: "center",
+            });
             doc.end();
             const pdfBuffer = await done;
 
             // Upload PDF next to original
-            const baseName = (f.file_name || f.storage_path.split("/").pop() || "file").replace(/\.(jpg|jpeg|png)$/i, "");
+            const baseName = (
+              f.file_name ||
+              f.storage_path.split("/").pop() ||
+              "file"
+            ).replace(/\.(jpg|jpeg|png)$/i, "");
             const timestamp = Date.now();
             const newPath = `results/${timestamp}_${baseName}.pdf`;
             const { error: upErr } = await supabase.storage
@@ -444,7 +461,10 @@ export const sendResults: RequestHandler = async (req, res) => {
               .single();
             if (dbErr) throw dbErr;
 
-            return { id: rec.id, storage_path: newPath } as { id: string; storage_path: string };
+            return { id: rec.id, storage_path: newPath } as {
+              id: string;
+              storage_path: string;
+            };
           };
 
           // Convert images to PDF if necessary first
@@ -473,7 +493,9 @@ export const sendResults: RequestHandler = async (req, res) => {
 
         // Prefer using a pre-approved WhatsApp template when available (to avoid 63016)
         // Accept multiple template SIDs (comma-separated string or array) and try them in order.
-        const rawTemplateSid = (req.body as any).template_content_sid || process.env.WHATSAPP_TEMPLATE_CONTENT_SID;
+        const rawTemplateSid =
+          (req.body as any).template_content_sid ||
+          process.env.WHATSAPP_TEMPLATE_CONTENT_SID;
         const templateCandidates: string[] = [];
         if (rawTemplateSid) {
           if (Array.isArray(rawTemplateSid)) {
@@ -542,7 +564,12 @@ export const sendResults: RequestHandler = async (req, res) => {
                     lastErr = templateErr;
                     const msg = String(templateErr?.message || templateErr);
                     // If this candidate failed due to template/window, try next candidate
-                    if (msg.includes("template") || msg.includes("window") || msg.includes("63016") || msg.includes("ContentVariables")) {
+                    if (
+                      msg.includes("template") ||
+                      msg.includes("window") ||
+                      msg.includes("63016") ||
+                      msg.includes("ContentVariables")
+                    ) {
                       continue;
                     }
                     // Unexpected error -> rethrow
@@ -552,7 +579,10 @@ export const sendResults: RequestHandler = async (req, res) => {
 
                 // If none of the template candidates worked, throw error
                 if (!messageId) {
-                  throw lastErr || new Error("Template send failed for all candidates");
+                  throw (
+                    lastErr ||
+                    new Error("Template send failed for all candidates")
+                  );
                 }
               } else {
                 throw new Error("No template ContentSid configured");
@@ -633,7 +663,12 @@ export const sendResults: RequestHandler = async (req, res) => {
               } catch (templateErr: any) {
                 lastErr = templateErr;
                 const msg = String(templateErr?.message || templateErr);
-                if (msg.includes("template") || msg.includes("window") || msg.includes("63016") || msg.includes("ContentVariables")) {
+                if (
+                  msg.includes("template") ||
+                  msg.includes("window") ||
+                  msg.includes("63016") ||
+                  msg.includes("ContentVariables")
+                ) {
                   continue; // try next candidate
                 }
                 throw templateErr;
@@ -641,7 +676,9 @@ export const sendResults: RequestHandler = async (req, res) => {
             }
 
             if (!messageId) {
-              throw lastErr || new Error("Template send failed for all candidates");
+              throw (
+                lastErr || new Error("Template send failed for all candidates")
+              );
             }
           } else {
             throw new Error("No template ContentSid configured");

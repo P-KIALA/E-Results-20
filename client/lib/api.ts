@@ -88,7 +88,10 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
       } catch (e: any) {
         // Normalize AbortError into a clearer timeout message
         const name = e && (e.name || e.code);
-        if (name === "AbortError" || (controller.signal && controller.signal.aborted)) {
+        if (
+          name === "AbortError" ||
+          (controller.signal && controller.signal.aborted)
+        ) {
           const err: any = new Error("Request timed out");
           err.code = "ETIMEDOUT";
           throw err;
