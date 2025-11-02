@@ -170,7 +170,7 @@ export const getMe: RequestHandler = async (req, res) => {
 
     const { data: user, error } = await supabase
       .from("users")
-      .select("*")
+      .select(USER_PUBLIC_FIELDS)
       .eq("id", userId)
       .single();
 
