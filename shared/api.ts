@@ -26,6 +26,10 @@ export interface SendLogEntry {
   doctor_id: string;
   status: "pending" | "sent" | "delivered" | "read" | "failed";
   custom_message?: string;
+  patient_name?: string | null;
+  patient_site?: string | null;
+  sender_id?: string | null;
+  sender?: { email?: string | null; site?: string | null } | null;
   sent_at?: string;
   delivered_at?: string;
   read_at?: string;
