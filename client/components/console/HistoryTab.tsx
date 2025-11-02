@@ -29,10 +29,6 @@ interface HistoryTabProps {
 }
 
 type SendLogWithExtras = SendLogEntry & {
-  patient_name?: string | null;
-  patient_site?: string | null;
-  sender_id?: string | null;
-  sender?: { email?: string | null; site?: string | null } | null;
   doctors?: { name?: string | null; phone?: string | null } | null;
 };
 
