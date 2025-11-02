@@ -620,13 +620,13 @@ export default function DoctorsTab() {
                         <CheckCircle
                           size={16}
                           className="text-green-600"
-                          title="Vérifié WhatsApp"
+                          aria-label="Vérifié WhatsApp"
                         />
                       ) : (
                         <AlertCircle
                           size={16}
                           className="text-amber-600"
-                          title="Non vérifié WhatsApp"
+                          aria-label="Non vérifié WhatsApp"
                         />
                       )}
                     </div>
