@@ -28,6 +28,14 @@ interface HistoryTabProps {
   userOnly?: boolean; // if true, only show current user's history and limit filters
 }
 
+type SendLogWithExtras = SendLogEntry & {
+  patient_name?: string | null;
+  patient_site?: string | null;
+  sender_id?: string | null;
+  sender?: { email?: string | null; site?: string | null } | null;
+  doctors?: { name?: string | null; phone?: string | null } | null;
+};
+
 export default function HistoryTab({
   active = false,
   userOnly = false,
