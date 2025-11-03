@@ -615,18 +615,34 @@ export default function HistoryTab({
                           variant="destructive"
                           onClick={async () => {
                             if (!confirm("Supprimer cet envoi ? Cette action ne supprime pas le message du téléphone mais marquera l'envoi comme supprimé et essaiera de supprimer la ressource côté fournisseur.")) return;
+                            setLoading(true);
                             try {
-                              setLoading(true);
-                              const res = await safeFetch(`/api/send-logs/${log.id}/delete`, { method: "POST" });
+                              const res = await authFetch(`/api/send-logs/${log.id}/delete`, { method: "POST" });
+                              // authFetch will throw on network errors/timeouts; for HTTP errors we should read body
                               if (!res.ok) {
-                                const err = await res.clone().text().catch(() => "");
-                                throw new Error(err || `HTTP ${res.status}`);
+                                const ct = (res.headers.get("content-type") || "").toLowerCase();
+                                let errMsg = `HTTP ${res.status}`;
+                                try {
+                                  if (ct.includes("application/json")) {
+                                    const j = await res.clone().json();
+                                    errMsg = j.error || JSON.stringify(j);
+                                  } else {
+                                    errMsg = await res.clone().text();
+                                  }
+                                } catch (_) {}
+                                throw new Error(errMsg);
                               }
+
                               setMessage({ type: "success", text: "Envoi supprimé" });
                               await fetchLogs();
                             } catch (e: any) {
                               console.error("Failed to delete send log", e);
-                              setMessage({ type: "error", text: e?.message || "Erreur lors de la suppression" });
+                              // If auth error, suggest re-login
+                              if (e && /auth/i.test(String(e.message || ""))) {
+                                setMessage({ type: "error", text: "Authentification requise. Veuillez vous reconnecter." });
+                              } else {
+                                setMessage({ type: "error", text: e?.message || "Erreur lors de la suppression" });
+                              }
                             } finally {
                               setLoading(false);
                             }
