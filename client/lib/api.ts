@@ -56,7 +56,7 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
           throw err;
         }
         // If content-type is not JSON and the response has a body (not 204), surface the text as an error
-        if (!ct.includes("application/json") && resp.status !== 204) {
+        if (ct && !ct.includes("application/json") && resp.status !== 204) {
           const text = await resp.clone().text();
           const err: any = new Error("Non-JSON response from server");
           err.status = resp.status;
