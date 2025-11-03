@@ -15,6 +15,7 @@ import { proxyHandler } from "./routes/proxy";
 import { uploadFiles, getFileUrl } from "./routes/upload";
 import { twilioSendHandler } from "./routes/twilio_send";
 import { twilioStatusWebhook } from "./routes/twilio_webhook";
+import { deleteSendLog } from "./routes/delete_send_log";
 import {
   login,
   register,
@@ -193,16 +194,7 @@ export function createServer() {
   app.get("/api/send-logs/:id/files", requireAuth, getSendLogFiles);
 
   // Delete a send_log (soft-delete + attempt to delete provider message)
-  // Requires auth
-  // Handler implemented in server/routes/delete_send_log.ts
-  // @ts-ignore
-  import("./routes/delete_send_log").then((mod) => {
-    try {
-      app.post("/api/send-logs/:id/delete", requireAuth, mod.deleteSendLog);
-    } catch (e) {
-      console.error("Failed to register deleteSendLog route", e);
-    }
-  });
+  app.post("/api/send-logs/:id/delete", requireAuth, deleteSendLog);
 
   // Settings (admin) - allows updating runtime settings such as the WhatsApp template Content SID
   app.post(
