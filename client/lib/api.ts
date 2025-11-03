@@ -41,13 +41,22 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
     }, timeout);
     try {
       const resp = await fetch(url, { ...opts, signal: controller.signal });
-      // If server returned HTML (e.g., dev server error page or client index.html), treat as failure to allow fallbacks
+      // If server returned HTML (e.g., dev server error page or client index.html), or any non-JSON text, treat as failure
       try {
         const ct = (resp.headers.get("content-type") || "").toLowerCase();
+        // Reject common HTML responses quickly
         if (
           ct.includes("text/html") ||
           ct.includes("application/xhtml+xml")
         ) {
+          const text = await resp.clone().text();
+          const err: any = new Error("Non-JSON response from server");
+          err.status = resp.status;
+          err.responseText = text.slice(0, 2000);
+          throw err;
+        }
+        // If content-type is not JSON and the response has a body (not 204), surface the text as an error
+        if (!ct.includes("application/json") && resp.status !== 204) {
           const text = await resp.clone().text();
           const err: any = new Error("Non-JSON response from server");
           err.status = resp.status;
