@@ -1,8 +1,8 @@
 import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { createServer } from "./server";
-import { initializeBuckets } from "./server/lib/storage";
+// Server imports are loaded lazily inside the express plugin to avoid importing server-only code during build time
+// (avoids exposing service role keys or other privileged server code at build)
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
