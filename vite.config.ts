@@ -30,16 +30,31 @@ function expressPlugin(): Plugin {
   return {
     name: "express-plugin",
     apply: "serve", // Only apply during development (serve mode)
-    configureServer(server) {
-      const app = createServer();
+    async configureServer(server) {
+      // Lazy-load server creation and storage initialization only in dev server runtime
+      let app;
+      try {
+        const serverMod = await import("./server");
+        app = serverMod.createServer();
+      } catch (e) {
+        console.error("Could not load server module in dev plugin:", e);
+      }
 
-      // Initialize storage buckets
-      initializeBuckets().catch((error) => {
-        console.error("Failed to initialize storage:", error);
-      });
+      try {
+        const storageMod = await import("./server/lib/storage");
+        if (storageMod && typeof storageMod.initializeBuckets === "function") {
+          storageMod.initializeBuckets().catch((error: any) => {
+            console.error("Failed to initialize storage:", error);
+          });
+        }
+      } catch (e) {
+        console.warn("Could not initialize storage buckets (dev):", e);
+      }
 
-      // Add Express app as middleware to Vite dev server
-      server.middlewares.use(app);
+      // Add Express app as middleware to Vite dev server if available
+      if (app && server.middlewares) {
+        server.middlewares.use(app);
+      }
     },
   };
 }
