@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { authFetch } from "@/lib/api";
 import { useSite } from "@/lib/site-context";
+import { useAuth } from "@/lib/auth-context";
 
 export default function DoctorsTab() {
   const { sites, currentSiteId, canChangeSite } = useSite();
