@@ -188,6 +188,16 @@ export function createServer() {
   app.post("/api/upload-files", requireAuth, uploadFiles);
   app.get("/api/file-url", requireAuth, getFileUrl);
 
+  // File proxy endpoint that streams files with Content-Disposition so external services (e.g. Twilio)
+  // preserve the original filename when downloading.
+  app.get("/api/file/:id/download", requireAuth, (req, res) => {
+    // lazy import to avoid top-level server bundle issues
+    return require("./routes/file_proxy").fileProxyDownload(req, res);
+  });
+  app.get("/api/file/proxy", requireAuth, (req, res) => {
+    return require("./routes/file_proxy").fileProxyDownload(req, res);
+  });
+
   // Send results (protected)
   app.post("/api/send-results", requireAuth, sendResults);
   app.get("/api/send-logs", requireAuth, getSendLogs);
