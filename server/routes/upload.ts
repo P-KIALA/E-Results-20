@@ -88,16 +88,6 @@ export const uploadFiles: RequestHandler = async (req, res) => {
           throw storageError;
         }
 
-        // Upload to Supabase Storage
-        const { data: storageData, error: storageError } =
-          await supabase.storage.from("results").upload(storagePath, buffer, {
-            contentType: type,
-            upsert: false,
-          });
-
-        if (storageError) {
-          throw storageError;
-        }
 
         // Store file metadata in database
         let resultFileData: any = {
