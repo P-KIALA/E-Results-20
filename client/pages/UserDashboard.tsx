@@ -50,7 +50,11 @@ export default function UserDashboard() {
 
   useEffect(() => {
     fetchDoctors();
-    // Auto-fill patient site: prefer selected site when user can change site, otherwise use user's primary site
+
+    // Auto-fill patient site:
+    // 1) If user can change site and a currentSiteId is selected, use that site's name
+    // 2) Otherwise, prefer the fully loaded user.primary_site.name
+    // 3) If user.primary_site is not populated but primary_site_id exists, find the site from the sites list and use its name
     if (canChangeSite && currentSiteId) {
       const site = sites.find((s: any) => s.id === currentSiteId);
       if (site?.name) {
@@ -58,8 +62,13 @@ export default function UserDashboard() {
       }
     } else if (user?.primary_site?.name) {
       setPatientSite(user.primary_site.name);
+    } else if (user?.primary_site_id) {
+      const site = sites.find((s: any) => s.id === user.primary_site_id);
+      if (site?.name) {
+        setPatientSite(site.name);
+      }
     }
-  }, [user?.primary_site?.name, sites, currentSiteId, canChangeSite]);
+  }, [user?.primary_site?.name, user?.primary_site_id, sites, currentSiteId, canChangeSite]);
 
   const fetchDoctors = async () => {
     try {
