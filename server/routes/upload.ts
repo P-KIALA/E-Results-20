@@ -36,11 +36,12 @@ export const uploadFiles: RequestHandler = async (req, res) => {
       }
 
       try {
-        // Generate unique filename
+        // Generate unique filename that preserves original name for recipient
         const timestamp = Date.now();
         const randomId = Math.random().toString(36).substring(2, 8);
-        const ext = path.extname(name);
-        const storagePath = `results/${timestamp}_${randomId}${ext}`;
+        const originalBase = path.basename(name);
+        const sanitized = originalBase.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 200);
+        const storagePath = `results/${timestamp}_${randomId}_${sanitized}`;
 
         // Convert base64 to buffer
         const buffer = Buffer.from(data, "base64");
