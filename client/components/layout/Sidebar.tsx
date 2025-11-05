@@ -52,7 +52,7 @@ export default function Sidebar() {
   const selectSite = (id: string) => {
     setCurrentSiteId(id);
     setChooseSiteOpen(false);
-    toast({ title: "Centre sélectionné", description: sites.find((s: any) => s.id === id)?.name || "" });
+    toast({ title: "Site sélectionné", description: sites.find((s: any) => s.id === id)?.name || "" });
   };
 
   return (
@@ -209,11 +209,11 @@ export default function Sidebar() {
                 "hover:bg-muted/60 hover:text-primary font-semibold whitespace-nowrap",
                 !canChangeSite && "opacity-60 cursor-not-allowed hover:bg-transparent hover:text-foreground"
               )}
-              title="Choisir le centre"
+              title="Choisir le site"
             >
               <MapPin size={20} className="flex-shrink-0" />
               {!isMinimized && (
-                <span>{currentSiteName ? `Centre: ${currentSiteName}` : "Choisir centre"}</span>
+                <span>{currentSiteName ? `Site: ${currentSiteName}` : "Choisir site"}</span>
               )}
             </button>
 
@@ -223,12 +223,12 @@ export default function Sidebar() {
                 <div className="absolute inset-0 bg-black/30" onClick={() => setChooseSiteOpen(false)} />
                 <div className="relative z-10 w-11/12 sm:w-96 bg-white border rounded shadow p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-semibold">Choisir un centre</h4>
+                    <h4 className="text-sm font-semibold">Choisir un site</h4>
                     <Button size="sm" variant="ghost" onClick={() => setChooseSiteOpen(false)}>Fermer</Button>
                   </div>
                   <div className="max-h-64 overflow-auto">
                     {sites.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Aucun centre trouvé</p>
+                      <p className="text-sm text-muted-foreground">Aucun site trouvé</p>
                     ) : (
                       sites.map((s) => (
                         <div key={s.id} className="flex items-center justify-between p-2 hover:bg-muted rounded">
