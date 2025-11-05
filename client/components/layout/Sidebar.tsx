@@ -50,6 +50,18 @@ export default function Sidebar() {
   const currentSiteName =
     sites.find((s: any) => s.id === currentSiteId)?.name || null;
 
+  // Determine site display name for the site-selector button.
+  // Prefer: selected currentSiteName -> user's primary_site.name -> lookup by user.primary_site_id -> fallback null
+  const displaySiteName = (() => {
+    if (currentSiteName) return currentSiteName;
+    if (user?.primary_site?.name) return user.primary_site.name;
+    if (user?.primary_site_id) {
+      const s = sites.find((s: any) => s.id === user.primary_site_id);
+      if (s?.name) return s.name;
+    }
+    return null;
+  })();
+
   const selectSite = (id: string) => {
     setCurrentSiteId(id);
     setChooseSiteOpen(false);
@@ -221,8 +233,8 @@ export default function Sidebar() {
               <MapPin size={20} className="flex-shrink-0" />
               {!isMinimized && (
                 <span>
-                  {currentSiteName
-                    ? `Site: ${currentSiteName}`
+                  {displaySiteName
+                    ? `Site: ${displaySiteName}`
                     : "Choisir site"}
                 </span>
               )}
