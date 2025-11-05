@@ -30,7 +30,9 @@ import { useAuth } from "@/lib/auth-context";
 
 export default function DoctorsTab() {
   const { sites, currentSiteId, canChangeSite } = useSite();
-  const [siteFilter, setSiteFilter] = useState<string>(() => (canChangeSite ? "all" : (localStorage.getItem("current_site_id") || "")));
+  const [siteFilter, setSiteFilter] = useState<string>(() =>
+    canChangeSite ? "all" : localStorage.getItem("current_site_id") || "",
+  );
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -114,20 +116,28 @@ export default function DoctorsTab() {
       const parsed = await readResponse(res);
       if (!parsed.ok) {
         // Handle auth errors explicitly
-        if (parsed.status === 401 || (parsed.json && /auth/i.test(String(parsed.json.error || "")))) {
+        if (
+          parsed.status === 401 ||
+          (parsed.json && /auth/i.test(String(parsed.json.error || "")))
+        ) {
           // Force logout and show message
           try {
             logout();
           } catch (_) {}
-          throw new Error("Authentification requise. Veuillez vous reconnecter.");
+          throw new Error(
+            "Authentification requise. Veuillez vous reconnecter.",
+          );
         }
-        throw new Error(parsed.json?.error || parsed.text || "Failed to fetch doctors");
+        throw new Error(
+          parsed.json?.error || parsed.text || "Failed to fetch doctors",
+        );
       }
       setDoctors(parsed.json?.doctors || []);
     } catch (error) {
       console.error("Error fetching doctors:", error);
       // Provide user-friendly messages for common cases
-      const messageText = error instanceof Error ? error.message : "Erreur lors du chargement";
+      const messageText =
+        error instanceof Error ? error.message : "Erreur lors du chargement";
       setMessage({ type: "error", text: messageText });
     } finally {
       setLoading(false);
@@ -361,10 +371,17 @@ export default function DoctorsTab() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <select value={siteFilter} onChange={(e) => setSiteFilter(e.target.value)} disabled={!canChangeSite} className="px-2 py-1 border rounded text-sm mr-2">
+          <select
+            value={siteFilter}
+            onChange={(e) => setSiteFilter(e.target.value)}
+            disabled={!canChangeSite}
+            className="px-2 py-1 border rounded text-sm mr-2"
+          >
             {canChangeSite ? <option value="all">Tout le site</option> : null}
             {sites.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
             ))}
           </select>
           <Button onClick={() => setShowAddForm(true)} className="gap-2">

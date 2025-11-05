@@ -30,8 +30,9 @@ export default function ResultsTab() {
   const [uploadedFileIds, setUploadedFileIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const { sites, currentSiteId, canChangeSite } = useSite();
-  const [siteFilter, setSiteFilter] = useState<string>(() => (canChangeSite ? "all" : (localStorage.getItem("current_site_id") || "")));
-
+  const [siteFilter, setSiteFilter] = useState<string>(() =>
+    canChangeSite ? "all" : localStorage.getItem("current_site_id") || "",
+  );
 
   const filteredDoctors = doctors.filter((d) => {
     if (!searchQuery || searchQuery.trim().length === 0) return false; // hide all until user searches
@@ -55,7 +56,13 @@ export default function ResultsTab() {
     } else if (user?.primary_site?.name) {
       setPatientSite(user.primary_site.name);
     }
-  }, [user?.primary_site?.name, siteFilter, currentSiteId, canChangeSite, sites]);
+  }, [
+    user?.primary_site?.name,
+    siteFilter,
+    currentSiteId,
+    canChangeSite,
+    sites,
+  ]);
 
   const fetchDoctors = async () => {
     try {
@@ -157,7 +164,6 @@ export default function ResultsTab() {
       setMessage({ type: "error", text: "Sélectionnez au moins un médecin" });
       return;
     }
-
 
     if (!patientName.trim()) {
       setMessage({ type: "error", text: "Le nom du malade est requis" });
@@ -329,11 +335,22 @@ export default function ResultsTab() {
         <CardContent className="space-y-2">
           <div>
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Rechercher un médecin (nom, prénom, téléphone)</label>
-              <select value={siteFilter} onChange={(e) => setSiteFilter(e.target.value)} className="px-2 py-1 border rounded text-sm" disabled={!canChangeSite}>
-                {canChangeSite ? <option value="all">Tout le site</option> : null}
+              <label className="text-sm font-medium">
+                Rechercher un médecin (nom, prénom, téléphone)
+              </label>
+              <select
+                value={siteFilter}
+                onChange={(e) => setSiteFilter(e.target.value)}
+                className="px-2 py-1 border rounded text-sm"
+                disabled={!canChangeSite}
+              >
+                {canChangeSite ? (
+                  <option value="all">Tout le site</option>
+                ) : null}
                 {sites.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -343,11 +360,16 @@ export default function ResultsTab() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="mt-2"
             />
-            <p className="text-xs text-muted-foreground mt-1">Tapez le nom, prénom ou téléphone pour afficher les médecins correspondants.</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Tapez le nom, prénom ou téléphone pour afficher les médecins
+              correspondants.
+            </p>
           </div>
 
           {filteredDoctors.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucun médecin correspondant</p>
+            <p className="text-sm text-muted-foreground">
+              Aucun médecin correspondant
+            </p>
           ) : (
             filteredDoctors.map((doctor) => (
               <label
@@ -369,7 +391,9 @@ export default function ResultsTab() {
                 />
                 <div className="flex-1">
                   <p className="font-medium text-sm">{doctor.name}</p>
-                  <p className="text-xs text-muted-foreground">{doctor.phone}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {doctor.phone}
+                  </p>
                 </div>
               </label>
             ))

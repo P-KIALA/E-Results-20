@@ -47,12 +47,16 @@ export default function Sidebar() {
         : "text-foreground hover:bg-muted/60 hover:text-primary",
     );
 
-  const currentSiteName = sites.find((s: any) => s.id === currentSiteId)?.name || null;
+  const currentSiteName =
+    sites.find((s: any) => s.id === currentSiteId)?.name || null;
 
   const selectSite = (id: string) => {
     setCurrentSiteId(id);
     setChooseSiteOpen(false);
-    toast({ title: "Site sélectionné", description: sites.find((s: any) => s.id === id)?.name || "" });
+    toast({
+      title: "Site sélectionné",
+      description: sites.find((s: any) => s.id === id)?.name || "",
+    });
   };
 
   return (
@@ -201,47 +205,74 @@ export default function Sidebar() {
         {user && (
           <>
             <button
-              onClick={() => canChangeSite ? setChooseSiteOpen(true) : undefined}
+              onClick={() =>
+                canChangeSite ? setChooseSiteOpen(true) : undefined
+              }
               aria-disabled={!canChangeSite}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                 "w-full text-left no-underline text-foreground",
                 "hover:bg-muted/60 hover:text-primary font-semibold whitespace-nowrap",
-                !canChangeSite && "opacity-60 cursor-not-allowed hover:bg-transparent hover:text-foreground"
+                !canChangeSite &&
+                  "opacity-60 cursor-not-allowed hover:bg-transparent hover:text-foreground",
               )}
               title="Choisir le site"
             >
               <MapPin size={20} className="flex-shrink-0" />
               {!isMinimized && (
-                <span>{currentSiteName ? `Site: ${currentSiteName}` : "Choisir site"}</span>
+                <span>
+                  {currentSiteName
+                    ? `Site: ${currentSiteName}`
+                    : "Choisir site"}
+                </span>
               )}
             </button>
 
             {/* Choose site modal */}
             {chooseSiteOpen && (
               <div className="fixed inset-0 z-50 flex items-center justify-center">
-                <div className="absolute inset-0 bg-black/30" onClick={() => setChooseSiteOpen(false)} />
+                <div
+                  className="absolute inset-0 bg-black/30"
+                  onClick={() => setChooseSiteOpen(false)}
+                />
                 <div className="relative z-10 w-11/12 sm:w-96 bg-white border rounded shadow p-3">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-sm font-semibold">Choisir un site</h4>
-                    <Button size="sm" variant="ghost" onClick={() => setChooseSiteOpen(false)}>Fermer</Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setChooseSiteOpen(false)}
+                    >
+                      Fermer
+                    </Button>
                   </div>
                   <div className="max-h-64 overflow-auto">
                     {sites.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Aucun site trouvé</p>
+                      <p className="text-sm text-muted-foreground">
+                        Aucun site trouvé
+                      </p>
                     ) : (
                       sites.map((s) => (
-                        <div key={s.id} className="flex items-center justify-between p-2 hover:bg-muted rounded">
+                        <div
+                          key={s.id}
+                          className="flex items-center justify-between p-2 hover:bg-muted rounded"
+                        >
                           <div>
                             <div className="font-medium">{s.name}</div>
-                            {s.address && <div className="text-xs text-muted-foreground">{s.address}</div>}
+                            {s.address && (
+                              <div className="text-xs text-muted-foreground">
+                                {s.address}
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center gap-2">
                             <Button size="sm" onClick={() => selectSite(s.id)}>
                               Sélectionner
                             </Button>
                             {currentSiteId === s.id && (
-                              <span className="text-xs text-green-600">Actuel</span>
+                              <span className="text-xs text-green-600">
+                                Actuel
+                              </span>
                             )}
                           </div>
                         </div>

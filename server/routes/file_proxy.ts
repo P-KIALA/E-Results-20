@@ -40,9 +40,15 @@ export const fileProxyDownload: RequestHandler = async (req, res) => {
     }
 
     // Stream the data back with Content-Disposition header so consumers (Twilio) get original filename
-    res.setHeader("Content-Type", fileRecord.file_type || "application/octet-stream");
+    res.setHeader(
+      "Content-Type",
+      fileRecord.file_type || "application/octet-stream",
+    );
     // Ensure filename is ASCII-safe
-    const filename = (fileRecord.file_name || "file").replace(/[^\x20-\x7E]/g, "_");
+    const filename = (fileRecord.file_name || "file").replace(
+      /[^\x20-\x7E]/g,
+      "_",
+    );
     res.setHeader(
       "Content-Disposition",
       `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,

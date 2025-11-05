@@ -38,7 +38,9 @@ export const uploadFiles: RequestHandler = async (req, res) => {
       try {
         // Preserve original filename for recipient while avoiding collisions
         const originalBase = path.basename(name);
-        const sanitizedBase = originalBase.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 200);
+        const sanitizedBase = originalBase
+          .replace(/[^a-zA-Z0-9._-]/g, "_")
+          .slice(0, 200);
         let storagePath = `results/${sanitizedBase}`;
 
         // Convert base64 to buffer
@@ -54,16 +56,21 @@ export const uploadFiles: RequestHandler = async (req, res) => {
           const suffix = attempt === 0 ? "" : `_${attempt}`;
           if (suffix) {
             const ext = path.extname(sanitizedBase);
-            const baseNoExt = sanitizedBase.slice(0, sanitizedBase.length - ext.length);
+            const baseNoExt = sanitizedBase.slice(
+              0,
+              sanitizedBase.length - ext.length,
+            );
             storagePath = `results/${baseNoExt}${suffix}${ext}`;
           } else {
             storagePath = `results/${sanitizedBase}`;
           }
 
-          const uploadResult = await supabase.storage.from("results").upload(storagePath, buffer, {
-            contentType: type,
-            upsert: false,
-          });
+          const uploadResult = await supabase.storage
+            .from("results")
+            .upload(storagePath, buffer, {
+              contentType: type,
+              upsert: false,
+            });
 
           storageData = uploadResult.data;
           storageError = uploadResult.error;
@@ -74,8 +81,10 @@ export const uploadFiles: RequestHandler = async (req, res) => {
           }
 
           // If error indicates file exists, try next suffix; otherwise break and throw
-          const msg = String(storageError?.message || storageError?.msg || "").toLowerCase();
-          if (msg.includes("already exists") || (storageError?.status === 409)) {
+          const msg = String(
+            storageError?.message || storageError?.msg || "",
+          ).toLowerCase();
+          if (msg.includes("already exists") || storageError?.status === 409) {
             attempt++;
             continue;
           } else {
@@ -87,7 +96,6 @@ export const uploadFiles: RequestHandler = async (req, res) => {
         if (storageError) {
           throw storageError;
         }
-
 
         // Store file metadata in database
         let resultFileData: any = {

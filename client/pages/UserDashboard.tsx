@@ -193,7 +193,10 @@ export default function UserDashboard() {
     const parsedExtras = parseExtraRecipients();
 
     if (selectedDoctors.length === 0 && parsedExtras.length === 0) {
-      setMessage({ type: "error", text: "Sélectionnez au moins un médecin ou ajoutez un numéro" });
+      setMessage({
+        type: "error",
+        text: "Sélectionnez au moins un médecin ou ajoutez un numéro",
+      });
       return;
     }
 
@@ -278,7 +281,9 @@ export default function UserDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Destinataires supplémentaires</CardTitle>
-          <CardDescription>Ajoutez des numéros (un par ligne ou séparés par des virgules)</CardDescription>
+          <CardDescription>
+            Ajoutez des numéros (un par ligne ou séparés par des virgules)
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Textarea
