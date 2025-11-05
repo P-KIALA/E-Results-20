@@ -91,6 +91,8 @@ export default function DoctorsTab() {
     }
   };
 
+  const { logout } = useAuth();
+
   const fetchDoctors = async () => {
     setLoading(true);
     try {
@@ -111,18 +113,22 @@ export default function DoctorsTab() {
       const res = await authFetch(url);
       const parsed = await readResponse(res);
       if (!parsed.ok) {
-        throw new Error(
-          parsed.json?.error || parsed.text || "Failed to fetch doctors",
-        );
+        // Handle auth errors explicitly
+        if (parsed.status === 401 || (parsed.json && /auth/i.test(String(parsed.json.error || "")))) {
+          // Force logout and show message
+          try {
+            logout();
+          } catch (_) {}
+          throw new Error("Authentification requise. Veuillez vous reconnecter.");
+        }
+        throw new Error(parsed.json?.error || parsed.text || "Failed to fetch doctors");
       }
       setDoctors(parsed.json?.doctors || []);
     } catch (error) {
       console.error("Error fetching doctors:", error);
-      setMessage({
-        type: "error",
-        text:
-          error instanceof Error ? error.message : "Erreur lors du chargement",
-      });
+      // Provide user-friendly messages for common cases
+      const messageText = error instanceof Error ? error.message : "Erreur lors du chargement";
+      setMessage({ type: "error", text: messageText });
     } finally {
       setLoading(false);
     }
