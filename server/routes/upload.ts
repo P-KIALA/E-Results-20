@@ -139,13 +139,9 @@ export const getFileUrl: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "storage_path is required" });
     }
 
-    const { data, error } = supabase.storage
-      .from("results")
-      .getPublicUrl(String(storage_path));
-
-    if (error) throw error;
-
-    res.json({ url: data.publicUrl });
+    // Return proxy URL to ensure consumers get correct filename via Content-Disposition
+    const proxyUrl = `/api/file/proxy?storage_path=${encodeURIComponent(String(storage_path))}`;
+    res.json({ url: proxyUrl });
   } catch (error) {
     console.error("Error getting file URL:", error);
     res.status(500).json({ error: "Failed to get file URL" });
