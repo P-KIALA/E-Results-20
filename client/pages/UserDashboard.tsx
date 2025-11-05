@@ -46,20 +46,20 @@ export default function UserDashboard() {
       .map((s) => s.trim())
       .filter(Boolean);
 
+  const { sites, currentSiteId, canChangeSite } = useSite();
+
   useEffect(() => {
     fetchDoctors();
     // Auto-fill patient site: prefer selected site when user can change site, otherwise use user's primary site
-    if ((window as any).__APP_SELECTED_SITE_ID__ && (window as any).__APP_CAN_CHANGE_SITE__) {
-      // If the app exposes selected site via global, use it; otherwise prefer context/provider (handled in other components)
-      const siteId = (window as any).__APP_SELECTED_SITE_ID__;
-      try {
-        const s = (window as any).APP_SITES?.find((x: any) => x.id === siteId);
-        if (s?.name) setPatientSite(s.name);
-      } catch (_) {}
+    if (canChangeSite && currentSiteId) {
+      const site = sites.find((s: any) => s.id === currentSiteId);
+      if (site?.name) {
+        setPatientSite(site.name);
+      }
     } else if (user?.primary_site?.name) {
       setPatientSite(user.primary_site.name);
     }
-  }, [user?.primary_site?.name]);
+  }, [user?.primary_site?.name, sites, currentSiteId, canChangeSite]);
 
   const fetchDoctors = async () => {
     try {
