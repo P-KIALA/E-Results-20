@@ -46,11 +46,16 @@ export default function ResultsTab() {
 
   useEffect(() => {
     fetchDoctors();
-    // Auto-fill patient site from user's primary site
-    if (user?.primary_site?.name) {
+    // Auto-fill patient site: prefer selected site when user can change site, otherwise use user's primary site
+    if (canChangeSite && currentSiteId) {
+      const site = sites.find((s: any) => s.id === currentSiteId);
+      if (site?.name) {
+        setPatientSite(site.name);
+      }
+    } else if (user?.primary_site?.name) {
       setPatientSite(user.primary_site.name);
     }
-  }, [user?.primary_site?.name, siteFilter, currentSiteId]);
+  }, [user?.primary_site?.name, siteFilter, currentSiteId, canChangeSite, sites]);
 
   const fetchDoctors = async () => {
     try {
