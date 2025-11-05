@@ -68,7 +68,13 @@ export default function UserDashboard() {
         setPatientSite(site.name);
       }
     }
-  }, [user?.primary_site?.name, user?.primary_site_id, sites, currentSiteId, canChangeSite]);
+  }, [
+    user?.primary_site?.name,
+    user?.primary_site_id,
+    sites,
+    currentSiteId,
+    canChangeSite,
+  ]);
 
   const fetchDoctors = async () => {
     try {
