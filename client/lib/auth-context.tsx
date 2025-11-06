@@ -114,13 +114,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    role: "admin" | "user" | "prelevement" = "user",
+    permissions: string[] = [],
+    primary_site_id: string | null = null,
+  ) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          role,
+          permissions,
+          primary_site_id,
+        }),
       });
 
       const data = await response.json();
