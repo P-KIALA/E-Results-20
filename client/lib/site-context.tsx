@@ -38,7 +38,8 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   );
 
   const canChangeSite =
-    user?.role === "admin" || (user?.permissions || []).includes("access_all_sites");
+    user?.role === "admin" ||
+    (user?.permissions || []).includes("access_all_sites");
 
   useEffect(() => {
     (async () => {
@@ -76,7 +77,15 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <SiteContext.Provider value={{ sites, currentSiteId, setCurrentSiteId, canChangeSite, refreshSites }}>
+    <SiteContext.Provider
+      value={{
+        sites,
+        currentSiteId,
+        setCurrentSiteId,
+        canChangeSite,
+        refreshSites,
+      }}
+    >
       {children}
     </SiteContext.Provider>
   );
