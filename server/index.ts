@@ -100,7 +100,9 @@ export function createServer() {
             // Allow Builder project hostnames (projects.builder.* like projects.builder.my / projects.builder.codes)
             (hostname && /projects\.builder\./.test(hostname)) ||
             // Broad builder subdomain match (e.g. ce33...-main.projects.builder.codes)
-            (hostname && /(^|\.)builder\./.test(hostname));
+            (hostname && /(^|\.)builder\./.test(hostname)) ||
+            // Allow Netlify hosted sites and subdomains (e.g. my-site.netlify.app, my-site.netlify.app)
+            (hostname && /(^|\.)netlify\.app$/.test(hostname));
 
           if (isAllowed) return callback(null, true);
 
