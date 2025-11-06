@@ -19,7 +19,13 @@ interface SiteContextValue {
 const SiteContext = createContext<SiteContextValue | undefined>(undefined);
 
 export function SiteProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  let user: any = null;
+  try {
+    user = useAuth().user;
+  } catch (e) {
+    // If AuthProvider is not mounted yet (or during tests/SSR), fallback to null
+    user = null;
+  }
   const [sites, setSites] = useState<Site[]>([]);
   const [currentSiteId, setCurrentSiteIdState] = useState<string | null>(
     (() => {
