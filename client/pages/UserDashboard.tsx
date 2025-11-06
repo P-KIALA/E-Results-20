@@ -527,28 +527,12 @@ export default function UserDashboard() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Message personnalisé</CardTitle>
-        </CardHeader>
         <CardContent className="space-y-4">
-          <Textarea
-            value={customMessage}
-            onChange={(e) => setCustomMessage(e.target.value)}
-            rows={6}
-            placeholder="Écrivez votre message..."
-          />
           <Button
-            onClick={handleSend}
-            disabled={
-              sending ||
-              selectedDoctors.length === 0 ||
-              !patientName.trim() ||
-              !patientSite.trim()
-            }
-            className="w-full gap-2"
+            disabled
+            className="w-full gap-2 bg-emerald-500 text-white opacity-50 pointer-events-none"
           >
-            <Send size={16} />
-            {sending ? "Envoi en cours..." : "Envoyer"}
+            Envoyer
           </Button>
         </CardContent>
       </Card>
