@@ -8,3 +8,4 @@ export default function HistoryPage() {
 
   return <HistoryTab active={true} userOnly={userOnly} />;
 }
+
