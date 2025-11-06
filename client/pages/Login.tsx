@@ -237,6 +237,29 @@ export default function LoginPage() {
                   {isLoading ? "Connexion..." : "Se connecter"}
                 </Button>
 
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full mt-2"
+                  onClick={async () => {
+                    setError("");
+                    if (!email || !password) {
+                      setError("Email et mot de passe requis pour créer un compte");
+                      return;
+                    }
+                    try {
+                      await register(email, password);
+                      // after registering, try login to create session and navigate
+                      await login(email, password);
+                      navigate("/");
+                    } catch (err) {
+                      setError(String(err) || "Échec de la création du compte");
+                    }
+                  }}
+                >
+                  Créer un compte
+                </Button>
+
                 <p className="text-xs text-center text-white font-bold">
                   Les sessions expirent après 1 heure d'inactivité
                 </p>
