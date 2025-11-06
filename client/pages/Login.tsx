@@ -38,7 +38,7 @@ const images = [
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, isLoading, isAuthenticated } = useAuth();
+  const { login, register, isLoading, isAuthenticated } = useAuth();
   const { theme, setTheme } = useTheme();
   const prevThemeRef = useRef<string | undefined>(undefined);
 
