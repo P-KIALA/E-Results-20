@@ -244,7 +244,9 @@ export default function LoginPage() {
                   onClick={async () => {
                     setError("");
                     if (!email || !password) {
-                      setError("Email et mot de passe requis pour créer un compte");
+                      setError(
+                        "Email et mot de passe requis pour créer un compte",
+                      );
                       return;
                     }
                     try {
