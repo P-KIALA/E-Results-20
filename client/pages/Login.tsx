@@ -12,6 +12,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LogIn, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const images = [
   {
@@ -46,6 +55,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // register dialog state
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regRole, setRegRole] = useState<"user" | "admin" | "prelevement">("user");
 
   // Force light theme on /login while mounted
   useEffect(() => {
@@ -237,30 +251,79 @@ export default function LoginPage() {
                   {isLoading ? "Connexion..." : "Se connecter"}
                 </Button>
 
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full mt-2"
-                  onClick={async () => {
-                    setError("");
-                    if (!email || !password) {
-                      setError(
-                        "Email et mot de passe requis pour créer un compte",
-                      );
-                      return;
-                    }
-                    try {
-                      await register(email, password);
-                      // after registering, try login to create session and navigate
-                      await login(email, password);
-                      navigate("/");
-                    } catch (err) {
-                      setError(String(err) || "Échec de la création du compte");
-                    }
-                  }}
-                >
-                  Créer un compte
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="ghost" className="w-full mt-2">
+                      Créer un compte
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Créer un compte</DialogTitle>
+                      <DialogDescription>
+                        Remplissez les informations pour créer un compte.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        setError("");
+                        if (!regEmail || !regPassword) {
+                          setError("Email et mot de passe requis");
+                          return;
+                        }
+                        try {
+                          await register(regEmail, regPassword, regRole);
+                          await login(regEmail, regPassword);
+                          navigate("/");
+                        } catch (err) {
+                          setError(String(err) || "Échec de la création du compte");
+                        }
+                      }}
+                      className="space-y-3"
+                    >
+                      <div>
+                        <label className="text-sm font-medium">Email</label>
+                        <Input
+                          type="email"
+                          placeholder="votre.email@example.com"
+                          value={regEmail}
+                          onChange={(e) => setRegEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium">Mot de passe</label>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          value={regPassword}
+                          onChange={(e) => setRegPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium">Rôle</label>
+                        <select
+                          value={regRole}
+                          onChange={(e) => setRegRole(e.target.value as any)}
+                          className="w-full mt-1 rounded border p-2 bg-background"
+                        >
+                          <option value="user">Utilisateur</option>
+                          <option value="admin">Administrateur</option>
+                        </select>
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="submit" className="w-full">
+                          Créer le compte
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
 
                 <p className="text-xs text-center text-white font-bold">
                   Les sessions expirent après 1 heure d'inactivité
