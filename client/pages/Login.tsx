@@ -59,7 +59,9 @@ export default function LoginPage() {
   // register dialog state
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
-  const [regRole, setRegRole] = useState<"user" | "admin" | "prelevement">("user");
+  const [regRole, setRegRole] = useState<"user" | "admin" | "prelevement">(
+    "user",
+  );
 
   // Force light theme on /login while mounted
   useEffect(() => {
@@ -253,7 +255,11 @@ export default function LoginPage() {
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button type="button" variant="ghost" className="w-full mt-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full mt-2"
+                    >
                       Créer un compte
                     </Button>
                   </DialogTrigger>
@@ -277,7 +283,9 @@ export default function LoginPage() {
                           await login(regEmail, regPassword);
                           navigate("/");
                         } catch (err) {
-                          setError(String(err) || "Échec de la création du compte");
+                          setError(
+                            String(err) || "Échec de la création du compte",
+                          );
                         }
                       }}
                       className="space-y-3"
@@ -294,7 +302,9 @@ export default function LoginPage() {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium">Mot de passe</label>
+                        <label className="text-sm font-medium">
+                          Mot de passe
+                        </label>
                         <Input
                           type="password"
                           placeholder="••••••••"
