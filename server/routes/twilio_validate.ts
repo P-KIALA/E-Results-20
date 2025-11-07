@@ -8,7 +8,9 @@ export const twilioValidate: RequestHandler = async (req, res) => {
     const apiSecret = process.env.TWILIO_API_SECRET;
 
     if (!accountSid) {
-      return res.status(400).json({ ok: false, error: "TWILIO_ACCOUNT_SID not set" });
+      return res
+        .status(400)
+        .json({ ok: false, error: "TWILIO_ACCOUNT_SID not set" });
     }
 
     // Determine auth credentials preference: API Key pair if present, otherwise Account SID + Auth Token
@@ -16,7 +18,12 @@ export const twilioValidate: RequestHandler = async (req, res) => {
     let authPass = apiSecret || authToken;
 
     if (!authUser || !authPass) {
-      return res.status(400).json({ ok: false, error: "Twilio auth credentials not fully configured" });
+      return res
+        .status(400)
+        .json({
+          ok: false,
+          error: "Twilio auth credentials not fully configured",
+        });
     }
 
     const base = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}`;
