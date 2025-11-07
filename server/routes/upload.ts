@@ -36,65 +36,36 @@ export const uploadFiles: RequestHandler = async (req, res) => {
       }
 
       try {
-        // Preserve original filename for recipient while avoiding collisions
+        // Preserve original filename for recipient; use a timestamp prefix to ensure uniqueness
         const originalBase = path.basename(name);
         const sanitizedBase = originalBase
           .replace(/[^a-zA-Z0-9._-]/g, "_")
           .slice(0, 200);
-        let storagePath = `results/${sanitizedBase}`;
+
+        // Use timestamp to guarantee unique storage path and avoid race conditions / collisions
+        const timestamp = Date.now();
+        const storagePath = `results/${timestamp}_${sanitizedBase}`;
 
         // Convert base64 to buffer
         const buffer = Buffer.from(data, "base64");
 
-        // Try uploading with original name; if exists, append numeric suffix to avoid overwriting
-        let attempt = 0;
-        let uploaded = false;
-        let storageData: any = null;
-        let storageError: any = null;
-        while (!uploaded && attempt < 10) {
-          // attempt storagePath (first try uses original name, subsequent tries add _1, _2... before extension)
-          const suffix = attempt === 0 ? "" : `_${attempt}`;
-          if (suffix) {
-            const ext = path.extname(sanitizedBase);
-            const baseNoExt = sanitizedBase.slice(
-              0,
-              sanitizedBase.length - ext.length,
-            );
-            storagePath = `results/${baseNoExt}${suffix}${ext}`;
-          } else {
-            storagePath = `results/${sanitizedBase}`;
-          }
+        // Upload the file (use upsert=false to avoid overwriting if a rare collision occurs)
+        const uploadResult = await supabase.storage.from("results").upload(
+          storagePath,
+          buffer,
+          {
+            contentType: type,
+            upsert: false,
+          },
+        );
 
-          const uploadResult = await supabase.storage
-            .from("results")
-            .upload(storagePath, buffer, {
-              contentType: type,
-              upsert: false,
-            });
-
-          storageData = uploadResult.data;
-          storageError = uploadResult.error;
-
-          if (!storageError) {
-            uploaded = true;
-            break;
-          }
-
-          // If error indicates file exists, try next suffix; otherwise break and throw
-          const msg = String(
-            storageError?.message || storageError?.msg || "",
-          ).toLowerCase();
-          if (msg.includes("already exists") || storageError?.status === 409) {
-            attempt++;
-            continue;
-          } else {
-            // break to handle error below
-            break;
-          }
-        }
+        const storageData = uploadResult.data;
+        const storageError = uploadResult.error;
 
         if (storageError) {
-          throw storageError;
+          // Provide a helpful error message
+          const msg = String(storageError?.message || storageError?.msg || storageError);
+          throw new Error(msg);
         }
 
         // Store file metadata in database
