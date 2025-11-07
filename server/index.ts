@@ -228,6 +228,16 @@ export function createServer() {
   // Twilio debug send endpoint (public, dev only). Sends a simple WhatsApp text message.
   app.post("/api/debug/twilio-send-public", twilioSendHandler);
 
+  // Debug: validate Twilio credentials and account resources
+  app.get("/api/debug/twilio-validate", (req, res) => {
+    try {
+      return require("./routes/twilio_validate").twilioValidate(req, res);
+    } catch (e) {
+      console.error("Failed to route twilio-validate", e);
+      res.status(500).json({ ok: false, error: String(e) });
+    }
+  });
+
   // Server-side proxy to forward requests from embedded clients (iframes) to the app base URL.
   // Example: client calls /api/proxy/send-logs -> server forwards to APP_BASE_URL/api/send-logs
   // Use app.use for proxy to avoid path-to-regexp complications with wildcards
