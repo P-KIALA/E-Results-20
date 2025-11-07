@@ -82,6 +82,98 @@ function RootRedirector() {
   return null;
 }
 
+const AppRoutes = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<RootRedirector />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/console"
+        element={
+          <Layout>
+            <ProtectedRoute requiredRole="admin">
+              <ConsolePage />
+            </ProtectedRoute>
+          </Layout>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <Layout>
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          </Layout>
+        }
+      />
+      <Route
+        path="/sites"
+        element={
+          <Layout>
+            <ProtectedRoute requiredRole="admin">
+              <SitesManagement />
+            </ProtectedRoute>
+          </Layout>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <Layout>
+            <ProtectedRoute requiredRole="user">
+              <UserDashboard />
+            </ProtectedRoute>
+          </Layout>
+        }
+      />
+
+      <Route
+        path="/history"
+        element={
+          <Layout>
+            <ProtectedRoute>
+              <HistoryPage />
+            </ProtectedRoute>
+          </Layout>
+        }
+      />
+
+      <Route
+        path="/stats"
+        element={
+          <Layout>
+            <ProtectedRoute>
+              <StatsPage />
+            </ProtectedRoute>
+          </Layout>
+        }
+      />
+
+      <Route
+        path="/report"
+        element={
+          <Layout>
+            <ProtectedRoute>
+              <ReportPage />
+            </ProtectedRoute>
+          </Layout>
+        }
+      />
+
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route
+        path="*"
+        element={
+          <Layout>
+            <NotFound />
+          </Layout>
+        }
+      />
+    </Routes>
+  </BrowserRouter>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system">
@@ -91,94 +183,7 @@ const App = () => (
         <AuthProvider>
           <SiteProvider>
             <SidebarProvider>
-              <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<RootRedirector />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route
-                  path="/console"
-                  element={
-                    <Layout>
-                      <ProtectedRoute requiredRole="admin">
-                        <ConsolePage />
-                      </ProtectedRoute>
-                    </Layout>
-                  }
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <Layout>
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminDashboard />
-                      </ProtectedRoute>
-                    </Layout>
-                  }
-                />
-                <Route
-                  path="/sites"
-                  element={
-                    <Layout>
-                      <ProtectedRoute requiredRole="admin">
-                        <SitesManagement />
-                      </ProtectedRoute>
-                    </Layout>
-                  }
-                />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <Layout>
-                      <ProtectedRoute requiredRole="user">
-                        <UserDashboard />
-                      </ProtectedRoute>
-                    </Layout>
-                  }
-                />
-
-                <Route
-                  path="/history"
-                  element={
-                    <Layout>
-                      <ProtectedRoute>
-                        <HistoryPage />
-                      </ProtectedRoute>
-                    </Layout>
-                  }
-                />
-
-                <Route
-                  path="/stats"
-                  element={
-                    <Layout>
-                      <ProtectedRoute>
-                        <StatsPage />
-                      </ProtectedRoute>
-                    </Layout>
-                  }
-                />
-
-                <Route
-                  path="/report"
-                  element={
-                    <Layout>
-                      <ProtectedRoute>
-                        <ReportPage />
-                      </ProtectedRoute>
-                    </Layout>
-                  }
-                />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route
-                  path="*"
-                  element={
-                    <Layout>
-                      <NotFound />
-                    </Layout>
-                  }
-                />
-              </Routes>
-            </BrowserRouter>
+              <AppRoutes />
             </SidebarProvider>
           </SiteProvider>
         </AuthProvider>
