@@ -140,10 +140,21 @@ export default function ResultsTab() {
         body: JSON.stringify({ files: fileDataList }),
       });
 
-      const result = await res.json();
+      // Safely parse JSON body even if the stream was already consumed elsewhere
+      let result: any = null;
+      try {
+        result = await res.json();
+      } catch (e) {
+        try {
+          result = await res.clone().json();
+        } catch (_) {
+          result = null;
+        }
+      }
 
       if (!res.ok) {
-        throw new Error(result.error || "Upload failed");
+        const msg = (result && result.error) || "Upload failed";
+        throw new Error(msg);
       }
 
       setUploadedFileIds(result.files.map((f: any) => f.id));
@@ -187,10 +198,21 @@ export default function ResultsTab() {
         }),
       });
 
-      const result = await res.json();
+      // Safely parse JSON body even if the stream was already consumed elsewhere
+      let result: any = null;
+      try {
+        result = await res.json();
+      } catch (e) {
+        try {
+          result = await res.clone().json();
+        } catch (_) {
+          result = null;
+        }
+      }
 
       if (!res.ok) {
-        throw new Error(result.error || "Send failed");
+        const msg = (result && result.error) || "Send failed";
+        throw new Error(msg);
       }
 
       const successCount = result.results.filter((r: any) => r.success).length;
