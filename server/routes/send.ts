@@ -41,9 +41,19 @@ async function sendViaWhatsApp(
     creds?.messagingService || process.env.TWILIO_MESSAGING_SERVICE_SID;
   const fromEnv = creds?.from || process.env.TWILIO_PHONE_NUMBER;
 
-  // Choose auth credentials: prefer explicit creds.token, then API Key/Secret, then account auth token
-  const authUser = creds?.sid || apiKey || accountSid;
-  const authPass = creds?.token || apiSecret || accountAuth;
+  // Choose auth credentials. Use API Key auth only when BOTH API_KEY and API_SECRET are present.
+  let authUser: string | undefined;
+  let authPass: string | undefined;
+  if (creds?.sid && creds?.token) {
+    authUser = creds.sid;
+    authPass = creds.token;
+  } else if (apiKey && apiSecret) {
+    authUser = apiKey;
+    authPass = apiSecret;
+  } else {
+    authUser = accountSid;
+    authPass = accountAuth;
+  }
 
   if (!accountSid) {
     throw new Error("Twilio account SID not configured. Set TWILIO_ACCOUNT_SID.");
