@@ -1,0 +1,56 @@
+name: Build and package for Hostinger
+
+on:
+  workflow_dispatch:
+    inputs:
+      vite_base_url:
+        description: 'API base URL (optional, overrides secret)'
+        required: false
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build (inject VITE_APP_BASE_URL)
+        env:
+          VITE_APP_BASE_URL: ${{ github.event.inputs.vite_base_url || secrets.VITE_APP_BASE_URL }}
+        run: pnpm run build
+
+      - name: Detect build directory
+        run: |
+          if [ -d dist/spa ]; then echo "BUILD_DIR=dist/spa" >> $GITHUB_ENV
+          elif [ -d dist ]; then echo "BUILD_DIR=dist" >> $GITHUB_ENV
+          elif [ -d build ]; then echo "BUILD_DIR=build" >> $GITHUB_ENV
+          else echo "BUILD_DIR=" >> $GITHUB_ENV; fi
+
+      - name: Create ZIP artifact
+        run: |
+          if [ -z "$BUILD_DIR" ]; then echo "No build directory found (dist/ or dist/spa/)."; exit 1; fi
+          zipname="e-results-build-${{ github.sha }}.zip"
+          cd "$BUILD_DIR"
+          zip -r "../$zipname" .
+          cd -
+          echo "ZIP_PATH=$PWD/$zipname" >> $GITHUB_ENV
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: e-results-build
+          path: "${{ env.ZIP_PATH }}"
