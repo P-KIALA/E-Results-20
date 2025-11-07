@@ -31,8 +31,9 @@ export const deleteSendLog: RequestHandler = async (req, res) => {
         const envApiSecret = process.env.TWILIO_API_SECRET || undefined;
 
         const accountSid = envAccountSid;
-        const authUser = envApiKey || envAccountSid;
-        const authPass = envApiSecret || envAccountToken;
+        // Use API Key auth only when both api key and secret are present; otherwise use account SID/token
+        const authUser = envApiKey && envApiSecret ? envApiKey : envAccountSid;
+        const authPass = envApiSecret && envApiKey ? envApiSecret : envAccountToken;
 
         if (accountSid && authUser && authPass) {
           const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages/${providerMessageId}.json`;
