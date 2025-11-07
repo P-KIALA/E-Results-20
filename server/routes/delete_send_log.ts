@@ -25,14 +25,21 @@ export const deleteSendLog: RequestHandler = async (req, res) => {
     // Attempt to delete from Twilio if we have a provider message id and Twilio credentials
     if (providerMessageId) {
       try {
-        const sid = process.env.TWILIO_ACCOUNT_SID;
-        const token = process.env.TWILIO_AUTH_TOKEN;
-        if (sid && token) {
-          const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages/${providerMessageId}.json`;
+        const envAccountSid = process.env.TWILIO_ACCOUNT_SID;
+        const envAccountToken = process.env.TWILIO_AUTH_TOKEN;
+        const envApiKey = process.env.TWILIO_API_KEY || undefined;
+        const envApiSecret = process.env.TWILIO_API_SECRET || undefined;
+
+        const accountSid = envAccountSid;
+        const authUser = envApiKey || envAccountSid;
+        const authPass = envApiSecret || envAccountToken;
+
+        if (accountSid && authUser && authPass) {
+          const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages/${providerMessageId}.json`;
           const resp = await fetch(url, {
             method: "DELETE",
             headers: {
-              Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+              Authorization: `Basic ${Buffer.from(`${authUser}:${authPass}`).toString("base64")}`,
             },
           });
 
