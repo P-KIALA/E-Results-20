@@ -36,6 +36,7 @@ How to add secrets:
 4. The CI workflow will access secrets via ${{ secrets.NAME }}.
 
 Security notes:
+
 - Never commit secret values to the repository.
 - For runtime environment variables on your server, either add them to the server environment or use a secrets manager.
 
