@@ -41,7 +41,12 @@ export async function twilioSendHandler(req: Request, res: Response) {
     let authUser: string | undefined;
     let authPass: string | undefined;
 
-    if ((req.body && (req.body.sid as string)) && (req.body && (req.body.token as string))) {
+    if (
+      req.body &&
+      (req.body.sid as string) &&
+      req.body &&
+      (req.body.token as string)
+    ) {
       authUser = req.body.sid as string;
       authPass = req.body.token as string;
     } else if (envApiKey && envApiSecret) {
@@ -74,12 +79,10 @@ export async function twilioSendHandler(req: Request, res: Response) {
       "Test message from app";
 
     if (!toRaw) {
-      return res
-        .status(400)
-        .json({
-          ok: false,
-          error: "Missing 'to' parameter (e.g. whatsapp:+33612345678)",
-        });
+      return res.status(400).json({
+        ok: false,
+        error: "Missing 'to' parameter (e.g. whatsapp:+33612345678)",
+      });
     }
 
     const to = toRaw.startsWith("whatsapp:") ? toRaw : `whatsapp:${toRaw}`;

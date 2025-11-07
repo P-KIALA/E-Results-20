@@ -56,11 +56,13 @@ async function sendViaWhatsApp(
   }
 
   if (!accountSid) {
-    throw new Error("Twilio account SID not configured. Set TWILIO_ACCOUNT_SID.");
+    throw new Error(
+      "Twilio account SID not configured. Set TWILIO_ACCOUNT_SID.",
+    );
   }
   if (!authUser || !authPass) {
     throw new Error(
-      "Twilio credentials not configured. Set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN or TWILIO_API_KEY and TWILIO_API_SECRET."
+      "Twilio credentials not configured. Set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN or TWILIO_API_KEY and TWILIO_API_SECRET.",
     );
   }
 
@@ -267,9 +269,7 @@ export const sendResults: RequestHandler = async (req, res) => {
     const patient_name = (req.body as any).patient_name;
 
     if (!doctor_ids || doctor_ids.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "doctor_ids are required" });
+      return res.status(400).json({ error: "doctor_ids are required" });
     }
 
     const results: any[] = [];
@@ -360,21 +360,21 @@ export const sendResults: RequestHandler = async (req, res) => {
       }
 
       let sendLogId: string | null = null;
-    try {
-      // Get sender user info for site context
-      let senderSiteId = null;
-      if ((req as any).userId) {
-        const { data: senderUser } = await supabase
-          .from("users")
-          .select("primary_site_id")
-          .eq("id", (req as any).userId)
-          .single();
-        senderSiteId = senderUser?.primary_site_id || null;
-      }
+      try {
+        // Get sender user info for site context
+        let senderSiteId = null;
+        if ((req as any).userId) {
+          const { data: senderUser } = await supabase
+            .from("users")
+            .select("primary_site_id")
+            .eq("id", (req as any).userId)
+            .single();
+          senderSiteId = senderUser?.primary_site_id || null;
+        }
 
-      // Create send log entry
-      let sendLog: any = null;
-      const { data: inserted, error: logError } = await supabase
+        // Create send log entry
+        let sendLog: any = null;
+        const { data: inserted, error: logError } = await supabase
           .from("send_logs")
           .insert({
             doctor_id,
@@ -558,8 +558,8 @@ export const sendResults: RequestHandler = async (req, res) => {
               .insert({
                 doctor_id,
                 custom_message: custom_message || null,
-            patient_name: patient_name || null,
-            patient_site: (req.body as any).patient_site || null,
+                patient_name: patient_name || null,
+                patient_site: (req.body as any).patient_site || null,
                 sender_id: (req as any).userId || null,
                 status: "pending",
               })

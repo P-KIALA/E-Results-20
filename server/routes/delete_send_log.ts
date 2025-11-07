@@ -4,7 +4,8 @@ import { supabase } from "../lib/supabase";
 export const deleteSendLog: RequestHandler = async (req, res) => {
   try {
     const sendLogId = req.params.id;
-    if (!sendLogId) return res.status(400).json({ error: "send_log_id is required" });
+    if (!sendLogId)
+      return res.status(400).json({ error: "send_log_id is required" });
 
     // Fetch the send_log
     const { data: log, error: logErr } = await supabase
@@ -33,7 +34,8 @@ export const deleteSendLog: RequestHandler = async (req, res) => {
         const accountSid = envAccountSid;
         // Use API Key auth only when both api key and secret are present; otherwise use account SID/token
         const authUser = envApiKey && envApiSecret ? envApiKey : envAccountSid;
-        const authPass = envApiSecret && envApiKey ? envApiSecret : envAccountToken;
+        const authPass =
+          envApiSecret && envApiKey ? envApiSecret : envAccountToken;
 
         if (accountSid && authUser && authPass) {
           const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages/${providerMessageId}.json`;
@@ -47,7 +49,11 @@ export const deleteSendLog: RequestHandler = async (req, res) => {
           // Twilio returns 204 No Content on success; allow 200/204
           if (!resp.ok && resp.status !== 204) {
             const text = await resp.text().catch(() => "");
-            console.warn("deleteSendLog: Twilio delete failed", resp.status, text);
+            console.warn(
+              "deleteSendLog: Twilio delete failed",
+              resp.status,
+              text,
+            );
             // Don't fail the whole operation — continue to mark as deleted locally
           }
         }
@@ -57,7 +63,10 @@ export const deleteSendLog: RequestHandler = async (req, res) => {
     }
 
     // Soft-delete the send_log: mark status deleted and set deleted_at
-    const updates: any = { status: "deleted", deleted_at: new Date().toISOString() };
+    const updates: any = {
+      status: "deleted",
+      deleted_at: new Date().toISOString(),
+    };
     if ((req as any).userId) updates.deleted_by = (req as any).userId;
 
     const { error: updateErr } = await supabase
@@ -73,6 +82,8 @@ export const deleteSendLog: RequestHandler = async (req, res) => {
     return res.json({ ok: true });
   } catch (error: any) {
     console.error("deleteSendLog error:", error);
-    res.status(500).json({ error: error?.message || "Failed to delete send_log" });
+    res
+      .status(500)
+      .json({ error: error?.message || "Failed to delete send_log" });
   }
 };
