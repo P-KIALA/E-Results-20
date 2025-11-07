@@ -32,20 +32,33 @@ async function sendViaWhatsApp(
     ? to
     : `whatsapp:${validation.formatted_phone}`;
 
-  // Credentials
-  const sid = creds?.sid || process.env.TWILIO_ACCOUNT_SID;
-  const token = creds?.token || process.env.TWILIO_AUTH_TOKEN;
+  // Credentials and auth selection
+  const accountSid = creds?.sid || process.env.TWILIO_ACCOUNT_SID;
+  const accountAuth = creds?.token || process.env.TWILIO_AUTH_TOKEN;
+  const apiKey = process.env.TWILIO_API_KEY || undefined;
+  const apiSecret = process.env.TWILIO_API_SECRET || undefined;
   const messagingService =
     creds?.messagingService || process.env.TWILIO_MESSAGING_SERVICE_SID;
   const fromEnv = creds?.from || process.env.TWILIO_PHONE_NUMBER;
 
-  if (!sid || !token) throw new Error("Twilio credentials not configured");
+  // Choose auth credentials: prefer explicit creds.token, then API Key/Secret, then account auth token
+  const authUser = creds?.sid || apiKey || accountSid;
+  const authPass = creds?.token || apiSecret || accountAuth;
+
+  if (!accountSid) {
+    throw new Error("Twilio account SID not configured. Set TWILIO_ACCOUNT_SID.");
+  }
+  if (!authUser || !authPass) {
+    throw new Error(
+      "Twilio credentials not configured. Set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN or TWILIO_API_KEY and TWILIO_API_SECRET."
+    );
+  }
 
   // Status callback (so Twilio will POST delivery updates)
   const statusCallback =
     creds?.statusCallback || process.env.TWILIO_STATUS_CALLBACK_URL;
 
-  const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
 
   // Build payload depending on whether we're sending a template
   const buildPayload = (useMessagingService: boolean) => {
@@ -153,7 +166,7 @@ async function sendViaWhatsApp(
       const resp = await fetch(url, {
         method: "POST",
         headers: {
-          Authorization: `Basic ${Buffer.from(`${sid}:${token}`).toString("base64")}`,
+          Authorization: `Basic ${Buffer.from(`${authUser}:${authPass}`).toString("base64")}`,
           "Content-Type": "application/x-www-form-urlencoded",
           Accept: "application/json",
         },
@@ -189,6 +202,13 @@ async function sendViaWhatsApp(
         ) {
           throw new Error(
             `WhatsApp template/window error${code ? " " + code : ""}: ${msg}`,
+          );
+        }
+
+        // Authentication error from Twilio (code 20003) or HTTP 401
+        if (code === 20003 || resp.status === 401) {
+          throw new Error(
+            `Twilio authenticate error${code ? " " + code : ""}: Authentication failed. Verify TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN or TWILIO_API_KEY/TWILIO_API_SECRET are correct and not revoked. Response: ${msg}`,
           );
         }
 
