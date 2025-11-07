@@ -96,8 +96,9 @@ export const uploadFiles: RequestHandler = async (req, res) => {
         uploadedFiles.push(fileRecord);
       } catch (error) {
         console.error(`Error uploading file ${name}:`, error);
+        const msg = (error && (error.message || error.error || String(error))) || "Unknown upload error";
         return res.status(500).json({
-          error: `Failed to upload file ${name}: ${String(error)}`,
+          error: `Failed to upload file ${name}: ${msg}`,
         });
       }
     }
@@ -105,7 +106,8 @@ export const uploadFiles: RequestHandler = async (req, res) => {
     res.status(201).json({ files: uploadedFiles });
   } catch (error) {
     console.error("Error in upload handler:", error);
-    res.status(500).json({ error: "Failed to process upload" });
+    const msg = (error && (error.message || error.error || String(error))) || "Failed to process upload";
+    res.status(500).json({ error: msg });
   }
 };
 
