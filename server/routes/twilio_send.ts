@@ -4,8 +4,12 @@ import { Request, Response } from "express";
 // Accepts JSON body or query: to (e.g. whatsapp:+123...), message (text)
 export async function twilioSendHandler(req: Request, res: Response) {
   try {
-    const sid = process.env.TWILIO_ACCOUNT_SID;
-    const token = process.env.TWILIO_AUTH_TOKEN;
+    // Load credentials and support API Key auth
+    const envAccountSid = process.env.TWILIO_ACCOUNT_SID;
+    const envAccountToken = process.env.TWILIO_AUTH_TOKEN;
+    const envApiKey = process.env.TWILIO_API_KEY || undefined;
+    const envApiSecret = process.env.TWILIO_API_SECRET || undefined;
+
     let from = process.env.TWILIO_PHONE_NUMBER || undefined; // prefer WhatsApp formatted number like whatsapp:+1415...
     let messagingService =
       process.env.TWILIO_MESSAGING_SERVICE_SID || undefined;
@@ -24,29 +28,31 @@ export async function twilioSendHandler(req: Request, res: Response) {
     }
 
     // Allow passing credentials in request body for local/dev testing if env not set
-    let useSid = sid;
-    let useToken = token;
-    if (!useSid || !useToken) {
-      const maybeSid =
-        (req.body && (req.body.sid as string)) ||
-        (req.query && (req.query.sid as string));
-      const maybeToken =
-        (req.body && (req.body.token as string)) ||
-        (req.query && (req.query.token as string));
-      if (maybeSid && maybeToken) {
-        useSid = maybeSid;
-        useToken = maybeToken;
-      }
-    }
+    let useAccountSid =
+      (req.body && (req.body.sid as string)) ||
+      (req.query && (req.query.sid as string)) ||
+      envAccountSid;
+    let useAccountAuth =
+      (req.body && (req.body.token as string)) ||
+      (req.query && (req.query.token as string)) ||
+      envAccountToken;
 
-    if (!useSid || !useToken) {
+    // Support API Key/Secret if provided in env
+    const authUser = (req.body && (req.body.sid as string)) || envApiKey || useAccountSid;
+    const authPass = (req.body && (req.body.token as string)) || envApiSecret || useAccountAuth;
+
+    if (!useAccountSid) {
       return res
         .status(500)
-        .json({
-          ok: false,
-          error:
-            "TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN must be configured (or passed in request for dev testing)",
-        });
+        .json({ ok: false, error: "TWILIO_ACCOUNT_SID must be configured." });
+    }
+
+    if (!authUser || !authPass) {
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Twilio credentials not configured. Set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN or TWILIO_API_KEY and TWILIO_API_SECRET.",
+      });
     }
 
     const toRaw =
@@ -111,12 +117,12 @@ export async function twilioSendHandler(req: Request, res: Response) {
       if (m) payload.append("MediaUrl", m);
     }
 
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${useSid}/Messages.json`;
+    const url = `https://api.twilio.com/2010-04-01/Accounts/${useAccountSid}/Messages.json`;
 
     const resp = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Basic ${Buffer.from(`${useSid}:${useToken}`).toString("base64")}`,
+        Authorization: `Basic ${Buffer.from(`${authUser}:${authPass}`).toString("base64")}`,
         "Content-Type": "application/x-www-form-urlencoded",
         Accept: "application/json",
       },
