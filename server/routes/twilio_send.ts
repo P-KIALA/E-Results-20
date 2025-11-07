@@ -37,9 +37,20 @@ export async function twilioSendHandler(req: Request, res: Response) {
       (req.query && (req.query.token as string)) ||
       envAccountToken;
 
-    // Support API Key/Secret if provided in env
-    const authUser = (req.body && (req.body.sid as string)) || envApiKey || useAccountSid;
-    const authPass = (req.body && (req.body.token as string)) || envApiSecret || useAccountAuth;
+    // Determine auth credentials. Use API Key auth only when BOTH envApiKey and envApiSecret are present
+    let authUser: string | undefined;
+    let authPass: string | undefined;
+
+    if ((req.body && (req.body.sid as string)) && (req.body && (req.body.token as string))) {
+      authUser = req.body.sid as string;
+      authPass = req.body.token as string;
+    } else if (envApiKey && envApiSecret) {
+      authUser = envApiKey;
+      authPass = envApiSecret;
+    } else {
+      authUser = useAccountSid;
+      authPass = useAccountAuth;
+    }
 
     if (!useAccountSid) {
       return res
