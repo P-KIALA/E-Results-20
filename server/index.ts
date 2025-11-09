@@ -56,7 +56,10 @@ export function createServer() {
         // @ts-ignore
         return orig.call(this, path, ...args);
       } catch (err) {
-        console.error(`Error registering route ${m.toUpperCase()} ${String(path)}:`, err && err.stack ? err.stack : err);
+        console.error(
+          `Error registering route ${m.toUpperCase()} ${String(path)}:`,
+          err && err.stack ? err.stack : err,
+        );
         throw err;
       }
     } as any;
