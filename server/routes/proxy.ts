@@ -9,7 +9,9 @@ export async function proxyHandler(req: any, res: any) {
   try {
     const base = process.env.APP_BASE_URL;
     if (!base) {
-      return res.status(500).json({ error: "APP_BASE_URL not configured on server" });
+      return res
+        .status(500)
+        .json({ error: "APP_BASE_URL not configured on server" });
     }
 
     // Build target URL by removing the /api/proxy prefix and joining with APP_BASE_URL
@@ -20,7 +22,10 @@ export async function proxyHandler(req: any, res: any) {
       : incomingPath;
 
     // Preserve query
-    const query = req.url && req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
+    const query =
+      req.url && req.url.includes("?")
+        ? req.url.slice(req.url.indexOf("?"))
+        : "";
     const targetUrl = `${base.replace(/\/$/, "")}${forwardPath}${query}`;
 
     // Prepare headers - clone and remove host to avoid conflicts
@@ -34,7 +39,11 @@ export async function proxyHandler(req: any, res: any) {
     }
 
     // Force JSON content handling if body is an object and Content-Type missing
-    if ((req as any).body && typeof (req as any).body === "object" && !forwardHeaders["content-type"]) {
+    if (
+      (req as any).body &&
+      typeof (req as any).body === "object" &&
+      !forwardHeaders["content-type"]
+    ) {
       forwardHeaders["content-type"] = "application/json";
     }
 
@@ -48,7 +57,11 @@ export async function proxyHandler(req: any, res: any) {
     // Attach body for non-GET/HEAD
     if (method !== "GET" && method !== "HEAD") {
       // If body was parsed by express.json, send JSON string
-      if ((req as any).is && (req as any).is("application/json") && (req as any).body) {
+      if (
+        (req as any).is &&
+        (req as any).is("application/json") &&
+        (req as any).body
+      ) {
         fetchOptions.body = JSON.stringify((req as any).body);
       } else if ((req as any).body && typeof (req as any).body === "string") {
         fetchOptions.body = (req as any).body;

@@ -43,7 +43,9 @@ export default function HistoryTab({
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDoctor, setFilterDoctor] = useState("");
   const { sites, currentSiteId, canChangeSite } = useSite();
-  const [filterSite, setFilterSite] = useState<string>(() => (canChangeSite ? "all" : (localStorage.getItem("current_site_id") || "")));
+  const [filterSite, setFilterSite] = useState<string>(() =>
+    canChangeSite ? "all" : localStorage.getItem("current_site_id") || "",
+  );
   const [filterSender, setFilterSender] = useState("");
   const [users, setUsers] = useState<any[]>([]);
   const today = new Date().toISOString().split("T")[0];
@@ -60,7 +62,10 @@ export default function HistoryTab({
   const [filesLoading, setFilesLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Filter logs client-side by doctor name, patient name or doctor phone when a search query is provided
   const filteredLogs = (logs || []).filter((l) => {
@@ -68,7 +73,9 @@ export default function HistoryTab({
     const q = searchQuery.toLowerCase().trim();
 
     const doctorName = (
-      l.doctors?.name || getDoctorName(l.doctor_id) || ""
+      l.doctors?.name ||
+      getDoctorName(l.doctor_id) ||
+      ""
     ).toLowerCase();
     const patientName = (l.patient_name || "").toLowerCase();
     const doctorPhone = (
@@ -76,11 +83,21 @@ export default function HistoryTab({
     ).toLowerCase();
 
     // If the full query matches any field, include
-    if (doctorName.includes(q) || patientName.includes(q) || doctorPhone.includes(q)) return true;
+    if (
+      doctorName.includes(q) ||
+      patientName.includes(q) ||
+      doctorPhone.includes(q)
+    )
+      return true;
 
     // Otherwise try tokenized match: all tokens must appear in either doctorName, patientName or phone
     const tokens = q.split(/\s+/).filter(Boolean);
-    return tokens.every((t) => doctorName.includes(t) || patientName.includes(t) || doctorPhone.includes(t));
+    return tokens.every(
+      (t) =>
+        doctorName.includes(t) ||
+        patientName.includes(t) ||
+        doctorPhone.includes(t),
+    );
   });
 
   const getToken = () => localStorage.getItem("auth_token");
@@ -160,9 +177,17 @@ export default function HistoryTab({
       console.error("Failed to load files for log", e);
       setLogFiles([]);
       const msg = e?.message || "Impossible de charger les fichiers";
-      if (String(msg).includes("401") || String(msg).toLowerCase().includes("unauthorized")) {
-        try { logout(); } catch (_) {}
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+      if (
+        String(msg).includes("401") ||
+        String(msg).toLowerCase().includes("unauthorized")
+      ) {
+        try {
+          logout();
+        } catch (_) {}
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
       } else {
         setMessage({ type: "error", text: msg });
       }
@@ -202,9 +227,17 @@ export default function HistoryTab({
     } catch (e: any) {
       console.error("Failed to get file URL", e);
       const msg = e?.message || "Impossible d'ouvrir le fichier";
-      if (String(msg).includes("401") || String(msg).toLowerCase().includes("unauthorized")) {
-        try { logout(); } catch (_) {}
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+      if (
+        String(msg).includes("401") ||
+        String(msg).toLowerCase().includes("unauthorized")
+      ) {
+        try {
+          logout();
+        } catch (_) {}
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
       } else {
         setMessage({ type: "error", text: msg });
       }
@@ -243,9 +276,17 @@ export default function HistoryTab({
     } catch (e: any) {
       console.error("Failed to resend files:", e);
       const msg = e?.message || "Erreur lors du renvoi";
-      if (String(msg).includes("401") || String(msg).toLowerCase().includes("unauthorized")) {
-        try { logout(); } catch (_) {}
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+      if (
+        String(msg).includes("401") ||
+        String(msg).toLowerCase().includes("unauthorized")
+      ) {
+        try {
+          logout();
+        } catch (_) {}
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
       } else {
         setMessage({ type: "error", text: msg });
       }
@@ -337,8 +378,13 @@ export default function HistoryTab({
       console.error("Error fetching logs:", error);
       const msg = String(error?.message || error || "Failed to fetch logs");
       if (msg.includes("401") || msg.toLowerCase().includes("unauthorized")) {
-        try { logout(); } catch (_) {}
-        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+        try {
+          logout();
+        } catch (_) {}
+        setMessage({
+          type: "error",
+          text: "Session expirée. Veuillez vous reconnecter.",
+        });
       } else {
         setMessage({ type: "error", text: msg });
       }
@@ -630,13 +676,23 @@ export default function HistoryTab({
                           size="sm"
                           variant="destructive"
                           onClick={async () => {
-                            if (!confirm("Supprimer cet envoi ? Cette action ne supprime pas le message du téléphone mais marquera l'envoi comme supprimé et essaiera de supprimer la ressource côté fournisseur.")) return;
+                            if (
+                              !confirm(
+                                "Supprimer cet envoi ? Cette action ne supprime pas le message du téléphone mais marquera l'envoi comme supprimé et essaiera de supprimer la ressource côté fournisseur.",
+                              )
+                            )
+                              return;
                             setLoading(true);
                             try {
-                              const res = await authFetch(`/api/send-logs/${log.id}/delete`, { method: "POST" });
+                              const res = await authFetch(
+                                `/api/send-logs/${log.id}/delete`,
+                                { method: "POST" },
+                              );
                               // authFetch will throw on network errors/timeouts; for HTTP errors we should read body
                               if (!res.ok) {
-                                const ct = (res.headers.get("content-type") || "").toLowerCase();
+                                const ct = (
+                                  res.headers.get("content-type") || ""
+                                ).toLowerCase();
                                 let errMsg = `HTTP ${res.status}`;
                                 try {
                                   if (ct.includes("application/json")) {
@@ -649,15 +705,26 @@ export default function HistoryTab({
                                 throw new Error(errMsg);
                               }
 
-                              setMessage({ type: "success", text: "Envoi supprimé" });
+                              setMessage({
+                                type: "success",
+                                text: "Envoi supprimé",
+                              });
                               await fetchLogs();
                             } catch (e: any) {
                               console.error("Failed to delete send log", e);
                               // If auth error, suggest re-login
                               if (e && /auth/i.test(String(e.message || ""))) {
-                                setMessage({ type: "error", text: "Authentification requise. Veuillez vous reconnecter." });
+                                setMessage({
+                                  type: "error",
+                                  text: "Authentification requise. Veuillez vous reconnecter.",
+                                });
                               } else {
-                                setMessage({ type: "error", text: e?.message || "Erreur lors de la suppression" });
+                                setMessage({
+                                  type: "error",
+                                  text:
+                                    e?.message ||
+                                    "Erreur lors de la suppression",
+                                });
                               }
                             } finally {
                               setLoading(false);
