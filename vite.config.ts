@@ -22,10 +22,10 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           // Extract common vendor libs into a vendor chunk
-          vendor: ["react", "react-dom", "@supabase/supabase-js"]
-        }
-      }
-    }
+          vendor: ["react", "react-dom", "@supabase/supabase-js"],
+        },
+      },
+    },
   },
   plugins: [react(), expressPlugin()],
   resolve: {
