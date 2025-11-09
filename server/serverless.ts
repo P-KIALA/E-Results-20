@@ -28,12 +28,18 @@ async function initHandler() {
       break;
     } catch (err: any) {
       lastError = err;
-      console.warn(`Failed to import from ${candidate}:`, err && err.message ? err.message : err);
+      console.warn(
+        `Failed to import from ${candidate}:`,
+        err && err.message ? err.message : err,
+      );
     }
   }
 
   if (!appModule) {
-    console.error("Could not import any server module. Last error:", lastError && lastError.message ? lastError.message : lastError);
+    console.error(
+      "Could not import any server module. Last error:",
+      lastError && lastError.message ? lastError.message : lastError,
+    );
     throw lastError || new Error("No server module found");
   }
 
