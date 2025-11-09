@@ -36,7 +36,7 @@ export default function HistoryTab({
   active = false,
   userOnly = false,
 }: HistoryTabProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [logs, setLogs] = useState<SendLogWithExtras[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
