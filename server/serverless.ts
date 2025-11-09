@@ -26,6 +26,9 @@ async function initHandler() {
 
   let app: any = null;
   if (appModule) {
+    try {
+      console.log("Loaded server module exports:", Object.keys(appModule));
+    } catch (_) {}
     if (typeof appModule.createServer === "function") {
       app = appModule.createServer();
     } else if (typeof appModule.default === "function") {
@@ -37,6 +40,9 @@ async function initHandler() {
     ) {
       app = appModule.server.createServer();
     } else {
+      try {
+        console.error("Server module did not export createServer - keys:", Object.keys(appModule));
+      } catch (_) {}
       throw new Error("Could not find createServer() in server module");
     }
   }
