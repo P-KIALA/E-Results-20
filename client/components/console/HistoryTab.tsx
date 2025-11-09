@@ -201,10 +201,13 @@ export default function HistoryTab({
       }
     } catch (e: any) {
       console.error("Failed to get file URL", e);
-      setMessage({
-        type: "error",
-        text: e?.message || "Impossible d'ouvrir le fichier",
-      });
+      const msg = e?.message || "Impossible d'ouvrir le fichier";
+      if (String(msg).includes("401") || String(msg).toLowerCase().includes("unauthorized")) {
+        try { logout(); } catch (_) {}
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+      } else {
+        setMessage({ type: "error", text: msg });
+      }
     }
   };
 
