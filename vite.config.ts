@@ -16,6 +16,16 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: "dist/spa",
+    // Increase warning limit to reduce noisy warnings and improve build stability on Vercel
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Extract common vendor libs into a vendor chunk
+          vendor: ["react", "react-dom", "@supabase/supabase-js"]
+        }
+      }
+    }
   },
   plugins: [react(), expressPlugin()],
   resolve: {
