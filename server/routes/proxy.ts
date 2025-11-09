@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
+// Using any types for compatibility with Vercel serverless runtime
+// import { Request, Response } from "express";
 
 // Simple server-side proxy to forward requests to the application base URL.
 // This helps clients embedded in restrictive iframes avoid CORS/network limitations by
 // having the server perform the actual request.
 
-export async function proxyHandler(req: Request, res: Response) {
+export async function proxyHandler(req: any, res: any) {
   try {
     const base = process.env.APP_BASE_URL;
     if (!base) {
@@ -51,16 +52,11 @@ export async function proxyHandler(req: Request, res: Response) {
         fetchOptions.body = JSON.stringify((req as any).body);
       } else if ((req as any).body && typeof (req as any).body === "string") {
         fetchOptions.body = (req as any).body;
+      } else if ((req as any).rawBody) {
+        // Some middlewares attach rawBody
+        fetchOptions.body = (req as any).rawBody;
       } else {
-        // For other types (form-data / etc), attempt to pipe raw body by reading stream
-        // Note: express won't populate rawBody by default; in such cases clients should call the upstream directly.
-        try {
-          const chunks: Buffer[] = [];
-          for await (const chunk of req) chunks.push(Buffer.from(chunk));
-          if (chunks.length) fetchOptions.body = Buffer.concat(chunks);
-        } catch (e) {
-          // ignore
-        }
+        // Unable to read raw stream in this environment — skip body and let client call upstream directly for complex payloads
       }
     }
 
