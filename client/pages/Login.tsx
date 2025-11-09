@@ -265,7 +265,8 @@ export default function LoginPage() {
                       <DialogHeader>
                         <DialogTitle>Créer un compte</DialogTitle>
                         <DialogDescription>
-                          Remplissez les informations pour créer un nouvel utilisateur.
+                          Remplissez les informations pour créer un nouvel
+                          utilisateur.
                         </DialogDescription>
                       </DialogHeader>
 
@@ -296,7 +297,9 @@ export default function LoginPage() {
                         </div>
 
                         <div>
-                          <label className="text-sm font-medium">Mot de passe</label>
+                          <label className="text-sm font-medium">
+                            Mot de passe
+                          </label>
                           <Input
                             type="password"
                             placeholder="••••••••"
@@ -307,7 +310,9 @@ export default function LoginPage() {
                         </div>
 
                         <div>
-                          <label className="text-sm font-medium">Niveau d'accès</label>
+                          <label className="text-sm font-medium">
+                            Niveau d'accès
+                          </label>
                           <select
                             className="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
                             value={regRole}
