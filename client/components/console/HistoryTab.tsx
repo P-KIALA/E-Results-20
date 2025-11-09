@@ -324,8 +324,15 @@ export default function HistoryTab({
       const data = await res.clone().json();
       setLogs((data.logs || []) as SendLogWithExtras[]);
       setTotal(data.total || 0);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching logs:", error);
+      const msg = String(error?.message || error || "Failed to fetch logs");
+      if (msg.includes("401") || msg.toLowerCase().includes("unauthorized")) {
+        try { logout(); } catch (_) {}
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+      } else {
+        setMessage({ type: "error", text: msg });
+      }
     } finally {
       setLoading(false);
     }
