@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist/spa" }
+    },
+    { "src": "server/**/*.ts", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/server/$1.ts" },
+    { "src": "^/(api/.*)$", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/dist/spa/index.html" }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
