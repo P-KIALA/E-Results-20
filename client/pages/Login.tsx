@@ -252,7 +252,6 @@ export default function LoginPage() {
                   <LogIn size={18} />
                   {isLoading ? "Connexion..." : "Se connecter"}
                 </Button>
-
               </form>
             </CardContent>
           </Card>
