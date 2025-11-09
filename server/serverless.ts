@@ -6,22 +6,35 @@ async function initHandler() {
   if (handler) return handler;
 
   let appModule: any = null;
-  try {
-    appModule = await import("./index");
-  } catch (e) {
-    console.warn(
-      "Could not import ./index, trying built bundle: dist/server/node-build.mjs",
-      e?.message || e,
-    );
+  // Try multiple candidate paths to support various Vercel/build layouts
+  const candidates = [
+    "./index",
+    "./index.js",
+    "./index.mjs",
+    "../dist/server/node-build.mjs",
+    "../dist/server/node-build.js",
+    "../dist/server/node-build.cjs",
+    "../dist/server/index.mjs",
+    "../dist/server/index.js",
+  ];
+
+  let lastError: any = null;
+  for (const candidate of candidates) {
     try {
-      appModule = await import("../dist/server/node-build.mjs");
-    } catch (e2) {
-      console.error(
-        "Failed to import server module from built bundle:",
-        e2?.message || e2,
-      );
-      throw e2;
+      console.log("Attempting to import server module from:", candidate);
+      // dynamic import relative to this file
+      appModule = await import(candidate as any);
+      console.log("Successfully imported server module from:", candidate);
+      break;
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`Failed to import from ${candidate}:`, err && err.message ? err.message : err);
     }
+  }
+
+  if (!appModule) {
+    console.error("Could not import any server module. Last error:", lastError && lastError.message ? lastError.message : lastError);
+    throw lastError || new Error("No server module found");
   }
 
   let app: any = null;
