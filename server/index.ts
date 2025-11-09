@@ -48,9 +48,17 @@ export function createServer() {
     app[m] = function (path: any, ...args: any[]) {
       try {
         console.log(`[ROUTE REGISTER] ${m.toUpperCase()} ${String(path)}`);
-      } catch (e) {}
-      // @ts-ignore
-      return orig.call(this, path, ...args);
+      } catch (e) {
+        // ignore logging errors
+      }
+      try {
+        // Call the original registration and surface any errors with context
+        // @ts-ignore
+        return orig.call(this, path, ...args);
+      } catch (err) {
+        console.error(`Error registering route ${m.toUpperCase()} ${String(path)}:`, err && err.stack ? err.stack : err);
+        throw err;
+      }
     } as any;
   });
 
