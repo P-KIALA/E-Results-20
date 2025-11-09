@@ -36,7 +36,8 @@ function verifyPasswordLocal(password: string, hash: string): boolean {
 }
 
 const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || "";
+const supabaseKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default NextAuth({
@@ -55,7 +56,9 @@ export default NextAuth({
         // Query Supabase users table
         const { data, error } = await supabase
           .from("users")
-          .select("id, email, password_hash, role, permissions, primary_site_id")
+          .select(
+            "id, email, password_hash, role, permissions, primary_site_id",
+          )
           .eq("email", email)
           .single();
 
