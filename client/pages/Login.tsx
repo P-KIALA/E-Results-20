@@ -252,6 +252,82 @@ export default function LoginPage() {
                   <LogIn size={18} />
                   {isLoading ? "Connexion..." : "Se connecter"}
                 </Button>
+
+                <div className="mt-3 text-center">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="secondary" className="w-full">
+                        Créer un compte
+                      </Button>
+                    </DialogTrigger>
+
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Créer un compte</DialogTitle>
+                        <DialogDescription>
+                          Remplissez les informations pour créer un nouvel utilisateur.
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          try {
+                            await register(regEmail, regPassword, regRole);
+                            // close dialog by dispatching close (DialogPrimitive.Close exists but we use stateless trigger)
+                            // show a success message
+                            alert("Compte créé et connecté");
+                            navigate("/console");
+                          } catch (err) {
+                            alert(String(err) || "Erreur lors de la création");
+                          }
+                        }}
+                        className="space-y-4 mt-2"
+                      >
+                        <div>
+                          <label className="text-sm font-medium">Email</label>
+                          <Input
+                            type="email"
+                            placeholder="votre.email@example.com"
+                            value={regEmail}
+                            onChange={(e) => setRegEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-sm font-medium">Mot de passe</label>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            value={regPassword}
+                            onChange={(e) => setRegPassword(e.target.value)}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-sm font-medium">Niveau d'accès</label>
+                          <select
+                            className="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
+                            value={regRole}
+                            onChange={(e) => setRegRole(e.target.value as any)}
+                          >
+                            <option value="user">Utilisateur</option>
+                            <option value="admin">Administrateur</option>
+                            <option value="prelevement">Prélevement</option>
+                          </select>
+                        </div>
+
+                        <DialogFooter>
+                          <Button type="submit" className="w-full">
+                            Créer le compte
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </form>
             </CardContent>
           </Card>
