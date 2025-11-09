@@ -242,10 +242,13 @@ export default function HistoryTab({
       await fetchLogs();
     } catch (e: any) {
       console.error("Failed to resend files:", e);
-      setMessage({
-        type: "error",
-        text: e?.message || "Erreur lors du renvoi",
-      });
+      const msg = e?.message || "Erreur lors du renvoi";
+      if (String(msg).includes("401") || String(msg).toLowerCase().includes("unauthorized")) {
+        try { logout(); } catch (_) {}
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+      } else {
+        setMessage({ type: "error", text: msg });
+      }
     } finally {
       setResendLoading(false);
     }
