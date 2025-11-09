@@ -93,10 +93,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      let data: any = null;
+      try {
+        data = await response.json();
+      } catch (e) {
+        // Fallback to text when server returns non-JSON (HTML or plain text)
+        try {
+          const text = await response.clone().text();
+          data = text;
+        } catch (_e) {
+          data = null;
+        }
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+        const errMsg =
+          data && typeof data === "object"
+            ? data.error || JSON.stringify(data)
+            : String(data || response.statusText || "Login failed");
+        throw new Error(errMsg || "Login failed");
       }
 
       const session: AuthSession = {
