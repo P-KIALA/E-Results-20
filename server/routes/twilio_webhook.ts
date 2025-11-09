@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+// Use any for request/response to avoid typing conflicts in serverless environment
+import type { Request, Response } from "express";
 import { supabase } from "../lib/supabase";
 
-export async function twilioStatusWebhook(req: Request, res: Response) {
+export async function twilioStatusWebhook(req: any, res: any) {
   try {
     // Twilio will POST form-encoded fields like MessageSid, MessageStatus
     const body = req.body || {};
