@@ -9,11 +9,17 @@ async function initHandler() {
   try {
     appModule = await import("./index");
   } catch (e) {
-    console.warn("Could not import ./index, trying built bundle: dist/server/node-build.mjs", e?.message || e);
+    console.warn(
+      "Could not import ./index, trying built bundle: dist/server/node-build.mjs",
+      e?.message || e,
+    );
     try {
       appModule = await import("../dist/server/node-build.mjs");
     } catch (e2) {
-      console.error("Failed to import server module from built bundle:", e2?.message || e2);
+      console.error(
+        "Failed to import server module from built bundle:",
+        e2?.message || e2,
+      );
       throw e2;
     }
   }
@@ -24,7 +30,11 @@ async function initHandler() {
       app = appModule.createServer();
     } else if (typeof appModule.default === "function") {
       app = appModule.default();
-    } else if (appModule && typeof appModule.server === "object" && typeof appModule.server.createServer === "function") {
+    } else if (
+      appModule &&
+      typeof appModule.server === "object" &&
+      typeof appModule.server.createServer === "function"
+    ) {
       app = appModule.server.createServer();
     } else {
       throw new Error("Could not find createServer() in server module");
@@ -45,7 +55,9 @@ export default async function (req: any, res: any) {
       if (!res.headersSent) {
         res.statusCode = err && err.status ? err.status : 500;
         res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify({ error: String(err?.message || err || "internal") }));
+        res.end(
+          JSON.stringify({ error: String(err?.message || err || "internal") }),
+        );
       }
     } catch (e) {
       console.error("Error while sending error response:", e);
