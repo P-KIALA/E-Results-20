@@ -21,34 +21,44 @@ export default async function handler(req: any, res: any) {
       const { name, data, type, send_log_id } = file;
 
       if (!name || !data || !type) {
-        return res.status(400).json({ error: "Each file must have name, data (base64), and type" });
+        return res
+          .status(400)
+          .json({ error: "Each file must have name, data (base64), and type" });
       }
 
       // Validate file size (rough estimate from base64)
       const sizeBytes = Buffer.byteLength(data, "base64");
       if (sizeBytes > MAX_FILE_SIZE) {
-        return res.status(400).json({ error: `File ${name} exceeds 16 MB limit` });
+        return res
+          .status(400)
+          .json({ error: `File ${name} exceeds 16 MB limit` });
       }
 
       try {
         const originalBase = path.basename(name);
-        const sanitizedBase = originalBase.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 200);
+        const sanitizedBase = originalBase
+          .replace(/[^a-zA-Z0-9._-]/g, "_")
+          .slice(0, 200);
 
         const timestamp = Date.now();
         const storagePath = `results/${timestamp}_${sanitizedBase}`;
 
         const buffer = Buffer.from(data, "base64");
 
-        const uploadResult = await supabase.storage.from("results").upload(storagePath, buffer, {
-          contentType: type,
-          upsert: false,
-        });
+        const uploadResult = await supabase.storage
+          .from("results")
+          .upload(storagePath, buffer, {
+            contentType: type,
+            upsert: false,
+          });
 
         const storageData = uploadResult.data;
         const storageError = uploadResult.error;
 
         if (storageError) {
-          const msg = String(storageError?.message || storageError?.msg || storageError);
+          const msg = String(
+            storageError?.message || storageError?.msg || storageError,
+          );
           throw new Error(msg);
         }
 
@@ -77,15 +87,21 @@ export default async function handler(req: any, res: any) {
         uploadedFiles.push(fileRecord);
       } catch (error) {
         console.error(`Error uploading file ${name}:`, error);
-        const msg = (error && (error.message || error.error || String(error))) || "Unknown upload error";
-        return res.status(500).json({ error: `Failed to upload file ${name}: ${msg}` });
+        const msg =
+          (error && (error.message || error.error || String(error))) ||
+          "Unknown upload error";
+        return res
+          .status(500)
+          .json({ error: `Failed to upload file ${name}: ${msg}` });
       }
     }
 
     res.status(201).json({ files: uploadedFiles });
   } catch (error) {
     console.error("Error in upload handler:", error);
-    const msg = (error && (error.message || error.error || String(error))) || "Failed to process upload";
+    const msg =
+      (error && (error.message || error.error || String(error))) ||
+      "Failed to process upload";
     res.status(500).json({ error: msg });
   }
 }

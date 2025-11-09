@@ -20,7 +20,9 @@ export default async function handler(req: any, res: any) {
 
     try {
       // Attempt to create a public URL (works if bucket public)
-      const { data: publicUrl } = await supabase.storage.from(bucket).getPublicUrl(pathStr);
+      const { data: publicUrl } = await supabase.storage
+        .from(bucket)
+        .getPublicUrl(pathStr);
       if (publicUrl && publicUrl.publicUrl) {
         // For nicer filename handling, the frontend can proxy or set download attr.
         return res.json({ url: publicUrl.publicUrl });
@@ -31,7 +33,9 @@ export default async function handler(req: any, res: any) {
 
     // Fallback: create a signed URL (default expiry 1 hour)
     const expiresIn = 60 * 60; // seconds
-    const { data, error } = await supabase.storage.from(bucket).createSignedUrl(pathStr, expiresIn);
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(pathStr, expiresIn);
     if (error || !data) {
       console.error("Failed to create signed URL:", error);
       return res.status(500).json({ error: "Failed to create signed URL" });
