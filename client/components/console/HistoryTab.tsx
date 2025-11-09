@@ -159,10 +159,13 @@ export default function HistoryTab({
     } catch (e: any) {
       console.error("Failed to load files for log", e);
       setLogFiles([]);
-      setMessage({
-        type: "error",
-        text: e?.message || "Impossible de charger les fichiers",
-      });
+      const msg = e?.message || "Impossible de charger les fichiers";
+      if (String(msg).includes("401") || String(msg).toLowerCase().includes("unauthorized")) {
+        try { logout(); } catch (_) {}
+        setMessage({ type: "error", text: "Session expirée. Veuillez vous reconnecter." });
+      } else {
+        setMessage({ type: "error", text: msg });
+      }
     } finally {
       setFilesLoading(false);
     }
