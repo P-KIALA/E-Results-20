@@ -1,8 +1,9 @@
-import { Request, Response } from "express";
+// Use any types for Vercel serverless compatibility
+import type { Request, Response } from "express";
 
 // Public dev endpoint to send a WhatsApp test message via Twilio.
 // Accepts JSON body or query: to (e.g. whatsapp:+123...), message (text)
-export async function twilioSendHandler(req: Request, res: Response) {
+export async function twilioSendHandler(req: any, res: any) {
   try {
     // Load credentials and support API Key auth
     const envAccountSid = process.env.TWILIO_ACCOUNT_SID;
