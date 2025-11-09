@@ -150,10 +150,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }),
       });
 
-      const data = await response.json();
+      let data: any = null;
+      try {
+        data = await response.json();
+      } catch (e) {
+        try {
+          data = await response.clone().text();
+        } catch (_e) {
+          data = null;
+        }
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || "Registration failed");
+        const errMsg =
+          data && typeof data === "object"
+            ? data.error || JSON.stringify(data)
+            : String(data || response.statusText || "Registration failed");
+        throw new Error(errMsg || "Registration failed");
       }
 
       const session: AuthSession = {
