@@ -1,16 +1,12 @@
-import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "./auth";
 
-export interface AuthRequest extends Request {
+// Use any types for middleware to avoid express/next typing conflicts in serverless builds
+export interface AuthRequest extends Record<string, any> {
   userId?: string;
 }
 
-export function authMiddleware(
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction,
-) {
-  const authHeader = req.headers.authorization;
+export function authMiddleware(req: any, res: any, next: any) {
+  const authHeader = req?.headers?.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return next(); // Continue without auth (optional protection)
@@ -27,11 +23,7 @@ export function authMiddleware(
   next();
 }
 
-export function requireAuth(
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction,
-) {
+export function requireAuth(req: any, res: any, next: any) {
   if (!req.userId) {
     return res.status(401).json({ error: "Authentication required" });
   }
