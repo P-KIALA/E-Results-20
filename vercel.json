@@ -6,10 +6,10 @@
       "use": "@vercel/static-build",
       "config": { "distDir": "dist/spa" }
     },
-    { "src": "dist/server/node-build.mjs", "use": "@vercel/node" }
+    { "src": "server/serverless.ts", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/dist/server/node-build.mjs" },
+    { "src": "/api/(.*)", "dest": "/server/serverless.ts" },
     { "src": "^/(api/.*)$", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/dist/spa/index.html" }
   ],
