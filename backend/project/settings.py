@@ -87,6 +87,12 @@ REST_FRAMEWORK = {
     ),
 }
 
+# Custom authentication backends: attempt to verify legacy Supabase password hashes
+AUTHENTICATION_BACKENDS = [
+    "api.auth_backend.SupabaseLegacyAuthBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 from rest_framework_simplejwt.settings import api_settings as jwt_settings
 
 SIMPLE_JWT = {
